@@ -3,6 +3,11 @@ name = "pyuow"
 version = "0.1.0"
 description = ""
 authors = ["SMED"]
+maintainers = [
+    "Sviatoslav Mosorko <slavikmosorko@gmail.com>",
+    "Andrii Divnych <divnycha05@gmail.com>",
+]
+
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -19,7 +24,7 @@ mypy = "^1.5.1"
 coverage = { version = "^7.3.0", extras = ["toml"] }
 black = "^23.7.0"
 safety = "^2.3.5"
-greenlet = { version = "^2.0.2", platform = "darwin" }
+greenlet = { version = "^2.0.2" }
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
