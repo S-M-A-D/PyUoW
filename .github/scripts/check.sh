@@ -5,7 +5,7 @@ set -eu
 black --check --diff .
 isort --check --diff .
 autoflake --recursive --check --quiet .
-mypy src
+mypy pyuow
 safety check
 
 exit 0
