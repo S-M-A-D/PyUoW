@@ -4,15 +4,15 @@ from abc import ABC
 from logging import getLogger
 
 from .context import BaseContext
-from .exceptions import CannotReassignUnitError, \
-    FinalUnitError
+from .exceptions import CannotReassignUnitError, FinalUnitError
 from .result import Result
-from .types import MissingType, MISSING
+from .types import MISSING, MissingType
 
 logger = getLogger(__name__)
 
 CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
 OUT = t.TypeVar("OUT")
+
 
 class BaseUnit(t.Generic[CONTEXT, OUT], abc.ABC):
     def __init__(self) -> None:
@@ -56,6 +56,7 @@ class FinalUnit(BaseUnit[CONTEXT, OUT], ABC):
         self: "BaseUnit[CONTEXT, OUT]", other: "BaseUnit[CONTEXT, OUT]"
     ) -> "BaseUnit[CONTEXT, OUT]":
         raise FinalUnitError(self.__class__.__name__)
+
 
 @t.final
 class ErrorUnit(FinalUnit[CONTEXT, OUT]):

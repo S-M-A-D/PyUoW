@@ -15,4 +15,3 @@ class BaseContext(t.Generic[PARAMS]):
             raise AttributeCannotBeOverriddenError(name)
 
         super().__setattr__(name, value)
-

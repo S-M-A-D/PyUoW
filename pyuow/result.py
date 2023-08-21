@@ -2,9 +2,10 @@ import typing as t
 from dataclasses import dataclass
 
 from .exceptions import MissingOutError
-from .types import MissingType, MISSING
+from .types import MISSING, MissingType
 
 OUT = t.TypeVar("OUT")
+
 
 @dataclass(frozen=True, repr=False)
 @t.final

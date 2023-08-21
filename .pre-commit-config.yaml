@@ -24,7 +24,7 @@ repos:
             name: "Format the code according to pep8 standards"
             language: system
             types: [ file, python ]
-            entry: black src/ tests/
+            entry: black pyuow/ tests/
           - id: autoflake
             name: "Remove unused imports and unused variables"
             language: system
@@ -34,5 +34,5 @@ repos:
             language: system
             name: "Type annotations check"
             types: [ file, python ]
-            entry: mypy src/
+            entry: mypy pyuow/
             pass_filenames: false
