@@ -21,10 +21,13 @@ jobs:
           python -m pip install --upgrade pip
           curl -sSL https://install.python-poetry.org | python -
           poetry install
+        env:
+          POETRY_VIRTUALENVS_CREATE: false
 
       - name: Run checks
         run: |
-          ls -la
+          chmod +x ./.github/scripts/check.sh
+          ./.github/scripts/check.sh
 
       - name: Run tests with Pytest
         run: |
