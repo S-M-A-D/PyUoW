@@ -49,12 +49,6 @@ Then changes staged for committing will be automatically fixed and styled.
 pre-commit run
 ```
 
-### CLI
-
-The repo contains CLI tools. Run `server-cli --help` to learn which command are available.
-
-:warning: CLI requires ENV variables to be set. If you are using ZSH, **dotenv** plugin will do it for you.
-
 ### Project Layout
 ```
 
