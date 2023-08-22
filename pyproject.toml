@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "pyuow"
 version = "0.1.0"
-description = ""
+description = "Python custom implementation of unit of work pattern"
 authors = ["SMED"]
 readme = "README.md"
+include = [
+    "pyuow/py.typed"
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"

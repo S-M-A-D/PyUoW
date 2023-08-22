@@ -7,7 +7,7 @@ from .types import MISSING, MissingType
 OUT = t.TypeVar("OUT")
 
 
-@dataclass(frozen=True, repr=False)
+@dataclass(frozen=True, slots=True, repr=False)
 @t.final
 class Result(t.Generic[OUT]):
     _out: OUT | MissingType | Exception
