@@ -1,0 +1,26 @@
+name: PyUoW-publish-to-PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - name: Install dependencies
+        run: |
+          curl -sSL https://install.python-poetry.org | python -
+        env:
+          POETRY_VIRTUALENVS_CREATE: false
+      - name: Configure pypi
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+      - name: Build package
+        run: |
+          poetry build
+      - name: Publish package
+        run: |
+          poetry publish
