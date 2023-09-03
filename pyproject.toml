@@ -7,11 +7,31 @@ maintainers = [
     "Sviatoslav Mosorko <slavikmosorko@gmail.com>",
     "Andrii Divnych <divnycha05@gmail.com>",
 ]
+repository = "https://github.com/S-M-A-D/PyUoW"
+homepage = "https://github.com/S-M-A-D/PyUoW"
+license = "MIT"
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries",
+]
 
 readme = "README.md"
 include = [
     "pyuow/py.typed"
 ]
+
+[tool.poetry.urls]
+"Tracker" = "https://github.com/S-M-A-D/PyUoW/issues"
+"Changelog" = "https://github.com/S-M-A-D/PyUoW/releases"
 
 [tool.poetry.dependencies]
 python = "^3.11"
