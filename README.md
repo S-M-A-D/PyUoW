@@ -3,6 +3,7 @@
 [![Downloads](https://static.pepy.tech/badge/pyuow)](https://pepy.tech/project/pyuow)
 ![Formatter](https://img.shields.io/badge/code%20style-black-black)
 ![Build](https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml/badge.svg)
+[![codecov](https://codecov.io/gh/S-M-A-D/PyUoW/graph/badge.svg?token=L1Y13VT30W)](https://codecov.io/gh/S-M-A-D/PyUoW)
 ![Version](https://img.shields.io/pypi/pyversions/pyuow)
 ![License](https://img.shields.io/pypi/l/pyuow)
 ***
@@ -62,8 +63,6 @@ Then changes staged for committing will be automatically fixed and styled.
 ```bash
 pre-commit run
 ```
-<a name="features"></a>
-## 1. Installation
 
 ### Project Layout
 ```
