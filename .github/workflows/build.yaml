@@ -36,4 +36,7 @@ jobs:
 
       - name: Run tests with Pytest
         run: |
-          pytest --cov --cov-report term-missing
+          pytest --cov --cov-report=xml term-missing
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
