@@ -1,11 +1,26 @@
 # PyUoW
 
+[![Downloads](https://static.pepy.tech/badge/pyuow)](https://pepy.tech/project/pyuow)
+![Formatter](https://img.shields.io/badge/code%20style-black-black)
+![Build](https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml/badge.svg)
+[![codecov](https://codecov.io/gh/S-M-A-D/PyUoW/graph/badge.svg?token=L1Y13VT30W)](https://codecov.io/gh/S-M-A-D/PyUoW)
+![Version](https://img.shields.io/pypi/pyversions/pyuow)
+![License](https://img.shields.io/pypi/l/pyuow)
 ***
 
-###### [Python 3.11]
+## Installation
 
+PyUow package is available on PyPI:
+```console
+$ python -m pip install pyuow
+```
+PyUow officially supports Python >= 3.10.
 
-### Install requirements
+## Usage examples
+### 1) Raw example:
+### 2) FastAPI example:
+
+## For Contributors
 
 This project is managed with `poetry`. All python dependencies have to be specified inside `pyproject.toml` file. Don't use `pip` directly, as the installed dependencies will be overridden by poetry during next `poetry install` run.
 
