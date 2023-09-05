@@ -34,7 +34,7 @@ include = [
 "Changelog" = "https://github.com/S-M-A-D/PyUoW/releases"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.8"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
@@ -72,7 +72,7 @@ fail_under = 99
 [tool.black]
 line-length = 79
 target-version = [
-    "py311",
+    "py38",
 ]
 include = "\\.pyi?$"
 exclude = """
@@ -98,7 +98,7 @@ remove-duplicate-keys = true
 remove-unused-variables = true
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.8"
 strict_optional = true
 strict_equality = true
 check_untyped_defs = true
