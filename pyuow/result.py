@@ -7,17 +7,16 @@ from .types import MISSING, MissingType
 OUT = t.TypeVar("OUT")
 
 
-@dataclass(frozen=True, slots=True, repr=False)
+@dataclass(frozen=True, repr=False)
 @t.final
 class Result(t.Generic[OUT]):
-    _out: OUT | MissingType | Exception
+    _out: t.Union[OUT, MissingType, Exception]
 
     def get(self) -> OUT:
-        match self._out:
-            case MissingType():
-                raise MissingOutError
-            case Exception():
-                raise self._out
+        if isinstance(self._out, MissingType):
+            raise MissingOutError()
+        elif isinstance(self._out, Exception):
+            raise self._out
 
         return self._out
 

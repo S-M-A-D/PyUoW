@@ -17,7 +17,7 @@ OUT = t.TypeVar("OUT")
 class BaseUnit(t.Generic[CONTEXT, OUT], abc.ABC):
     def __init__(self) -> None:
         self._root: "BaseUnit[CONTEXT, OUT]" = self
-        self._next: "BaseUnit[CONTEXT, OUT]" | MissingType = MISSING
+        self._next: t.Union["BaseUnit[CONTEXT, OUT]", MissingType] = MISSING
 
     @abc.abstractmethod
     async def __call__(
