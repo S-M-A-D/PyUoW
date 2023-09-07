@@ -34,6 +34,11 @@ jobs:
           mypy pyuow
           safety check
 
+      - name: Bandit security scan
+        uses: shundor/bandit-action@v1
+        with:
+          exit_zero: true
+
       - name: Run tests with Pytest
         run: |
           pytest --cov --cov-report=xml
