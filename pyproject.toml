@@ -65,6 +65,12 @@ omit = [
 concurrency = ["greenlet"]
 
 [tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "@abc.abstractmethod",
+    "raise NotImplementedError",
+    "...",
+]
 show_missing = true
 skip_covered = true
 fail_under = 99

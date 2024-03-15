@@ -5,16 +5,15 @@ from logging import getLogger
 
 from .context import BaseContext
 from .exceptions import CannotReassignUnitError, FinalUnitError
-from .result import Result
+from .result import OUT, Result
 from .types import MISSING, MissingType
 
 logger = getLogger(__name__)
 
 CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
-OUT = t.TypeVar("OUT")
 
 
-class BaseUnit(t.Generic[CONTEXT, OUT], abc.ABC):
+class BaseUnit(t.Generic[CONTEXT, OUT], ABC):
     def __init__(self) -> None:
         self._root: "BaseUnit[CONTEXT, OUT]" = self
         self._next: t.Union["BaseUnit[CONTEXT, OUT]", MissingType] = MISSING
@@ -41,8 +40,18 @@ class BaseUnit(t.Generic[CONTEXT, OUT], abc.ABC):
 
 class FinalUnit(BaseUnit[CONTEXT, OUT], ABC):
     async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
-        result = await self.finish(context, **kwargs)
-        logger.info("[%s] completed", self.__class__.__name__)
+        cls_name = self.__class__.__name__
+
+        try:
+            result = await self.finish(context, **kwargs)
+        except Exception as error:
+            logger.exception(
+                "[%s] failed with exception", cls_name, exc_info=error
+            )
+            return Result.error(error)
+        else:
+            logger.info("[%s] completed", self.__class__.__name__)
+
         logger.debug("[%s] result [%s]", self.__class__.__name__, result)
         return result
 
