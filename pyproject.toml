@@ -41,17 +41,17 @@ include = [
 python = "^3.8"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
+pytest = "^8.1.1"
 pytest-cov = "^4.1.0"
-isort = "^5.12.0"
-pre-commit = "^3.3.3"
+isort = "^5.13.2"
+pre-commit = "^3.5.0"
 pytest-asyncio = "^0.21.1"
-autoflake = "^2.2.0"
-mypy = "^1.5.1"
-coverage = { version = "^7.3.0", extras = ["toml"] }
-black = "^23.7.0"
-safety = "^2.3.5"
-greenlet = { version = "^3.0.0" }
+autoflake = "^2.3.1"
+mypy = "^1.9.0"
+coverage = { version = "^7.4.4", extras = ["toml"] }
+black = "^24.3.0"
+safety = "^3.0.1"
+greenlet = { version = "^3.0.3" }
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
