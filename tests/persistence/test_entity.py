@@ -1,5 +1,5 @@
-import datetime
 from dataclasses import dataclass
+from datetime import timezone
 from uuid import UUID, uuid4
 
 from pyuow.persistence import AuditedEntity
@@ -19,5 +19,5 @@ class TestAuditedEntity:
         # then
         assert entity.id == entity_id
         assert entity.created_date == entity.updated_date
-        assert entity.created_date.tzinfo is datetime.UTC
-        assert entity.updated_date.tzinfo is datetime.UTC
+        assert entity.created_date.tzinfo == timezone.utc
+        assert entity.updated_date.tzinfo == timezone.utc
