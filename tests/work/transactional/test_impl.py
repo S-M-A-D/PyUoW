@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from unittest.mock import AsyncMock, Mock
 
 from pyuow import BaseContext, FinalUnit, Result
-from pyuow.work.transactional.base import (
+from pyuow.work.transactional import (
     BaseTransaction,
     BaseTransactionManager,
     TransactionalWorkManager,

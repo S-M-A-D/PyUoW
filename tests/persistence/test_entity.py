@@ -2,7 +2,7 @@ import datetime
 from dataclasses import dataclass
 from uuid import UUID, uuid4
 
-from pyuow.persistence.entity import AuditedEntity
+from pyuow.persistence import AuditedEntity
 
 
 @dataclass(frozen=True)

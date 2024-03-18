@@ -2,10 +2,11 @@ import typing as t
 from dataclasses import dataclass
 from uuid import UUID
 
-from pyuow.persistence.entity import ENTITY_ID, Entity
+from pyuow.persistence.entity import ENTITY_ID
 from pyuow.persistence.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
+    Entity,
 )
 
 
@@ -15,7 +16,7 @@ class FakeEntity(Entity[UUID]):
 
 
 class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
-    def find(self, entity_id: UUID) -> FakeEntity | None:
+    def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
         return None
 
     def find_all(self, entity_ids: t.Iterable[UUID]) -> t.Iterable[FakeEntity]:
