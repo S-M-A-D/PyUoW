@@ -14,14 +14,12 @@ class BaseWorkProxy(ABC):
         self,
         context: CONTEXT,
         **kwargs: t.Any,
-    ) -> Result[OUT]:
-        ...
+    ) -> Result[OUT]: ...
 
 
 class BaseWorkManager(ABC):
     @abc.abstractmethod
-    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseWorkProxy:
-        ...
+    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseWorkProxy: ...
 
     async def __aenter__(self: WORK_MANAGER) -> WORK_MANAGER:
         return self

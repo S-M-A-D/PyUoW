@@ -93,8 +93,9 @@ class TestUnits:
                 return context.context_field == "test"
 
         class FakeRunUnit(RunUnit[FakeContext, FakeOut]):
-            async def run(self, context: FakeContext, **kwargs: t.Any) -> None:
-                ...
+            async def run(
+                self, context: FakeContext, **kwargs: t.Any
+            ) -> None: ...
 
         class SuccessUnit(FinalUnit[FakeContext, FakeOut]):
             async def finish(
@@ -215,8 +216,7 @@ class TestUnits:
     async def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(self):
         # given
         class FakeUnit(RunUnit[Mock, None]):
-            async def run(self, context: Mock, **kwargs: t.Any) -> None:
-                ...
+            async def run(self, context: Mock, **kwargs: t.Any) -> None: ...
 
         flow = FakeUnit().build()
         # when
