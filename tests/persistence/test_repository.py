@@ -1,6 +1,9 @@
 import typing as t
 from dataclasses import dataclass
+from unittest.mock import Mock
 from uuid import UUID
+
+import pytest
 
 from pyuow.persistence.entity import ENTITY_ID
 from pyuow.persistence.repository import (
@@ -66,3 +69,12 @@ class TestRepositoryFactory:
         assert isinstance(
             factory.repo_for(FakeEntity), FakeBaseEntityRepository
         )
+
+    def test_repo_for_should_raise_if_no_repository_for_entity_type(
+        self,
+    ):
+        # given
+        factory = FakeRepositoryFactory()
+        # when
+        with pytest.raises(KeyError):
+            factory.repo_for(Mock)

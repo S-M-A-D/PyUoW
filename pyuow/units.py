@@ -22,7 +22,7 @@ class BaseUnit(t.Generic[CONTEXT, OUT], ABC):
     async def __call__(
         self, context: CONTEXT, **kwargs: t.Any
     ) -> Result[OUT]:  # pragma: no cover
-        ...
+        raise NotImplementedError
 
     def __rshift__(
         self: "BaseUnit[CONTEXT, OUT]", other: "BaseUnit[CONTEXT, OUT]"
@@ -59,7 +59,7 @@ class FinalUnit(BaseUnit[CONTEXT, OUT], ABC):
     async def finish(
         self, context: CONTEXT, **kwargs: t.Any
     ) -> Result[OUT]:  # pragma: no cover
-        ...
+        raise NotImplementedError
 
     def __rshift__(
         self: "BaseUnit[CONTEXT, OUT]", other: "BaseUnit[CONTEXT, OUT]"
@@ -110,7 +110,7 @@ class ConditionalUnit(BaseUnit[CONTEXT, OUT]):
     async def condition(
         self, context: CONTEXT, **kwargs: t.Any
     ) -> bool:  # pragma: no cover
-        ...
+        raise NotImplementedError
 
 
 class RunUnit(BaseUnit[CONTEXT, OUT]):
@@ -135,4 +135,4 @@ class RunUnit(BaseUnit[CONTEXT, OUT]):
     async def run(
         self, context: CONTEXT, **kwargs: t.Any
     ) -> None:  # pragma: no cover
-        ...
+        raise NotImplementedError

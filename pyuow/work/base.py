@@ -5,8 +5,6 @@ from abc import ABC
 from ..result import Result
 from ..units import CONTEXT, OUT, BaseUnit
 
-WORK_MANAGER = t.TypeVar("WORK_MANAGER", bound="BaseWorkManager")
-
 
 class BaseWorkProxy(ABC):
     @abc.abstractmethod
@@ -14,12 +12,11 @@ class BaseWorkProxy(ABC):
         self,
         context: CONTEXT,
         **kwargs: t.Any,
-    ) -> Result[OUT]: ...
+    ) -> Result[OUT]:
+        raise NotImplementedError
 
 
 class BaseWorkManager(ABC):
     @abc.abstractmethod
-    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseWorkProxy: ...
-
-    async def __aenter__(self: WORK_MANAGER) -> WORK_MANAGER:
-        return self
+    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseWorkProxy:
+        raise NotImplementedError

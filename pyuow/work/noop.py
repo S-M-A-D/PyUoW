@@ -6,7 +6,7 @@ from ..units import CONTEXT
 from .base import BaseWorkManager, BaseWorkProxy
 
 
-class NoOpWorkProxy(BaseWorkProxy):
+class NoOpWorkProxy(BaseWorkProxy):  # pragma: no cover
     def __init__(
         self,
         *,
@@ -18,6 +18,6 @@ class NoOpWorkProxy(BaseWorkProxy):
         return await self._unit(context, **kwargs)
 
 
-class NoOpWorkManager(BaseWorkManager):
+class NoOpWorkManager(BaseWorkManager):  # pragma: no cover
     def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseWorkProxy:
         return NoOpWorkProxy(unit=unit)

@@ -73,7 +73,6 @@ exclude_lines = [
     "pragma: no cover",
     "@abc.abstractmethod",
     "raise NotImplementedError",
-    "...",
 ]
 show_missing = true
 skip_covered = true
