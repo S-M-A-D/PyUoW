@@ -2,7 +2,7 @@ import typing as t
 from dataclasses import dataclass
 from uuid import UUID
 
-from pyuow.persistence.entity import Entity
+from pyuow.persistence.entity import ENTITY_ID, Entity
 from pyuow.persistence.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
@@ -14,17 +14,36 @@ class FakeEntity(Entity[UUID]):
     pass
 
 
-class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
+class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
+    def find(self, entity_id: UUID) -> FakeEntity | None:
+        return None
+
+    def find_all(self, entity_ids: t.Iterable[UUID]) -> t.Iterable[FakeEntity]:
+        return []
+
     def get(self, entity_id: UUID) -> FakeEntity:
-        pass
+        return FakeEntity(id=entity_id)
 
     def add(self, entity: FakeEntity) -> FakeEntity:
-        pass
+        return entity
+
+    def add_all(
+        self, entities: t.Sequence[FakeEntity]
+    ) -> t.Iterable[FakeEntity]:
+        return entities
 
     def update(self, entity: FakeEntity) -> FakeEntity:
-        pass
+        return entity
+
+    def update_all(
+        self, entities: t.Sequence[FakeEntity]
+    ) -> t.Iterable[FakeEntity]:
+        return entities
 
     def delete(self, entity: FakeEntity) -> bool:
+        return True
+
+    def exists(self, entity_id: ENTITY_ID) -> bool:
         pass
 
 
@@ -39,7 +58,7 @@ class FakeRepositoryFactory(BaseRepositoryFactory):
 class TestRepositoryFactory:
     def test_repo_for_should_return_proper_repository_for_entity_type(
         self,
-    ) -> None:
+    ):
         # given
         factory = FakeRepositoryFactory()
         # then

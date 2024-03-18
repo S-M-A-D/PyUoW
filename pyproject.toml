@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyuow"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python custom implementation of unit of work pattern"
 authors = ["SMED"]
 maintainers = [
@@ -19,7 +19,11 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries",
 ]
@@ -47,7 +51,7 @@ mypy = "^1.5.1"
 coverage = { version = "^7.3.0", extras = ["toml"] }
 black = "^23.7.0"
 safety = "^2.3.5"
-greenlet = { version = "^2.0.2" }
+greenlet = { version = "^3.0.0" }
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
