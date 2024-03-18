@@ -42,7 +42,7 @@ class TransactionalWorkProxy(BaseWorkProxy):
         self._transaction_manager = transaction_manager
         self._unit = unit
 
-    async def do(self, context: t.Any, **kwargs: t.Any) -> Result[t.Any]:
+    async def do_with(self, context: t.Any, **kwargs: t.Any) -> Result[t.Any]:
         async with self._transaction_manager.transaction() as trx:
             result = await self._unit(context, **kwargs)
 

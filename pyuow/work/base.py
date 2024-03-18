@@ -10,7 +10,7 @@ WORK_MANAGER = t.TypeVar("WORK_MANAGER", bound="BaseWorkManager")
 
 class BaseWorkProxy(ABC):
     @abc.abstractmethod
-    async def do(
+    async def do_with(
         self,
         context: CONTEXT,
         **kwargs: t.Any,

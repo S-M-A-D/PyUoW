@@ -44,7 +44,7 @@ class NoOpWorkProxy(TransactionalWorkProxy):
         self._unit = unit
         super().__init__(transaction_manager=transaction_manager, unit=unit)
 
-    async def do(self, context: t.Any, **kwargs: t.Any) -> Result[t.Any]:
+    async def do_with(self, context: t.Any, **kwargs: t.Any) -> Result[t.Any]:
         return await self._unit(context, **kwargs)
 
 

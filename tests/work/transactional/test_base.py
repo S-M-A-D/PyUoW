@@ -65,7 +65,7 @@ class FakeTransactionManager(BaseTransactionManager[FakeTransaction]):
 
 
 class TestTransactionalWorkProxy:
-    async def test_do_should_commit_on_success(self):
+    async def test_do_with_should_commit_on_success(self):
         # given
         unit = SuccessUnit()
         params = FakeParams()
@@ -76,12 +76,12 @@ class TestTransactionalWorkProxy:
             transaction_manager=transaction_manager, unit=unit
         )
         # when
-        result = await work_proxy.do(context=context)
+        result = await work_proxy.do_with(context=context)
         # then
         assert result.is_ok()
         transaction.commit.assert_awaited_once()
 
-    async def test_do_should_rollback_on_error(self):
+    async def test_do_with_should_rollback_on_error(self):
         # given
         unit = FailureUnit()
         params = FakeParams()
@@ -92,7 +92,7 @@ class TestTransactionalWorkProxy:
             transaction_manager=transaction_manager, unit=unit
         )
         # when
-        result = await work_proxy.do(context=context)
+        result = await work_proxy.do_with(context=context)
         # then
         assert result.is_error()
         transaction.rollback.assert_awaited_once()
@@ -122,7 +122,7 @@ class TestTransactionalWorkManager:
             transaction_manager=transaction_manager
         )
         # when
-        result = await work.by(unit).do(context)
+        result = await work.by(unit).do_with(context)
         # then
         assert result.is_ok()
         assert result.get() == FakeOut()
