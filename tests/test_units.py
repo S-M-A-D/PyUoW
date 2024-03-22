@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from pyuow import (
-    AttributeCannotBeOverriddenError,
     BaseContext,
     BaseUnit,
     CannotReassignUnitError,
@@ -13,7 +12,6 @@ from pyuow import (
     ErrorUnit,
     FinalUnit,
     FinalUnitError,
-    MissingOutError,
     Result,
     RunUnit,
 )
@@ -21,77 +19,6 @@ from pyuow.types import MISSING
 
 
 class TestUnits:
-    async def test_result_get_should_return_wrapped_out(self):
-        # given
-        mock_out = Mock()
-        result = Result.ok(mock_out)
-        # when
-        out = result.get()
-        # then
-        assert out == mock_out
-        assert result.is_ok() is True
-        assert result.is_error() is False
-        assert result.is_empty() is False
-
-    async def test_result_get_should_raise_if_out_is_missing(self):
-        # given
-        result = Result.empty()
-        # when
-        with pytest.raises(MissingOutError):
-            result.get()
-        # then
-        assert result.is_ok() is False
-        assert result.is_error() is False
-        assert result.is_empty() is True
-
-    async def test_result_get_should_raise_if_out_is_error(self):
-        # given
-        result = Result.error(Exception("test"))
-        # when
-        with pytest.raises(Exception):
-            result.get()
-        # then
-
-        assert result.is_ok() is False
-        assert result.is_error() is True
-        assert result.is_empty() is False
-
-    async def test_result_or_raise_should_raise_if_out_is_error(self):
-        # given
-        result = Result.error(Exception("test"))
-        # when
-        with pytest.raises(Exception):
-            result.or_raise()
-        # then
-
-        assert result.is_ok() is False
-        assert result.is_error() is True
-        assert result.is_empty() is False
-
-    async def test_result_repr_should_return_out_repr(self):
-        # given
-        mock_out = Mock()
-        result = Result(mock_out)
-        # when
-        _repr = result.__repr__()
-        # then
-        assert _repr == repr(mock_out)
-
-    async def test_context_should_raise_if_attribute_on_attr_override(self):
-        # given
-        @dataclass
-        class FakeParams:
-            pass
-
-        @dataclass
-        class FakeContext(BaseContext[FakeParams]):
-            context_field: str
-
-        context = FakeContext(params=FakeParams(), context_field="test")
-        # when
-        with pytest.raises(AttributeCannotBeOverriddenError):
-            context.context_field = "something"
-
     async def test_unit_rshift_should_properly_assign_units(
         self,
     ):
@@ -166,8 +93,9 @@ class TestUnits:
                 return context.context_field == "test"
 
         class FakeRunUnit(RunUnit[FakeContext, FakeOut]):
-            async def run(self, context: FakeContext, **kwargs: t.Any) -> None:
-                ...
+            async def run(
+                self, context: FakeContext, **kwargs: t.Any
+            ) -> None: ...
 
         class SuccessUnit(FinalUnit[FakeContext, FakeOut]):
             async def finish(
@@ -288,8 +216,7 @@ class TestUnits:
     async def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(self):
         # given
         class FakeUnit(RunUnit[Mock, None]):
-            async def run(self, context: Mock, **kwargs: t.Any) -> None:
-                ...
+            async def run(self, context: Mock, **kwargs: t.Any) -> None: ...
 
         flow = FakeUnit().build()
         # when

@@ -5,25 +5,22 @@ from logging import getLogger
 
 from .context import BaseContext
 from .exceptions import CannotReassignUnitError, FinalUnitError
-from .result import Result
+from .result import OUT, Result
 from .types import MISSING, MissingType
 
 logger = getLogger(__name__)
 
 CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
-OUT = t.TypeVar("OUT")
 
 
-class BaseUnit(t.Generic[CONTEXT, OUT], abc.ABC):
+class BaseUnit(t.Generic[CONTEXT, OUT], ABC):
     def __init__(self) -> None:
         self._root: "BaseUnit[CONTEXT, OUT]" = self
         self._next: t.Union["BaseUnit[CONTEXT, OUT]", MissingType] = MISSING
 
     @abc.abstractmethod
-    async def __call__(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> Result[OUT]:  # pragma: no cover
-        ...
+    async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+        raise NotImplementedError
 
     def __rshift__(
         self: "BaseUnit[CONTEXT, OUT]", other: "BaseUnit[CONTEXT, OUT]"
@@ -41,16 +38,24 @@ class BaseUnit(t.Generic[CONTEXT, OUT], abc.ABC):
 
 class FinalUnit(BaseUnit[CONTEXT, OUT], ABC):
     async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
-        result = await self.finish(context, **kwargs)
-        logger.info("[%s] completed", self.__class__.__name__)
+        cls_name = self.__class__.__name__
+
+        try:
+            result = await self.finish(context, **kwargs)
+        except Exception as error:
+            logger.exception(
+                "[%s] failed with exception", cls_name, exc_info=error
+            )
+            return Result.error(error)
+        else:
+            logger.info("[%s] completed", self.__class__.__name__)
+
         logger.debug("[%s] result [%s]", self.__class__.__name__, result)
         return result
 
     @abc.abstractmethod
-    async def finish(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> Result[OUT]:  # pragma: no cover
-        ...
+    async def finish(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+        raise NotImplementedError
 
     def __rshift__(
         self: "BaseUnit[CONTEXT, OUT]", other: "BaseUnit[CONTEXT, OUT]"
@@ -98,10 +103,8 @@ class ConditionalUnit(BaseUnit[CONTEXT, OUT]):
         return await self._on_failure(context, **kwargs)
 
     @abc.abstractmethod
-    async def condition(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> bool:  # pragma: no cover
-        ...
+    async def condition(self, context: CONTEXT, **kwargs: t.Any) -> bool:
+        raise NotImplementedError
 
 
 class RunUnit(BaseUnit[CONTEXT, OUT]):
@@ -123,7 +126,5 @@ class RunUnit(BaseUnit[CONTEXT, OUT]):
         return await self._next(context, **kwargs)
 
     @abc.abstractmethod
-    async def run(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> None:  # pragma: no cover
-        ...
+    async def run(self, context: CONTEXT, **kwargs: t.Any) -> None:
+        raise NotImplementedError
