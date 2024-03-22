@@ -21,7 +21,7 @@ class AuditedEntity(Entity[ENTITY_ID]):
     def __post_init__(self) -> None:
         now = datetime.now(tz=timezone.utc)
 
-        if self.created_date is MISSING:
+        if self.created_date is MISSING:  # pragma: no cover
             object.__setattr__(self, "created_date", now)
-        if self.updated_date is MISSING:
+        if self.updated_date is MISSING:  # pragma: no cover
             object.__setattr__(self, "updated_date", now)

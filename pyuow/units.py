@@ -19,9 +19,7 @@ class BaseUnit(t.Generic[CONTEXT, OUT], ABC):
         self._next: t.Union["BaseUnit[CONTEXT, OUT]", MissingType] = MISSING
 
     @abc.abstractmethod
-    async def __call__(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> Result[OUT]:  # pragma: no cover
+    async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
         raise NotImplementedError
 
     def __rshift__(
@@ -56,9 +54,7 @@ class FinalUnit(BaseUnit[CONTEXT, OUT], ABC):
         return result
 
     @abc.abstractmethod
-    async def finish(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> Result[OUT]:  # pragma: no cover
+    async def finish(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
         raise NotImplementedError
 
     def __rshift__(
@@ -107,9 +103,7 @@ class ConditionalUnit(BaseUnit[CONTEXT, OUT]):
         return await self._on_failure(context, **kwargs)
 
     @abc.abstractmethod
-    async def condition(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> bool:  # pragma: no cover
+    async def condition(self, context: CONTEXT, **kwargs: t.Any) -> bool:
         raise NotImplementedError
 
 
@@ -132,7 +126,5 @@ class RunUnit(BaseUnit[CONTEXT, OUT]):
         return await self._next(context, **kwargs)
 
     @abc.abstractmethod
-    async def run(
-        self, context: CONTEXT, **kwargs: t.Any
-    ) -> None:  # pragma: no cover
+    async def run(self, context: CONTEXT, **kwargs: t.Any) -> None:
         raise NotImplementedError
