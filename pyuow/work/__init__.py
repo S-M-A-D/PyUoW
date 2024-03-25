@@ -1,9 +1,9 @@
-from .base import BaseWorkManager, BaseWorkProxy
-from .noop import NoOpWorkManager, NoOpWorkProxy
+from .base import BaseUnitProxy, BaseWorkManager
+from .noop import NoOpUnitProxy, NoOpWorkManager
 
 __all__ = (
-    "BaseWorkProxy",
+    "BaseUnitProxy",
     "BaseWorkManager",
+    "NoOpUnitProxy",
     "NoOpWorkManager",
-    "NoOpWorkProxy",
 )

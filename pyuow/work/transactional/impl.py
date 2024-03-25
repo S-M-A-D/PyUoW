@@ -1,14 +1,12 @@
-import typing as t
-
-from ... import BaseUnit, Result
-from ...result import OUT
-from ...units import CONTEXT
-from ...work import BaseWorkManager, BaseWorkProxy
+from ...result import OUT, Result
+from ...units import CONTEXT, BaseUnit
+from ...work import BaseWorkManager
 from ...work.transactional import BaseTransactionManager
 from ...work.transactional.base import TRANSACTION
+from ..base import BaseUnitProxy
 
 
-class TransactionalWorkProxy(BaseWorkProxy):
+class TransactionalUnitProxy(BaseUnitProxy[CONTEXT, OUT]):
     def __init__(
         self,
         *,
@@ -18,9 +16,9 @@ class TransactionalWorkProxy(BaseWorkProxy):
         self._transaction_manager = transaction_manager
         self._unit = unit
 
-    async def do_with(self, context: t.Any, **kwargs: t.Any) -> Result[t.Any]:
+    async def __call__(self, context: CONTEXT) -> Result[OUT]:
         async with self._transaction_manager.transaction() as trx:
-            result = await self._unit(context, **kwargs)
+            result = await self._unit(context)
 
             if result.is_error():
                 await trx.rollback()
@@ -38,8 +36,8 @@ class TransactionalWorkManager(BaseWorkManager):
     ) -> None:
         self._transaction_manager = transaction_manager
 
-    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseWorkProxy:
-        return TransactionalWorkProxy(
+    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseUnitProxy[CONTEXT, OUT]:
+        return TransactionalUnitProxy(
             transaction_manager=self._transaction_manager,
             unit=unit,
         )
