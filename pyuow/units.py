@@ -14,17 +14,19 @@ CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
 
 
 class BaseUnit(t.Generic[CONTEXT, OUT], ABC):
-    def __init__(self) -> None:
-        self._root: "BaseUnit[CONTEXT, OUT]" = self
-        self._next: t.Union["BaseUnit[CONTEXT, OUT]", MissingType] = MISSING
-
     @abc.abstractmethod
-    async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+    async def __call__(self, context: CONTEXT) -> Result[OUT]:
         raise NotImplementedError
 
+
+class FlowUnit(BaseUnit[CONTEXT, OUT], ABC):
+    def __init__(self) -> None:
+        self._root: "FlowUnit[CONTEXT, OUT]" = self
+        self._next: t.Union["FlowUnit[CONTEXT, OUT]", MissingType] = MISSING
+
     def __rshift__(
-        self: "BaseUnit[CONTEXT, OUT]", other: "BaseUnit[CONTEXT, OUT]"
-    ) -> "BaseUnit[CONTEXT, OUT]":
+        self: "FlowUnit[CONTEXT, OUT]", other: "FlowUnit[CONTEXT, OUT]"
+    ) -> "FlowUnit[CONTEXT, OUT]":
         if not isinstance(other._next, MissingType):
             raise CannotReassignUnitError
 
@@ -32,16 +34,16 @@ class BaseUnit(t.Generic[CONTEXT, OUT], ABC):
         other._root = self._root
         return other
 
-    def build(self) -> "BaseUnit[CONTEXT, OUT]":
+    def build(self) -> "FlowUnit[CONTEXT, OUT]":
         return self._root
 
 
-class FinalUnit(BaseUnit[CONTEXT, OUT], ABC):
-    async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+class FinalUnit(FlowUnit[CONTEXT, OUT], ABC):
+    async def __call__(self, context: CONTEXT) -> Result[OUT]:
         cls_name = self.__class__.__name__
 
         try:
-            result = await self.finish(context, **kwargs)
+            result = await self.finish(context)
         except Exception as error:
             logger.exception(
                 "[%s] failed with exception", cls_name, exc_info=error
@@ -54,12 +56,12 @@ class FinalUnit(BaseUnit[CONTEXT, OUT], ABC):
         return result
 
     @abc.abstractmethod
-    async def finish(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+    async def finish(self, context: CONTEXT) -> Result[OUT]:
         raise NotImplementedError
 
     def __rshift__(
-        self: "BaseUnit[CONTEXT, OUT]", other: "BaseUnit[CONTEXT, OUT]"
-    ) -> "BaseUnit[CONTEXT, OUT]":
+        self: "FlowUnit[CONTEXT, OUT]", other: "FlowUnit[CONTEXT, OUT]"
+    ) -> "FlowUnit[CONTEXT, OUT]":
         raise FinalUnitError(self.__class__.__name__)
 
 
@@ -72,23 +74,23 @@ class ErrorUnit(FinalUnit[CONTEXT, OUT]):
         super().__init__()
         self._exc = exc
 
-    async def finish(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+    async def finish(self, context: CONTEXT) -> Result[OUT]:
         return Result.error(self._exc)
 
 
-class ConditionalUnit(BaseUnit[CONTEXT, OUT]):
-    def __init__(self, *, on_failure: BaseUnit[CONTEXT, OUT]) -> None:
+class ConditionalUnit(FlowUnit[CONTEXT, OUT]):
+    def __init__(self, *, on_failure: FlowUnit[CONTEXT, OUT]) -> None:
         super().__init__()
         self._on_failure = on_failure
 
-    async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+    async def __call__(self, context: CONTEXT) -> Result[OUT]:
         cls_name = self.__class__.__name__
 
         if isinstance(self._next, MissingType):
             raise NotImplementedError(f"[{cls_name}] next unit is not set")
 
         try:
-            passed = await self.condition(context, **kwargs)
+            passed = await self.condition(context)
         except Exception as error:
             logger.exception(
                 "[%s] failed with exception", cls_name, exc_info=error
@@ -97,25 +99,25 @@ class ConditionalUnit(BaseUnit[CONTEXT, OUT]):
 
         if passed:
             logger.info("[%s] completed", cls_name)
-            return await self._next(context, **kwargs)
+            return await self._next(context)
 
         logger.info("[%s] failed", cls_name)
-        return await self._on_failure(context, **kwargs)
+        return await self._on_failure(context)
 
     @abc.abstractmethod
-    async def condition(self, context: CONTEXT, **kwargs: t.Any) -> bool:
+    async def condition(self, context: CONTEXT) -> bool:
         raise NotImplementedError
 
 
-class RunUnit(BaseUnit[CONTEXT, OUT]):
-    async def __call__(self, context: CONTEXT, **kwargs: t.Any) -> Result[OUT]:
+class RunUnit(FlowUnit[CONTEXT, OUT]):
+    async def __call__(self, context: CONTEXT) -> Result[OUT]:
         cls_name = self.__class__.__name__
 
         if isinstance(self._next, MissingType):
             raise NotImplementedError(f"[{cls_name}] next unit is not set")
 
         try:
-            await self.run(context, **kwargs)
+            await self.run(context)
         except Exception as error:
             logger.exception(
                 "[%s] failed with exception", cls_name, exc_info=error
@@ -123,8 +125,8 @@ class RunUnit(BaseUnit[CONTEXT, OUT]):
             return Result.error(error)
 
         logger.info("[%s] completed", cls_name)
-        return await self._next(context, **kwargs)
+        return await self._next(context)
 
     @abc.abstractmethod
-    async def run(self, context: CONTEXT, **kwargs: t.Any) -> None:
+    async def run(self, context: CONTEXT) -> None:
         raise NotImplementedError

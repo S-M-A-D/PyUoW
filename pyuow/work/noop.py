@@ -1,12 +1,10 @@
-import typing as t
-
-from .. import BaseUnit
 from ..result import OUT, Result
-from ..units import CONTEXT
-from .base import BaseWorkManager, BaseWorkProxy
+from ..units import CONTEXT, BaseUnit
+from .base import BaseUnitProxy, BaseWorkManager
 
 
-class NoOpWorkProxy(BaseWorkProxy):  # pragma: no cover
+class NoOpUnitProxy(BaseUnitProxy[CONTEXT, OUT]):  # pragma: no cover
+
     def __init__(
         self,
         *,
@@ -14,10 +12,10 @@ class NoOpWorkProxy(BaseWorkProxy):  # pragma: no cover
     ) -> None:
         self._unit = unit
 
-    async def do_with(self, context: t.Any, **kwargs: t.Any) -> Result[t.Any]:
-        return await self._unit(context, **kwargs)
+    async def __call__(self, context: CONTEXT) -> Result[OUT]:
+        return await self._unit(context)
 
 
 class NoOpWorkManager(BaseWorkManager):  # pragma: no cover
-    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseWorkProxy:
-        return NoOpWorkProxy(unit=unit)
+    def by(self, unit: BaseUnit[CONTEXT, OUT]) -> BaseUnitProxy[CONTEXT, OUT]:
+        return NoOpUnitProxy(unit=unit)
