@@ -2,7 +2,7 @@ import abc
 import typing as t
 from abc import ABC
 
-from .entity import ENTITY_ID, ENTITY_TYPE, Entity
+from ..entities import ENTITY_ID, ENTITY_TYPE, Entity
 
 
 class BaseReadOnlyEntityRepository(t.Generic[ENTITY_ID, ENTITY_TYPE], ABC):

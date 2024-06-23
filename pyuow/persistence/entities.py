@@ -1,6 +1,6 @@
 import typing as t
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 
 from ..types import MISSING
 
@@ -19,7 +19,7 @@ class AuditedEntity(Entity[ENTITY_ID]):
     updated_date: datetime = MISSING  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.utcnow()
 
         if self.created_date is MISSING:  # pragma: no cover
             object.__setattr__(self, "created_date", now)

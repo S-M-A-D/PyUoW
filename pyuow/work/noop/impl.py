@@ -1,9 +1,9 @@
 import typing as t
 
-from .. import BaseUnit
-from ..result import OUT, Result
-from ..units import CONTEXT
-from .base import BaseWorkManager, BaseWorkProxy
+from ... import BaseUnit
+from ...result import OUT, Result
+from ...units import CONTEXT
+from ..base import BaseWorkManager, BaseWorkProxy
 
 
 class NoOpWorkProxy(BaseWorkProxy):  # pragma: no cover

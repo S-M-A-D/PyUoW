@@ -5,11 +5,11 @@ from uuid import UUID
 
 import pytest
 
-from pyuow.persistence.entity import ENTITY_ID
+from pyuow.persistence import Entity
+from pyuow.persistence.entities import ENTITY_ID
 from pyuow.persistence.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
-    Entity,
 )
 
 

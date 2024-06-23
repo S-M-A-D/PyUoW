@@ -19,7 +19,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -38,7 +37,8 @@ include = [
 "Changelog" = "https://github.com/S-M-A-D/PyUoW/releases"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
+sqlalchemy = {version = "^2.0.31", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -51,7 +51,13 @@ mypy = "^1.9.0"
 coverage = { version = "^7.4.4", extras = ["toml"] }
 black = "^24.3.0"
 safety = "^3.0.1"
-greenlet = { version = "^3.0.3" }
+greenlet = { version = "^3.0.3", platform = "darwin" }
+testcontainers = {version = "^4.0.0", extras = ["postgres"]}
+asyncpg = "^0.29.0"
+psycopg2 = "^2.9.9"
+
+[tool.poetry.extras]
+sa = ["sqlalchemy"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
