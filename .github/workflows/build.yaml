@@ -36,7 +36,11 @@ jobs:
 
       - name: Run tests with Pytest
         run: |
-          pytest --cov --cov-report=xml
+          if [ ${{ runner.os }} = "Linux" ]; then
+            pytest --cov --cov-report=xml --cov-fail-under=80
+          else; then
+            pytest --cov --cov-report=xml
+          fi
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
