@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 import typing as t
 from dataclasses import dataclass, replace
@@ -89,7 +90,13 @@ def repository_factory(engine: AsyncEngine) -> FakeRepositoryFactory:
     )
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+@pytest.mark.skipif(
+    (
+        sys.platform in ["win32", "darwin"]
+        and os.getenv("GITHUB_ACTIONS") == "true"
+    ),
+    reason="Does not run on windows and macos inside GitHub Action",
+)
 class TestSqlAlchemyEntityRepository:
     @pytest.fixture
     def repository(
