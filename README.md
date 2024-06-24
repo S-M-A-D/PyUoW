@@ -14,7 +14,7 @@ PyUow package is available on PyPI:
 ```console
 $ python -m pip install pyuow
 ```
-PyUow officially supports Python >= 3.8.
+PyUow officially supports Python >= 3.9.
 
 ## Usage examples
 
