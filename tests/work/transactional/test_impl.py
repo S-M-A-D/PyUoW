@@ -3,12 +3,12 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, Mock
 
-from pyuow import BaseContext, FinalUnit, Result
+from pyuow import BaseContext, BaseUnit, Result
 from pyuow.work.transactional import (
     BaseTransaction,
     BaseTransactionManager,
+    TransactionalUnitProxy,
     TransactionalWorkManager,
-    TransactionalWorkProxy,
 )
 
 
@@ -27,18 +27,18 @@ class FakeOut:
     pass
 
 
-class SuccessUnit(FinalUnit[FakeContext, FakeOut]):
-    async def finish(
+class SuccessUnit(BaseUnit[FakeContext, FakeOut]):
+    async def __call__(
         self, context: FakeContext, **kwargs: t.Any
     ) -> Result[FakeOut]:
         return Result.ok(FakeOut())
 
 
-class FailureUnit(FinalUnit[FakeContext, FakeOut]):
-    async def finish(
+class FailureUnit(BaseUnit[FakeContext, FakeOut]):
+    async def __call__(
         self, context: FakeContext, **kwargs: t.Any
     ) -> Result[FakeOut]:
-        raise Exception("Something went wrong")
+        return Result.error(Exception("Something went wrong"))
 
 
 class FakeTransaction(BaseTransaction[Mock]):
@@ -58,7 +58,7 @@ class FakeTransactionManager(BaseTransactionManager[FakeTransaction]):
         yield FakeTransaction(self._trx_provider_factory())
 
 
-class TestTransactionalWorkProxy:
+class TestTransactionalUnitProxy:
     async def test_do_with_should_commit_on_success(self):
         # given
         unit = SuccessUnit()
@@ -66,7 +66,7 @@ class TestTransactionalWorkProxy:
         context = FakeContext(params=params)
         transaction = AsyncMock()
         transaction_manager = FakeTransactionManager(lambda: transaction)
-        work_proxy = TransactionalWorkProxy(
+        work_proxy = TransactionalUnitProxy(
             transaction_manager=transaction_manager, unit=unit
         )
         # when
@@ -82,7 +82,7 @@ class TestTransactionalWorkProxy:
         context = FakeContext(params=params)
         transaction = AsyncMock()
         transaction_manager = FakeTransactionManager(lambda: transaction)
-        work_proxy = TransactionalWorkProxy(
+        work_proxy = TransactionalUnitProxy(
             transaction_manager=transaction_manager, unit=unit
         )
         # when
@@ -103,7 +103,7 @@ class TestTransactionalWorkManager:
         # when
         proxy = work_manager.by(unit)
         # then
-        assert isinstance(proxy, TransactionalWorkProxy)
+        assert isinstance(proxy, TransactionalUnitProxy)
 
     async def test_example_fake_flow_should_pass(self):
         # given

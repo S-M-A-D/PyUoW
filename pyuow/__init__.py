@@ -6,7 +6,14 @@ from .exceptions import (
     MissingOutError,
 )
 from .result import Result
-from .units import BaseUnit, ConditionalUnit, ErrorUnit, FinalUnit, RunUnit
+from .units import (
+    BaseUnit,
+    ConditionalUnit,
+    ErrorUnit,
+    FinalUnit,
+    FlowUnit,
+    RunUnit,
+)
 
 __all__ = (
     "BaseContext",
@@ -16,6 +23,7 @@ __all__ = (
     "MissingOutError",
     "Result",
     "BaseUnit",
+    "FlowUnit",
     "ConditionalUnit",
     "ErrorUnit",
     "FinalUnit",

@@ -1,6 +1,6 @@
-from .base import BaseWorkManager, BaseWorkProxy
+from .base import BaseUnitProxy, BaseWorkManager
 
 __all__ = (
-    "BaseWorkProxy",
+    "BaseUnitProxy",
     "BaseWorkManager",
 )

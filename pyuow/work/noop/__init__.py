@@ -1,6 +1,6 @@
-from .impl import NoOpWorkManager, NoOpWorkProxy
+from .impl import NoOpUnitProxy, NoOpWorkManager
 
 __all__ = (
+    "NoOpUnitProxy",
     "NoOpWorkManager",
-    "NoOpWorkProxy",
 )
