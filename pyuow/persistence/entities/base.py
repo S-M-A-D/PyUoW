@@ -15,13 +15,13 @@ class Entity(t.Generic[ENTITY_ID]):
 
 @dataclass(frozen=True)
 class AuditedEntity(Entity[ENTITY_ID]):
-    created_date: datetime = MISSING  # type: ignore[assignment]
-    updated_date: datetime = MISSING  # type: ignore[assignment]
+    created_date: datetime = t.cast(t.Any, MISSING)
+    updated_date: datetime = t.cast(t.Any, MISSING)
 
     def __post_init__(self) -> None:
         now = datetime.utcnow()
 
-        if self.created_date is MISSING:  # pragma: no cover
+        if self.created_date is MISSING:
             object.__setattr__(self, "created_date", now)
-        if self.updated_date is MISSING:  # pragma: no cover
+        if self.updated_date is MISSING:
             object.__setattr__(self, "updated_date", now)

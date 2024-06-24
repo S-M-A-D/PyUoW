@@ -11,7 +11,7 @@ from sqlalchemy.orm import (
 )
 
 
-class BaseTable(MappedAsDataclass, DeclarativeBase, kw_only=True):
+class BaseTable(MappedAsDataclass, DeclarativeBase):
     __abstract__ = True
     type_annotation_map = {
         UUID: postgresql.UUID(as_uuid=True),

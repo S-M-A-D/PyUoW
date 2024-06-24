@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import typing as t
 from dataclasses import dataclass, replace
 from uuid import UUID, uuid4
@@ -20,13 +21,14 @@ from pyuow.contrib.sqlalchemy.work import (
 )
 from pyuow.persistence.entities import AuditedEntity, Entity
 from pyuow.persistence.repository import BaseEntityRepository
+from pyuow.types import MISSING
 
 FakeEntityId = t.NewType("FakeEntityId", UUID)
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True)
 class FakeAuditedEntity(AuditedEntity[FakeEntityId]):
-    field: str
+    field: str = t.cast(t.Any, MISSING)
 
     def change_field(self, value: str) -> FakeAuditedEntity:
         return replace(self, field=value)
@@ -87,6 +89,7 @@ def repository_factory(engine: AsyncEngine) -> FakeRepositoryFactory:
     )
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 class TestSqlAlchemyEntityRepository:
     @pytest.fixture
     def repository(
