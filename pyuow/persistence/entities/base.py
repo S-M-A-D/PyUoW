@@ -15,8 +15,8 @@ class Entity(t.Generic[ENTITY_ID]):
 
 @dataclass(frozen=True)
 class AuditedEntity(Entity[ENTITY_ID]):
-    created_date: datetime = t.cast(t.Any, MISSING)
-    updated_date: datetime = t.cast(t.Any, MISSING)
+    created_date: datetime = t.cast(datetime, MISSING)
+    updated_date: datetime = t.cast(datetime, MISSING)
 
     def __post_init__(self) -> None:
         now = datetime.utcnow()

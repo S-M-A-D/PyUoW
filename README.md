@@ -18,7 +18,7 @@ PyUow officially supports Python >= 3.9.
 
 ## Usage examples
 
-### Simple example:
+### Simple unit example:
 
 #### Definition:
 ```python
@@ -37,30 +37,30 @@ from pyuow import (
 
 @dataclass(frozen=True)
 class ExampleParams:
-    params_field: str
+    field: str
 
 
 @dataclass
 class ExampleContext(BaseContext[ExampleParams]):
-    context_field: str
+    field: str
 
 
 @dataclass(frozen=True)
 class ExampleOutput:
-    result_field: str
+    field: str
 
 
 class ExampleConditionalUnit(ConditionalUnit[ExampleContext, ExampleOutput]):
     async def condition(
         self, context: ExampleContext, **kwargs: t.Any
     ) -> bool:
-        return context.context_field == "context field value"
+        return context.field == "context field value"
 
 
 class ExampleRunUnit(RunUnit[ExampleContext, ExampleOutput]):
     async def run(self, context: ExampleContext, **kwargs: t.Any) -> None:
         print(
-            f"I'm just running a logic, and displaying: {context.params.params_field}"
+            f"I'm just running a logic, and displaying: {context.params.field}"
         )
 
 
@@ -68,7 +68,7 @@ class SuccessUnit(FinalUnit[ExampleContext, ExampleOutput]):
     async def finish(
         self, context: ExampleContext, **kwargs: t.Any
     ) -> Result[ExampleOutput]:
-        return Result.ok(ExampleOutput(result_field="success"))
+        return Result.ok(ExampleOutput(field="success"))
 
 
 flow = (
@@ -83,8 +83,8 @@ flow = (
 #### Success scenario:
 ```python
 async def main() -> None:
-    params = ExampleParams(params_field="params field value")
-    context = ExampleContext(params=params, context_field="context field value")
+    params = ExampleParams(field="params field value")
+    context = ExampleContext(params=params, field="context field value")
     result = await flow(context)
     result.get()
 ```
@@ -92,12 +92,12 @@ async def main() -> None:
 #### Failure scenario:
 ```python
 async def main() -> None:
-    params = ExampleParams(params_field="params field value")
-    context = ExampleContext(params=params, context_field="invalid field value")
+    params = ExampleParams(field="params field value")
+    context = ExampleContext(params=params, field="invalid field value")
     result = await flow(context)
 ```
 
-### With Unit of Work example
+### With Unit of Work manager example
 
 :warning: NoOp - No Operations, can be replaced with your own implementation of UoW.
 
@@ -116,7 +116,7 @@ async def main() -> None:
     result = await work.by(flow).do_with(context)
 ```
 
-### With SqlAlchemy based Unit of Work:
+### With SqlAlchemy based Unit of Work manager:
 ```python
 from __future__ import annotations
 
@@ -135,7 +135,7 @@ from pyuow import (
     Result,
     ErrorUnit,
 )
-from pyuow.contrib.sqlalchemy.persistence import AuditedEntityTable
+from pyuow.contrib.sqlalchemy.persistence.tables import AuditedEntityTable
 from pyuow.contrib.sqlalchemy.persistence.repository import (
     BaseSqlAlchemyRepositoryFactory,
     BaseSqlAlchemyEntityRepository,
@@ -144,7 +144,7 @@ from pyuow.contrib.sqlalchemy.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.persistence import Entity, AuditedEntity
+from pyuow.persistence.entities import Entity, AuditedEntity
 from pyuow.persistence.repository import BaseEntityRepository
 from pyuow.work.transactional import TransactionalWorkManager
 
@@ -212,24 +212,24 @@ class ExampleRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
 
 @dataclass(frozen=True)
 class ExampleParams:
-    params_field: str
+    field: str
 
 
 @dataclass
 class ExampleContext(BaseContext[ExampleParams]):
-    context_field: str
+    field: str
 
 
 @dataclass(frozen=True)
 class ExampleOutput:
-    result_field: str
+    field: str
 
 
 class ExampleConditionalUnit(ConditionalUnit[ExampleContext, ExampleOutput]):
     async def condition(
         self, context: ExampleContext, **kwargs: t.Any
     ) -> bool:
-        return context.context_field == "context field value"
+        return context.field == "context field value"
 
 
 class ExampleRunUnit(RunUnit[ExampleContext, ExampleOutput]):
@@ -241,7 +241,7 @@ class ExampleRunUnit(RunUnit[ExampleContext, ExampleOutput]):
 
     async def run(self, context: ExampleContext, **kwargs: t.Any) -> None:
         entity = ExampleAuditedEntity(
-            id=ExampleEntityId(uuid4()), field=context.params.params_field
+            id=ExampleEntityId(uuid4()), field=context.params.field
         )
         await self._example_entity_repository.add(entity)
 
@@ -250,7 +250,7 @@ class SuccessUnit(FinalUnit[ExampleContext, ExampleOutput]):
     async def finish(
         self, context: ExampleContext, **kwargs: t.Any
     ) -> Result[ExampleOutput]:
-        return Result.ok(ExampleOutput(result_field="success"))
+        return Result.ok(ExampleOutput(field="success"))
 
 
 engine = create_async_engine("postgresql://postgres:postgres@db:5432/postgres")
@@ -277,8 +277,8 @@ flow = (
 
 
 async def main() -> None:
-    params = ExampleParams(params_field="params field value")
-    context = ExampleContext(params=params, context_field="context field value")
+    params = ExampleParams(field="params field value")
+    context = ExampleContext(params=params, field="context field value")
     result = await work.by(flow).do_with(context)
     result.get()
 

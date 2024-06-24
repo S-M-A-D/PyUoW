@@ -56,7 +56,7 @@ testcontainers = {version = "^4.0.0", extras = ["postgres"]}
 asyncpg = "^0.29.0"
 
 [tool.poetry.extras]
-sa = ["sqlalchemy"]
+sqlalchemy = ["sqlalchemy"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

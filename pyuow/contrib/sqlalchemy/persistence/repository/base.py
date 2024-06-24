@@ -3,7 +3,13 @@ from abc import ABC, abstractmethod
 from dataclasses import asdict
 from datetime import datetime
 
-from sqlalchemy import delete, exists, insert, select, update
+try:
+    from sqlalchemy import delete, exists, insert, select, update
+except ImportError:
+    raise ImportError(
+        "Seems You are trying to import extra module that was not installed,"
+        " please install pyuow[sqlalchemy]"
+    )
 
 from .....persistence.entities.base import ENTITY_ID, ENTITY_TYPE
 from .....persistence.repository import (
