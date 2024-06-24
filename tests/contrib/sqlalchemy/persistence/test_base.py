@@ -21,11 +21,11 @@ from pyuow.contrib.sqlalchemy.work import (
 from pyuow.persistence import AuditedEntity, Entity
 from pyuow.persistence.repository import BaseEntityRepository
 
-TestingEntityId = t.NewType("TestingEntityId", UUID)
+FakeEntityId = t.NewType("FakeEntityId", UUID)
 
 
 @dataclass(frozen=True, kw_only=True)
-class FakeAuditedEntity(AuditedEntity[TestingEntityId]):
+class FakeAuditedEntity(AuditedEntity[FakeEntityId]):
     field: str
 
     def change_field(self, value: str) -> FakeAuditedEntity:
@@ -40,7 +40,7 @@ class FakeEntityTable(AuditedEntityTable):
 
 class FakeEntityRepository(
     BaseSqlAlchemyEntityRepository[
-        TestingEntityId, FakeAuditedEntity, FakeEntityTable
+        FakeEntityId, FakeAuditedEntity, FakeEntityTable
     ]
 ):
     @staticmethod
@@ -98,7 +98,7 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ) -> None:
         # given
-        entity = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
+        entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await repository.add(entity)
         # when
         result = await repository.find(entity.id)
@@ -109,8 +109,8 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ) -> None:
         # given
-        entity1 = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
-        entity2 = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
+        entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
+        entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await repository.add_all([entity1, entity2])
         # when
         result = await repository.find_all([entity1.id, entity2.id])
@@ -121,18 +121,18 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ) -> None:
         # given
-        entity = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
+        entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await repository.add(entity)
         # when
         result = await repository.get(entity.id)
         # then
         assert result == entity
 
-    async def test_get_should_raise_if_no_entity_found(
+    async def test_get_should_raise_if_no_entity_exists(
         self, repository: FakeEntityRepository
     ) -> None:
         # given
-        entity_id = TestingEntityId(uuid4())
+        entity_id = FakeEntityId(uuid4())
         # when / then
         with pytest.raises(NoResultFound):
             await repository.get(entity_id)
@@ -141,7 +141,7 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ) -> None:
         # given
-        entity = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
+        entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await repository.add(entity)
         # when
         result = await repository.exists(entity.id)
@@ -152,7 +152,7 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ) -> None:
         # given
-        entity_id = TestingEntityId(uuid4())
+        entity_id = FakeEntityId(uuid4())
         # when
         result = await repository.exists(entity_id)
         # then
@@ -162,7 +162,7 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ):
         # given
-        entity = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
+        entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await repository.add(entity)
         # when
         result = await repository.update(entity.change_field("changed"))
@@ -174,8 +174,8 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ):
         # given
-        entity1 = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
-        entity2 = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
+        entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
+        entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await repository.add_all([entity1, entity2])
         # when
         result1, result2 = await repository.update_all(
@@ -192,7 +192,7 @@ class TestSqlAlchemyEntityRepository:
         self, repository: FakeEntityRepository
     ):
         # given
-        entity = FakeAuditedEntity(id=TestingEntityId(uuid4()), field="test")
+        entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await repository.add(entity)
         # when
         result = await repository.delete(entity)

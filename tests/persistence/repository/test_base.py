@@ -19,35 +19,37 @@ class FakeEntity(Entity[UUID]):
 
 
 class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
-    def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
+    async def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
         return None
 
-    def find_all(self, entity_ids: t.Iterable[UUID]) -> t.Iterable[FakeEntity]:
+    async def find_all(
+        self, entity_ids: t.Iterable[UUID]
+    ) -> t.Iterable[FakeEntity]:
         return []
 
-    def get(self, entity_id: UUID) -> FakeEntity:
+    async def get(self, entity_id: UUID) -> FakeEntity:
         return FakeEntity(id=entity_id)
 
-    def add(self, entity: FakeEntity) -> FakeEntity:
+    async def add(self, entity: FakeEntity) -> FakeEntity:
         return entity
 
-    def add_all(
+    async def add_all(
         self, entities: t.Sequence[FakeEntity]
     ) -> t.Iterable[FakeEntity]:
         return entities
 
-    def update(self, entity: FakeEntity) -> FakeEntity:
+    async def update(self, entity: FakeEntity) -> FakeEntity:
         return entity
 
-    def update_all(
+    async def update_all(
         self, entities: t.Sequence[FakeEntity]
     ) -> t.Iterable[FakeEntity]:
         return entities
 
-    def delete(self, entity: FakeEntity) -> bool:
+    async def delete(self, entity: FakeEntity) -> bool:
         return True
 
-    def exists(self, entity_id: ENTITY_ID) -> bool:
+    async def exists(self, entity_id: ENTITY_ID) -> bool:
         pass
 
 

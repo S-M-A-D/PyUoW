@@ -7,47 +7,47 @@ from ..entities import ENTITY_ID, ENTITY_TYPE, Entity
 
 class BaseReadOnlyEntityRepository(t.Generic[ENTITY_ID, ENTITY_TYPE], ABC):
     @abc.abstractmethod
-    def find(self, entity_id: ENTITY_ID) -> t.Optional[ENTITY_TYPE]:
+    async def find(self, entity_id: ENTITY_ID) -> t.Optional[ENTITY_TYPE]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def find_all(
+    async def find_all(
         self, entity_ids: t.Iterable[ENTITY_ID]
     ) -> t.Iterable[ENTITY_TYPE]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get(self, entity_id: ENTITY_ID) -> ENTITY_TYPE:
+    async def get(self, entity_id: ENTITY_ID) -> ENTITY_TYPE:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def exists(self, entity_id: ENTITY_ID) -> bool:
+    async def exists(self, entity_id: ENTITY_ID) -> bool:
         raise NotImplementedError
 
 
 class BaseWriteOnlyEntityRepository(t.Generic[ENTITY_ID, ENTITY_TYPE], ABC):
     @abc.abstractmethod
-    def add(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
+    async def add(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def add_all(
+    async def add_all(
         self, entities: t.Sequence[ENTITY_TYPE]
     ) -> t.Iterable[ENTITY_TYPE]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
+    async def update(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update_all(
+    async def update_all(
         self, entities: t.Sequence[ENTITY_TYPE]
     ) -> t.Iterable[ENTITY_TYPE]:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def delete(self, entity: ENTITY_TYPE) -> bool:
+    async def delete(self, entity: ENTITY_TYPE) -> bool:
         raise NotImplementedError
 
 
