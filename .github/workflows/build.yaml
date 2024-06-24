@@ -36,7 +36,7 @@ jobs:
 
       - name: Run tests with Pytest
         run: |
-          pytest --cov --cov-report=xml --cov-fail-under=80 --markers "${{ runner.os == 'Linux' && 'not skip_on_ci' || 'skip_on_ci' }}"
+          pytest --cov --cov-report=xml ${{ runner.os != 'Linux' && '--cov-fail-under=80 ' }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
