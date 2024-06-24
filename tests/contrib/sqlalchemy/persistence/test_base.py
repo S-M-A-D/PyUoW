@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-import sys
 import typing as t
 from dataclasses import dataclass, replace
 from uuid import UUID, uuid4
@@ -90,13 +88,7 @@ def repository_factory(engine: AsyncEngine) -> FakeRepositoryFactory:
     )
 
 
-@pytest.mark.skipif(
-    (
-        sys.platform in ["win32", "darwin"]
-        and os.getenv("GITHUB_ACTIONS") == "true"
-    ),
-    reason="Does not run on windows and macos inside GitHub Action",
-)
+@pytest.mark.skip_on_ci
 class TestSqlAlchemyEntityRepository:
     @pytest.fixture
     def repository(

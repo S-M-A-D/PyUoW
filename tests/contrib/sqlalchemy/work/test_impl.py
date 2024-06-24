@@ -1,5 +1,6 @@
 from unittest.mock import AsyncMock
 
+import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from pyuow.contrib.sqlalchemy.work import (
@@ -9,7 +10,6 @@ from pyuow.contrib.sqlalchemy.work import (
 
 
 class TestSqlAlchemyTransaction:
-
     async def test_rollback_should_call_transaction_provider_original_rollback(
         self,
     ):
@@ -33,6 +33,7 @@ class TestSqlAlchemyTransaction:
         trx_provider.commit.assert_awaited_once()
 
 
+@pytest.mark.skip_on_ci
 class TestSqlAlchemyTransactionManager:
     async def test_transaction_should_return_same_session_if_called_in_already_opened_transaction(
         self, engine: AsyncEngine

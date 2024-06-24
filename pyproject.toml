@@ -65,6 +65,9 @@ junit_family = "xunit2"
 testpaths = [
     "tests",
 ]
+markers = [
+    "skip_on_ci: mark a test that cannot be executed on CI with unsoported platforms."
+]
 
 [tool.coverage.run]
 branch = true
