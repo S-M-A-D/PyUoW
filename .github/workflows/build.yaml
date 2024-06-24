@@ -37,9 +37,9 @@ jobs:
       - name: Run tests with Pytest
         run: |
           if [ "${{ runner.os }}" = "Linux" ]; then
-            pytest --cov --cov-report=xml --cov-fail-under=80
-          else
             pytest --cov --cov-report=xml
+          else
+            pytest --cov --cov-report=xml --cov-fail-under=80
           fi
 
       - name: Upload coverage
