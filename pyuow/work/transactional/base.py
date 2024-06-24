@@ -6,9 +6,11 @@ TRANSACTION_PROVIDER = t.TypeVar("TRANSACTION_PROVIDER")
 
 
 class BaseTransaction(t.Generic[TRANSACTION_PROVIDER], ABC):
-    @abc.abstractmethod
+    def __init__(self, transaction_provider: TRANSACTION_PROVIDER) -> None:
+        self._transaction_provider = transaction_provider
+
     def it(self) -> TRANSACTION_PROVIDER:
-        raise NotImplementedError
+        return self._transaction_provider
 
     @abc.abstractmethod
     async def rollback(self) -> None:

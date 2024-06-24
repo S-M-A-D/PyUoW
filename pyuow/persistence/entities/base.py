@@ -1,8 +1,8 @@
 import typing as t
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 
-from ..types import MISSING
+from ...types import MISSING
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound="Entity[t.Any]")
@@ -15,13 +15,13 @@ class Entity(t.Generic[ENTITY_ID]):
 
 @dataclass(frozen=True)
 class AuditedEntity(Entity[ENTITY_ID]):
-    created_date: datetime = MISSING  # type: ignore[assignment]
-    updated_date: datetime = MISSING  # type: ignore[assignment]
+    created_date: datetime = t.cast(datetime, MISSING)
+    updated_date: datetime = t.cast(datetime, MISSING)
 
     def __post_init__(self) -> None:
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.utcnow()
 
-        if self.created_date is MISSING:  # pragma: no cover
+        if self.created_date is MISSING:
             object.__setattr__(self, "created_date", now)
-        if self.updated_date is MISSING:  # pragma: no cover
+        if self.updated_date is MISSING:
             object.__setattr__(self, "updated_date", now)
