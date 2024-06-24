@@ -2,7 +2,7 @@ import typing as t
 from dataclasses import dataclass
 from datetime import datetime
 
-from ..types import MISSING
+from ...types import MISSING
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound="Entity[t.Any]")

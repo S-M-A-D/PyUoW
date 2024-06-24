@@ -5,7 +5,7 @@ from datetime import datetime
 
 from sqlalchemy import delete, exists, insert, select, update
 
-from .....persistence.entities import ENTITY_ID, ENTITY_TYPE
+from .....persistence.entities.base import ENTITY_ID, ENTITY_TYPE
 from .....persistence.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
@@ -14,7 +14,7 @@ from ...work.impl import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from ..table import AuditedEntityTable, EntityTable
+from ..tables import AuditedEntityTable, EntityTable
 
 ENTITY_TABLE = t.TypeVar("ENTITY_TABLE", bound=EntityTable)
 

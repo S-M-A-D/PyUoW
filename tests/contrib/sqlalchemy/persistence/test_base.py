@@ -9,16 +9,16 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import Mapped
 
-from pyuow.contrib.sqlalchemy.persistence import AuditedEntityTable
 from pyuow.contrib.sqlalchemy.persistence.repository import (
     BaseSqlAlchemyEntityRepository,
     BaseSqlAlchemyRepositoryFactory,
 )
+from pyuow.contrib.sqlalchemy.persistence.tables import AuditedEntityTable
 from pyuow.contrib.sqlalchemy.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.persistence import AuditedEntity, Entity
+from pyuow.persistence.entities import AuditedEntity, Entity
 from pyuow.persistence.repository import BaseEntityRepository
 
 FakeEntityId = t.NewType("FakeEntityId", UUID)
