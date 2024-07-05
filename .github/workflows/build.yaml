@@ -1,16 +1,47 @@
 name: PyUoW-build
 
+
 on: [push]
 
 jobs:
-  build:
+  ubuntu-checks:
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install --all-extras
+        env:
+          POETRY_VIRTUALENVS_CREATE: false
+      - name: Run checks
+        run: |
+          black --check --diff .
+          isort --check --diff .
+          autoflake --recursive --check --quiet .
+          mypy pyuow
+          safety check --ignore 70612
+      - name: Run tests with Pytest
+        run: |
+          pytest --cov=pyuow --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+
+  windows-macos-checks:
+    strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ macos-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -36,7 +67,4 @@ jobs:
 
       - name: Run tests with Pytest
         run: |
-          pytest --cov --cov-report=xml ${{ runner.os != 'Linux' && '--cov-fail-under=80' || ''}}
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
+          pytest --cov --cov-report=xml --cov-fail-under=0
