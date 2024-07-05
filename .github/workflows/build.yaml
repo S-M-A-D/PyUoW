@@ -31,7 +31,7 @@ jobs:
           safety check --ignore 70612
       - name: Run tests with Pytest
         run: |
-          pytest --cov=pyuow --cov-report=xml
+          pytest --cov --cov-report=xml
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -67,4 +67,4 @@ jobs:
 
       - name: Run tests with Pytest
         run: |
-          pytest --cov --cov-report=xml --cov-fail-under=0
+          pytest --cov --cov-fail-under=0

@@ -5,7 +5,7 @@ from datetime import datetime
 
 try:
     from sqlalchemy import delete, exists, insert, select, update
-except ImportError:
+except ImportError:  # pragma: no cover
     raise ImportError(
         "Seems You are trying to import extra module that was not installed,"
         " please install pyuow[sqlalchemy]"
