@@ -18,7 +18,7 @@ PyUow officially supports Python >= 3.9.
 
 ## Usage examples
 
-### Simple unit example:
+### Simple unit usage example:
 
 #### Definition:
 ```python
@@ -95,9 +95,10 @@ async def main() -> None:
     params = ExampleParams(field="params field value")
     context = ExampleContext(params=params, field="invalid field value")
     result = await flow(context)
+    result.get()
 ```
 
-### With Unit of Work manager example
+### Example with Unit of Work manager example
 
 :warning: NoOp - No Operations, can be replaced with your own implementation of UoW.
 
@@ -114,9 +115,10 @@ work = NoOpWorkManager()
 async def main() -> None:
     ...
     result = await work.by(flow).do_with(context)
+    ...
 ```
 
-### With SqlAlchemy based Unit of Work manager:
+### Example with SqlAlchemy based Unit of Work manager:
 ```python
 from __future__ import annotations
 
