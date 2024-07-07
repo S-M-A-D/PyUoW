@@ -1,10 +1,10 @@
-from ..result import OUT, Result
-from ..units import CONTEXT, BaseUnit
-from .base import BaseUnitProxy, BaseWorkManager
+from ... import BaseUnit
+from ...result import OUT, Result
+from ...units import CONTEXT
+from ..base import BaseUnitProxy, BaseWorkManager
 
 
 class NoOpUnitProxy(BaseUnitProxy[CONTEXT, OUT]):  # pragma: no cover
-
     def __init__(
         self,
         *,

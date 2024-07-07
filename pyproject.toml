@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyuow"
-version = "0.1.4"
+version = "0.2.0"
 description = "Python custom implementation of unit of work pattern"
 authors = ["SMED"]
 maintainers = [
@@ -19,7 +19,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -38,7 +37,8 @@ include = [
 "Changelog" = "https://github.com/S-M-A-D/PyUoW/releases"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
+sqlalchemy = {version = "^2.0.31", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
@@ -51,7 +51,12 @@ mypy = "^1.9.0"
 coverage = { version = "^7.4.4", extras = ["toml"] }
 black = "^24.4.2"
 safety = "^3.2.3"
-greenlet = { version = "^3.0.3" }
+greenlet = "^3.0.3"
+testcontainers = {version = "^4.0.0", extras = ["postgres"]}
+asyncpg = "^0.29.0"
+
+[tool.poetry.extras]
+sqlalchemy = ["sqlalchemy"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -59,6 +64,9 @@ addopts = "-xvrs --color=yes"
 junit_family = "xunit2"
 testpaths = [
     "tests",
+]
+markers = [
+    "skip_on_ci: mark a test that cannot be executed on CI with unsoported platforms."
 ]
 
 [tool.coverage.run]

@@ -42,17 +42,11 @@ class FailureUnit(BaseUnit[FakeContext, FakeOut]):
 
 
 class FakeTransaction(BaseTransaction[Mock]):
-    def __init__(self, trx_provider: Mock):
-        self._trx_provider = trx_provider
-
-    def it(self) -> Mock:
-        return self._trx_provider
-
     async def rollback(self) -> None:
-        await self._trx_provider.rollback()
+        await self._transaction_provider.rollback()
 
     async def commit(self) -> None:
-        await self._trx_provider.commit()
+        await self._transaction_provider.commit()
 
 
 class FakeTransactionManager(BaseTransactionManager[FakeTransaction]):
