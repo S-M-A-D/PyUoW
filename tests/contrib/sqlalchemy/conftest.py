@@ -16,7 +16,7 @@ def postgres() -> Iterator[PostgresContainer]:
 def engine(postgres: PostgresContainer) -> Iterator[AsyncEngine]:
     engine = create_async_engine(
         postgres.get_connection_url(),
-        # NullPool is required for sqlalchemy in test
+        # NullPool is required for sqlalchemy in tests
         # to properly work with asyncio
         # https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#using-multiple-asyncio-event-loops
         poolclass=NullPool,
