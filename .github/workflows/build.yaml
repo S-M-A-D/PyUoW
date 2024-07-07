@@ -24,11 +24,11 @@ jobs:
           POETRY_VIRTUALENVS_CREATE: false
       - name: Run checks
         run: |
-          black --check --diff .
           isort --check --diff .
+          black --check --diff .
           autoflake --recursive --check --quiet .
           mypy pyuow
-          safety check --ignore 70612
+          safety check --ignore 70612  # Safety dependency jinja2 fails (check for new versions lately)
       - name: Run tests with Pytest
         run: |
           pytest --cov --cov-report=xml
@@ -59,8 +59,8 @@ jobs:
 
       - name: Run checks
         run: |
-          black --check --diff .
           isort --check --diff .
+          black --check --diff .
           autoflake --recursive --check --quiet .
           mypy pyuow
           safety check --ignore 70612  # Safety dependency jinja2 fails (check for new versions lately)

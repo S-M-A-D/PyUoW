@@ -1,14 +1,20 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    Mapped,
-    MappedAsDataclass,
-    mapped_column,
-)
+try:
+    from sqlalchemy import DateTime
+    from sqlalchemy.dialects import postgresql
+    from sqlalchemy.orm import (
+        DeclarativeBase,
+        Mapped,
+        MappedAsDataclass,
+        mapped_column,
+    )
+except ImportError:  # pragma: no cover
+    raise ImportError(
+        "Seems that you are trying to import extra module that was not installed,"
+        " please install pyuow[sqlalchemy]"
+    )
 
 
 class BaseTable(MappedAsDataclass, DeclarativeBase):

@@ -2,12 +2,18 @@ import typing as t
 from asyncio import current_task
 from contextlib import asynccontextmanager
 
-from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
-    AsyncSession,
-    async_scoped_session,
-    async_sessionmaker,
-)
+try:
+    from sqlalchemy.ext.asyncio import (
+        AsyncEngine,
+        AsyncSession,
+        async_scoped_session,
+        async_sessionmaker,
+    )
+except ImportError:  # pragma: no cover
+    raise ImportError(
+        "Seems that you are trying to import extra module that was not installed,"
+        " please install pyuow[sqlalchemy]"
+    )
 
 from ....work.transactional import BaseTransaction, BaseTransactionManager
 

@@ -7,7 +7,7 @@ try:
     from sqlalchemy import delete, exists, insert, select, update
 except ImportError:  # pragma: no cover
     raise ImportError(
-        "Seems You are trying to import extra module that was not installed,"
+        "Seems that you are trying to import extra module that was not installed,"
         " please install pyuow[sqlalchemy]"
     )
 
