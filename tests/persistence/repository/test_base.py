@@ -8,8 +8,8 @@ import pytest
 from pyuow.persistence.entities import Entity
 from pyuow.persistence.entities.base import ENTITY_ID
 from pyuow.persistence.repository import (
-    BaseEntityRepository,
-    BaseRepositoryFactory,
+    BaseAsyncEntityRepository,
+    BaseAsyncRepositoryFactory,
 )
 
 
@@ -18,7 +18,7 @@ class FakeEntity(Entity[UUID]):
     pass
 
 
-class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
+class FakeBaseEntityRepository(BaseAsyncEntityRepository[UUID, UUID]):
     async def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
         return None
 
@@ -53,11 +53,13 @@ class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
         pass
 
 
-class FakeRepositoryFactory(BaseRepositoryFactory):
+class FakeRepositoryFactory(BaseAsyncRepositoryFactory):
     @property
     def repositories(
         self,
-    ) -> t.Mapping[t.Type[Entity[t.Any]], BaseEntityRepository[t.Any, t.Any]]:
+    ) -> t.Mapping[
+        t.Type[Entity[t.Any]], BaseAsyncEntityRepository[t.Any, t.Any]
+    ]:
         return {FakeEntity: FakeBaseEntityRepository()}
 
 

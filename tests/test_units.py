@@ -7,13 +7,13 @@ import pytest
 from pyuow import (
     BaseContext,
     CannotReassignUnitError,
-    ConditionalUnit,
-    ErrorUnit,
-    FinalUnit,
+    ConditionalAsyncUnit,
+    ErrorAsyncUnit,
+    FinalAsyncUnit,
     FinalUnitError,
-    FlowUnit,
+    FlowAsyncUnit,
     Result,
-    RunUnit,
+    RunAsyncUnit,
 )
 from pyuow.types import MISSING
 
@@ -23,7 +23,7 @@ class TestUnits:
         self,
     ):
         # given
-        class FakeUnit(FlowUnit[Mock, None]):
+        class FakeUnit(FlowAsyncUnit[Mock, None]):
             async def __call__(
                 self, context: Mock, **kwargs: t.Any
             ) -> Result[None]:
@@ -43,7 +43,7 @@ class TestUnits:
         self,
     ):
         # given
-        class FakeUnit(FlowUnit[Mock, None]):
+        class FakeUnit(FlowAsyncUnit[Mock, None]):
             async def __call__(
                 self, context: Mock, **kwargs: t.Any
             ) -> Result[None]:
@@ -59,7 +59,7 @@ class TestUnits:
         self,
     ):
         # given
-        class FakeUnit(FlowUnit[Mock, None]):
+        class FakeUnit(FlowAsyncUnit[Mock, None]):
             async def __call__(
                 self, context: Mock, **kwargs: t.Any
             ) -> Result[None]:
@@ -86,18 +86,18 @@ class TestUnits:
         class FakeOut:
             result_field: str
 
-        class FakeConditionalUnit(ConditionalUnit[FakeContext, FakeOut]):
+        class FakeConditionalUnit(ConditionalAsyncUnit[FakeContext, FakeOut]):
             async def condition(
                 self, context: FakeContext, **kwargs: t.Any
             ) -> bool:
                 return context.context_field == "test"
 
-        class FakeRunUnit(RunUnit[FakeContext, FakeOut]):
+        class FakeRunUnit(RunAsyncUnit[FakeContext, FakeOut]):
             async def run(
                 self, context: FakeContext, **kwargs: t.Any
             ) -> None: ...
 
-        class SuccessUnit(FinalUnit[FakeContext, FakeOut]):
+        class SuccessUnit(FinalAsyncUnit[FakeContext, FakeOut]):
             async def finish(
                 self, context: FakeContext, **kwargs: t.Any
             ) -> Result[FakeOut]:
@@ -105,7 +105,9 @@ class TestUnits:
 
         # when
         flow = (
-            FakeConditionalUnit(on_failure=ErrorUnit(exc=Exception("test")))
+            FakeConditionalUnit(
+                on_failure=ErrorAsyncUnit(exc=Exception("test"))
+            )
             >> FakeRunUnit()
             >> SuccessUnit()
         ).build()
@@ -131,7 +133,7 @@ class TestUnits:
                 super().__init__(params)
                 self.context_field = context_field
 
-        class FakeConditionalUnit(ConditionalUnit[FakeContext, None]):
+        class FakeConditionalUnit(ConditionalAsyncUnit[FakeContext, None]):
             async def condition(
                 self, context: FakeContext, **kwargs: t.Any
             ) -> bool:
@@ -154,7 +156,7 @@ class TestUnits:
         self,
     ):
         # given
-        class FakeUnit(ConditionalUnit[Mock, None]):
+        class FakeUnit(ConditionalAsyncUnit[Mock, None]):
             async def condition(self, context: Mock, **kwargs: t.Any) -> bool:
                 return False
 
@@ -167,7 +169,7 @@ class TestUnits:
         self,
     ):
         # given
-        class FakeUnit(ConditionalUnit[Mock, None]):
+        class FakeUnit(ConditionalAsyncUnit[Mock, None]):
             async def condition(self, context: Mock, **kwargs: t.Any) -> bool:
                 raise Exception
 
@@ -186,7 +188,7 @@ class TestUnits:
         mock_context = Mock()
         mock_on_failure = AsyncMock()
 
-        class FakeUnit(ConditionalUnit[Mock, None]):
+        class FakeUnit(ConditionalAsyncUnit[Mock, None]):
             async def condition(self, context: Mock, **kwargs: t.Any) -> bool:
                 return False
 
@@ -203,7 +205,7 @@ class TestUnits:
         mock_context = Mock()
         mock_logic = Mock()
 
-        class FakeUnit(RunUnit[Mock, None]):
+        class FakeUnit(RunAsyncUnit[Mock, None]):
             async def run(self, context: Mock, **kwargs: t.Any) -> None:
                 mock_logic(context)
 
@@ -215,7 +217,7 @@ class TestUnits:
 
     async def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(self):
         # given
-        class FakeUnit(RunUnit[Mock, None]):
+        class FakeUnit(RunAsyncUnit[Mock, None]):
             async def run(self, context: Mock, **kwargs: t.Any) -> None: ...
 
         flow = FakeUnit().build()
@@ -227,7 +229,7 @@ class TestUnits:
         self,
     ):
         # given
-        class FakeUnit(RunUnit[Mock, None]):
+        class FakeUnit(RunAsyncUnit[Mock, None]):
             async def run(self, context: Mock, **kwargs: t.Any) -> None:
                 raise Exception
 
@@ -239,7 +241,7 @@ class TestUnits:
 
     async def test_final_unit_should_raise_on_next_assigned(self):
         # given
-        class FakeUnit(FinalUnit[Mock, None]):
+        class FakeUnit(FinalAsyncUnit[Mock, None]):
             async def finish(
                 self, context: Mock, **kwargs: t.Any
             ) -> Result[None]:
@@ -253,7 +255,7 @@ class TestUnits:
         self,
     ):
         # given
-        class FakeUnit(FinalUnit[Mock, None]):
+        class FakeUnit(FinalAsyncUnit[Mock, None]):
             async def finish(self, context: Mock, **kwargs: t.Any) -> bool:
                 raise Exception
 
@@ -266,7 +268,7 @@ class TestUnits:
     async def test_error_unit_should_behave_properly(self):
         # given
         mock_context = Mock()
-        unit = ErrorUnit(exc=Exception("test"))
+        unit = ErrorAsyncUnit(exc=Exception("test"))
         # when
         result = await unit.finish(mock_context)
         # then

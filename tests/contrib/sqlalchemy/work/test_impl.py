@@ -4,8 +4,8 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from pyuow.contrib.sqlalchemy.work import (
-    SqlAlchemyTransaction,
-    SqlAlchemyTransactionManager,
+    SqlAlchemyAsyncTransaction,
+    SqlAlchemyAsyncTransactionManager,
 )
 
 
@@ -15,7 +15,7 @@ class TestSqlAlchemyTransaction:
     ):
         # given
         trx_provider = AsyncMock()
-        trx = SqlAlchemyTransaction(trx_provider)
+        trx = SqlAlchemyAsyncTransaction(trx_provider)
         # when
         await trx.rollback()
         # then
@@ -26,7 +26,7 @@ class TestSqlAlchemyTransaction:
     ):
         # given
         trx_provider = AsyncMock()
-        trx = SqlAlchemyTransaction(trx_provider)
+        trx = SqlAlchemyAsyncTransaction(trx_provider)
         # when
         await trx.commit()
         # then
@@ -39,7 +39,7 @@ class TestSqlAlchemyTransactionManager:
         self, engine: AsyncEngine
     ):
         # given
-        manager = SqlAlchemyTransactionManager(engine)
+        manager = SqlAlchemyAsyncTransactionManager(engine)
         # when
         async with manager.transaction() as trx:
             first_trx = trx.it().get_transaction()
@@ -53,7 +53,7 @@ class TestSqlAlchemyTransactionManager:
         self, engine: AsyncEngine
     ):
         # given
-        manager = SqlAlchemyTransactionManager(engine)
+        manager = SqlAlchemyAsyncTransactionManager(engine)
         # when
         async with manager.transaction() as trx:
             first_trx = trx.it().get_transaction()

@@ -1,4 +1,8 @@
 from .base import (
+    BaseAsyncEntityRepository,
+    BaseAsyncReadOnlyEntityRepository,
+    BaseAsyncRepositoryFactory,
+    BaseAsyncWriteOnlyEntityRepository,
     BaseEntityRepository,
     BaseReadOnlyEntityRepository,
     BaseRepositoryFactory,
@@ -6,8 +10,12 @@ from .base import (
 )
 
 __all__ = (
-    "BaseReadOnlyEntityRepository",
-    "BaseWriteOnlyEntityRepository",
     "BaseEntityRepository",
+    "BaseAsyncEntityRepository",
+    "BaseReadOnlyEntityRepository",
+    "BaseAsyncReadOnlyEntityRepository",
     "BaseRepositoryFactory",
+    "BaseAsyncRepositoryFactory",
+    "BaseWriteOnlyEntityRepository",
+    "BaseAsyncWriteOnlyEntityRepository",
 )

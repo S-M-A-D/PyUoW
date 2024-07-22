@@ -10,19 +10,22 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import Mapped
 
 from pyuow.contrib.sqlalchemy.persistence.repository import (
-    BaseSqlAlchemyEntityRepository,
-    BaseSqlAlchemyRepositoryFactory,
+    BaseAsyncSqlAlchemyEntityRepository,
+    BaseAsyncSqlAlchemyRepositoryFactory,
 )
 from pyuow.contrib.sqlalchemy.persistence.tables import (
     AuditedEntityTable,
     EntityTable,
 )
 from pyuow.contrib.sqlalchemy.work import (
-    SqlAlchemyReadOnlyTransactionManager,
-    SqlAlchemyTransactionManager,
+    SqlAlchemyAsyncReadOnlyTransactionManager,
+    SqlAlchemyAsyncTransactionManager,
 )
 from pyuow.persistence.entities import AuditedEntity, Entity
-from pyuow.persistence.repository import BaseEntityRepository
+from pyuow.persistence.repository import (
+    BaseAsyncEntityRepository,
+    BaseEntityRepository,
+)
 from pyuow.types import MISSING
 
 FakeEntityId = t.NewType("FakeEntityId", UUID)
@@ -57,7 +60,7 @@ class FakeEntity(Entity[FakeEntityId]):
 
 
 class FakeEntityRepository(
-    BaseSqlAlchemyEntityRepository[
+    BaseAsyncSqlAlchemyEntityRepository[
         FakeEntityId, FakeEntity, FakeAuditedEntityTable
     ]
 ):
@@ -77,7 +80,7 @@ class FakeEntityRepository(
 
 
 class FakeAuditedEntityRepository(
-    BaseSqlAlchemyEntityRepository[
+    BaseAsyncSqlAlchemyEntityRepository[
         FakeEntityId, FakeAuditedEntity, FakeAuditedEntityTable
     ]
 ):
@@ -100,11 +103,11 @@ class FakeAuditedEntityRepository(
         )
 
 
-class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
+class FakeRepositoryFactory(BaseAsyncSqlAlchemyRepositoryFactory):
     @property
     def repositories(self) -> t.Mapping[
         t.Type[Entity[t.Any]],
-        BaseEntityRepository[t.Any, t.Any],
+        BaseAsyncEntityRepository[t.Any, t.Any],
     ]:
         return {
             FakeAuditedEntity: FakeAuditedEntityRepository(
@@ -123,8 +126,8 @@ class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
 @pytest.fixture
 def repository_factory(engine: AsyncEngine) -> FakeRepositoryFactory:
     return FakeRepositoryFactory(
-        transaction_manager=SqlAlchemyTransactionManager(engine),
-        readonly_transaction_manager=SqlAlchemyReadOnlyTransactionManager(
+        transaction_manager=SqlAlchemyAsyncTransactionManager(engine),
+        readonly_transaction_manager=SqlAlchemyAsyncReadOnlyTransactionManager(
             engine
         ),
     )
