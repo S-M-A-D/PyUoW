@@ -1,12 +1,25 @@
-# PyUoW
+<p align="center">
+  <a href="https://github.com/S-M-A-D/PyUoW"><img src="./static/logo.png" alt="FastAPI" width="800"></a>
+</p>
+<p align="center">
+    <em>A unit of work a behavioral pattern in software development, implemented in Python.</em>
+<p align="center">
+    <a href="https://pepy.tech/project/pyuow" target="_blank">
+        <img src="https://static.pepy.tech/badge/pyuow" alt="Downloads">
+    </a>
+    <a href="https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml" target="_blank">
+        <img src="https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml/badge.svg" alt="Build">
+    </a>
+    <a href="https://codecov.io/gh/S-M-A-D/PyUoW" target="_blank">
+        <img src="https://codecov.io/gh/S-M-A-D/PyUoW/graph/badge.svg?token=L1Y13VT30W" alt="Codecov">
+    </a>
+    <img src="https://img.shields.io/badge/code%20style-black-black" alt="Formatter">
+    <img src="https://img.shields.io/pypi/pyversions/pyuow" alt="Python versions">
+    <img src="https://img.shields.io/pypi/l/pyuow" alt="License">
+</p>
 
-[![Downloads](https://static.pepy.tech/badge/pyuow)](https://pepy.tech/project/pyuow)
-![Formatter](https://img.shields.io/badge/code%20style-black-black)
-![Build](https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml/badge.svg)
-[![codecov](https://codecov.io/gh/S-M-A-D/PyUoW/graph/badge.svg?token=L1Y13VT30W)](https://codecov.io/gh/S-M-A-D/PyUoW)
-![Version](https://img.shields.io/pypi/pyversions/pyuow)
-![License](https://img.shields.io/pypi/l/pyuow)
-***
+---
+
 
 ## Installation
 
