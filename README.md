@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/S-M-A-D/PyUoW"><img src="./static/logo.png" alt="FastAPI" width="500"></a>
+  <a href="https://github.com/S-M-A-D/PyUoW"><img src="https://raw.githubusercontent.com/S-M-A-D/PyUoW/main/static/logo.png" alt="pyUoW" width="500"></a>
 </p>
 <p align="center">
     <em>Unit of Work: A Behavioral Pattern in Software Development Implemented in Python.</em>
