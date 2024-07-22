@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/S-M-A-D/PyUoW"><img src="./static/logo.png" alt="FastAPI" width="800"></a>
+  <a href="https://github.com/S-M-A-D/PyUoW"><img src="./static/logo.png" alt="FastAPI" width="500"></a>
 </p>
 <p align="center">
     <em>A unit of work a behavioral pattern in software development, implemented in Python.</em>
