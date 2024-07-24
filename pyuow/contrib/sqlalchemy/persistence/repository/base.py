@@ -11,7 +11,7 @@ except ImportError:  # pragma: no cover
         " please install pyuow[sqlalchemy]"
     )
 
-from .....persistence.entities.base import ENTITY_ID, ENTITY_TYPE
+from .....persistence.entity.base import ENTITY_ID, ENTITY_TYPE
 from .....persistence.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,

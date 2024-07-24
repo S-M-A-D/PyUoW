@@ -1,5 +1,5 @@
 from ...result import OUT, Result
-from ...units import CONTEXT, BaseUnit
+from ...unit import CONTEXT, BaseUnit
 from ...work import BaseWorkManager
 from ...work.transactional import BaseTransactionManager
 from ...work.transactional.base import TRANSACTION

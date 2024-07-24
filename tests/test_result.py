@@ -36,7 +36,6 @@ class TestResult:
         with pytest.raises(Exception):
             result.get()
         # then
-
         assert result.is_ok() is False
         assert result.is_error() is True
         assert result.is_empty() is False
@@ -48,7 +47,6 @@ class TestResult:
         with pytest.raises(Exception):
             result.or_raise()
         # then
-
         assert result.is_ok() is False
         assert result.is_error() is True
         assert result.is_empty() is False

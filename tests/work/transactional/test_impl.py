@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, Mock
 
-from pyuow import BaseContext, BaseUnit, Result
+from pyuow import BaseUnit, Result
+from pyuow.context import BaseMutableContext, BaseParams
 from pyuow.work.transactional import (
     BaseTransaction,
     BaseTransactionManager,
@@ -12,13 +13,13 @@ from pyuow.work.transactional import (
 )
 
 
-@dataclass
-class FakeParams:
+@dataclass(frozen=True)
+class FakeParams(BaseParams):
     pass
 
 
 @dataclass
-class FakeContext(BaseContext[FakeParams]):
+class FakeContext(BaseMutableContext[FakeParams]):
     pass
 
 

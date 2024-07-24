@@ -3,6 +3,7 @@ import typing as t
 from abc import ABC
 
 TRANSACTION_PROVIDER = t.TypeVar("TRANSACTION_PROVIDER")
+TRANSACTION = t.TypeVar("TRANSACTION", bound="BaseTransaction[t.Any]")
 
 
 class BaseTransaction(t.Generic[TRANSACTION_PROVIDER], ABC):
@@ -19,9 +20,6 @@ class BaseTransaction(t.Generic[TRANSACTION_PROVIDER], ABC):
     @abc.abstractmethod
     async def commit(self) -> None:
         raise NotImplementedError
-
-
-TRANSACTION = t.TypeVar("TRANSACTION", bound=BaseTransaction[t.Any])
 
 
 class BaseTransactionManager(t.Generic[TRANSACTION], ABC):

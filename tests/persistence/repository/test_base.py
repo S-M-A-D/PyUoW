@@ -5,8 +5,8 @@ from uuid import UUID
 
 import pytest
 
-from pyuow.persistence.entities import Entity
-from pyuow.persistence.entities.base import ENTITY_ID
+from pyuow.persistence.entity import Entity
+from pyuow.persistence.entity.base import ENTITY_ID
 from pyuow.persistence.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
@@ -18,7 +18,7 @@ class FakeEntity(Entity[UUID]):
     pass
 
 
-class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
+class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
     async def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
         return None
 
@@ -50,7 +50,7 @@ class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
         return True
 
     async def exists(self, entity_id: ENTITY_ID) -> bool:
-        pass
+        return True
 
 
 class FakeRepositoryFactory(BaseRepositoryFactory):
@@ -77,6 +77,6 @@ class TestRepositoryFactory:
     ):
         # given
         factory = FakeRepositoryFactory()
-        # when
+        # when / then
         with pytest.raises(KeyError):
             factory.repo_for(Mock)
