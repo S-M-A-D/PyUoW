@@ -11,16 +11,16 @@ except ImportError:  # pragma: no cover
         " please install pyuow[sqlalchemy]"
     )
 
-from ......persistence.entities.base import ENTITY_ID, ENTITY_TYPE
 from ......persistence.aio.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
 )
+from ......persistence.entities.base import ENTITY_ID, ENTITY_TYPE
+from ....persistence.tables import AuditedEntityTable, EntityTable
 from ...work.impl import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from ....persistence.tables import AuditedEntityTable, EntityTable
 
 ENTITY_TABLE = t.TypeVar("ENTITY_TABLE", bound=EntityTable)
 

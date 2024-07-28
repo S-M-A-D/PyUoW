@@ -4,20 +4,9 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pyuow import (
-    BaseContext,
-    CannotReassignUnitError,
-    FinalUnitError,
-    Result,
-)
+from pyuow import BaseContext, CannotReassignUnitError, FinalUnitError, Result
+from pyuow.aio import ConditionalUnit, ErrorUnit, FinalUnit, FlowUnit, RunUnit
 from pyuow.types import MISSING
-from pyuow.aio import (
-    FlowUnit,
-    FinalUnit,
-    ConditionalUnit,
-    RunUnit,
-    ErrorUnit,
-)
 
 
 class TestUnits:

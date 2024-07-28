@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass, replace
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlalchemy.orm import Mapped
 
 from pyuow.contrib.sqlalchemy.aio.persistence.repository import (
     BaseSqlAlchemyEntityRepository,
@@ -17,21 +16,14 @@ from pyuow.contrib.sqlalchemy.aio.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.persistence.aio.repository import (
-    BaseEntityRepository,
-)
-from pyuow.contrib.sqlalchemy.persistence.tables import (
-    AuditedEntityTable,
-    EntityTable,
-)
-
+from pyuow.persistence.aio.repository import BaseEntityRepository
 from pyuow.persistence.entities import AuditedEntity, Entity
 from pyuow.types import MISSING
 
 from ...faked_entities import (
-    FakeEntityTable,
-    FakeEntityId,
     FakeAuditedEntityTable,
+    FakeEntityId,
+    FakeEntityTable,
 )
 
 

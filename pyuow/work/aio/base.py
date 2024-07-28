@@ -1,9 +1,9 @@
 import abc
 from abc import ABC
 
+from ...aio.units import BaseUnit
 from ...result import OUT, Result
 from ...units import CONTEXT
-from ...aio.units import BaseUnit
 
 
 class BaseUnitProxy(BaseUnit[CONTEXT, OUT], ABC):

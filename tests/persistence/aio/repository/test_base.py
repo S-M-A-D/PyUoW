@@ -5,12 +5,12 @@ from uuid import UUID
 
 import pytest
 
-from pyuow.persistence.entities import Entity
-from pyuow.persistence.entities.base import ENTITY_ID
 from pyuow.persistence.aio.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
 )
+from pyuow.persistence.entities import Entity
+from pyuow.persistence.entities.base import ENTITY_ID
 
 
 @dataclass(frozen=True)

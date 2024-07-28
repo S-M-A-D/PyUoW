@@ -1,7 +1,4 @@
-from .base import (
-    BaseUnitProxy,
-    BaseWorkManager,
-)
+from .base import BaseUnitProxy, BaseWorkManager
 
 __all__ = (
     "BaseUnitProxy",

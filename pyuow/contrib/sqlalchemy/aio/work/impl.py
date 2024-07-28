@@ -3,24 +3,19 @@ from asyncio import current_task
 from contextlib import asynccontextmanager
 
 try:
-    from sqlalchemy import Engine
     from sqlalchemy.ext.asyncio import (
         AsyncEngine,
         AsyncSession,
         async_scoped_session,
         async_sessionmaker,
     )
-    from sqlalchemy.orm import Session, scoped_session, sessionmaker
 except ImportError:  # pragma: no cover
     raise ImportError(
         "Seems that you are trying to import extra module that was not installed,"
         " please install pyuow[sqlalchemy]"
     )
 
-from .....work.aio.transactional import (
-    BaseTransaction,
-    BaseTransactionManager,
-)
+from .....work.aio.transactional import BaseTransaction, BaseTransactionManager
 
 
 class SqlAlchemyTransaction(BaseTransaction[AsyncSession]):

@@ -1,12 +1,10 @@
-from typing import Iterator
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 from sqlalchemy import NullPool, text
-from sqlalchemy.engine import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from testcontainers.postgres import PostgresContainer
-
 
 TEST_DB_SCHEMA = Path(__file__).parent.parent / "test_db_schema.sql"
 

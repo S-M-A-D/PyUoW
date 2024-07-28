@@ -4,8 +4,8 @@ from uuid import UUID
 from sqlalchemy.orm import Mapped
 
 from pyuow.contrib.sqlalchemy.persistence.tables import (
-    EntityTable,
     AuditedEntityTable,
+    EntityTable,
 )
 
 
