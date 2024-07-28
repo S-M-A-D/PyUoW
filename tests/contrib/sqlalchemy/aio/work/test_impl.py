@@ -9,6 +9,7 @@ from pyuow.contrib.sqlalchemy.aio.work import (
 )
 
 
+@pytest.mark.skip_on_ci
 class TestSqlAlchemyTransaction:
     async def test_async_rollback_should_call_transaction_provider_original_rollback(
         self,
