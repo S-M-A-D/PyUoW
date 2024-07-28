@@ -2,20 +2,15 @@ from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass, replace
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlalchemy.orm import Mapped
 
 from pyuow.contrib.sqlalchemy.persistence.repository import (
     BaseSqlAlchemyEntityRepository,
     BaseSqlAlchemyRepositoryFactory,
-)
-from pyuow.contrib.sqlalchemy.persistence.tables import (
-    AuditedEntityTable,
-    EntityTable,
 )
 from pyuow.contrib.sqlalchemy.work import (
     SqlAlchemyReadOnlyTransactionManager,
@@ -25,19 +20,11 @@ from pyuow.persistence.entities import AuditedEntity, Entity
 from pyuow.persistence.repository import BaseEntityRepository
 from pyuow.types import MISSING
 
-FakeEntityId = t.NewType("FakeEntityId", UUID)
-
-
-class FakeEntityTable(EntityTable):
-    __tablename__ = "fake_entities"
-
-    field: Mapped[str]
-
-
-class FakeAuditedEntityTable(AuditedEntityTable):
-    __tablename__ = "fake_audited_entities"
-
-    field: Mapped[str]
+from ..faked_entities import (
+    FakeAuditedEntityTable,
+    FakeEntityId,
+    FakeEntityTable,
+)
 
 
 @dataclass(frozen=True)
@@ -121,7 +108,7 @@ class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
 
 
 @pytest.fixture
-def repository_factory(engine: AsyncEngine) -> FakeRepositoryFactory:
+def repository_factory(engine: Engine) -> FakeRepositoryFactory:
     return FakeRepositoryFactory(
         transaction_manager=SqlAlchemyTransactionManager(engine),
         readonly_transaction_manager=SqlAlchemyReadOnlyTransactionManager(
@@ -144,106 +131,104 @@ class TestSqlAlchemyEntityRepository:
     ) -> BaseEntityRepository:
         return repository_factory.repo_for(FakeEntity)
 
-    async def test_find_should_find_entity(
+    def test_find_should_find_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
-        await audited_entity_repository.add(entity)
+        audited_entity_repository.add(entity)
         # when
-        result = await audited_entity_repository.find(entity.id)
+        result = audited_entity_repository.find(entity.id)
         # then
         assert result == entity
 
-    async def test_find_all_should_find_all_entities(
+    def test_find_all_should_find_all_entities(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
         # given
         entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
-        await audited_entity_repository.add_all([entity1, entity2])
+        audited_entity_repository.add_all([entity1, entity2])
         # when
-        result = await audited_entity_repository.find_all(
-            [entity1.id, entity2.id]
-        )
+        result = audited_entity_repository.find_all([entity1.id, entity2.id])
         # then
         assert {e for e in result} == {entity1, entity2}
 
-    async def test_get_should_get_existing_entity(
+    def test_get_should_get_existing_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
-        await audited_entity_repository.add(entity)
+        audited_entity_repository.add(entity)
         # when
-        result = await audited_entity_repository.get(entity.id)
+        result = audited_entity_repository.get(entity.id)
         # then
         assert result == entity
 
-    async def test_get_should_raise_if_no_entity_exists(
+    def test_get_should_raise_if_no_entity_exists(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
         # given
         entity_id = FakeEntityId(uuid4())
         # when / then
         with pytest.raises(NoResultFound):
-            await audited_entity_repository.get(entity_id)
+            audited_entity_repository.get(entity_id)
 
-    async def test_exists_should_return_true_if_entity_exists(
+    def test_exists_should_return_true_if_entity_exists(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
-        await audited_entity_repository.add(entity)
+        audited_entity_repository.add(entity)
         # when
-        result = await audited_entity_repository.exists(entity.id)
+        result = audited_entity_repository.exists(entity.id)
         # then
         assert result is True
 
-    async def test_exists_should_return_false_if_no_entity_found(
+    def test_exists_should_return_false_if_no_entity_found(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
         # given
         entity_id = FakeEntityId(uuid4())
         # when
-        result = await audited_entity_repository.exists(entity_id)
+        result = audited_entity_repository.exists(entity_id)
         # then
         assert result is False
 
-    async def test_update_non_audited_entity_should_update_both_entity_and_date(
+    def test_update_non_audited_entity_should_update_both_entity_and_date(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ):
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
-        await audited_entity_repository.add(entity)
+        audited_entity_repository.add(entity)
         # when
-        result = await audited_entity_repository.update(
+        result = audited_entity_repository.update(
             entity.change_field("changed")
         )
         # then
         assert result.field == "changed"
         assert result.updated_date > entity.updated_date
 
-    async def test_update_non_audited_entity_should_update_only_entity(
+    def test_update_non_audited_entity_should_update_only_entity(
         self, entity_repository: FakeEntityRepository
     ):
         # given
         entity = FakeEntity(id=FakeEntityId(uuid4()), field="test")
-        await entity_repository.add(entity)
+        entity_repository.add(entity)
         # when
-        result = await entity_repository.update(entity.change_field("changed"))
+        result = entity_repository.update(entity.change_field("changed"))
         # then
         assert result.field == "changed"
 
-    async def test_update_all_should_update_all_entities(
+    def test_update_all_should_update_all_entities(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ):
         # given
         entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
-        await audited_entity_repository.add_all([entity1, entity2])
+        audited_entity_repository.add_all([entity1, entity2])
         # when
-        result1, result2 = await audited_entity_repository.update_all(
+        result1, result2 = audited_entity_repository.update_all(
             [
                 entity1.change_field("changed 1"),
                 entity2.change_field("changed 2"),
@@ -253,13 +238,13 @@ class TestSqlAlchemyEntityRepository:
         assert result1.field == "changed 1"
         assert result2.field == "changed 2"
 
-    async def test_delete_should_delete_entity(
+    def test_delete_should_delete_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ):
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
-        await audited_entity_repository.add(entity)
+        audited_entity_repository.add(entity)
         # when
-        result = await audited_entity_repository.delete(entity)
+        result = audited_entity_repository.delete(entity)
         # then
         assert result is True

@@ -1,7 +1,7 @@
 import typing as t
-from contextlib import asynccontextmanager
+from contextlib import contextmanager
 from dataclasses import dataclass
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 from pyuow import BaseContext, BaseUnit, Result
 from pyuow.work.transactional import (
@@ -28,68 +28,68 @@ class FakeOut:
 
 
 class SuccessUnit(BaseUnit[FakeContext, FakeOut]):
-    async def __call__(
+    def __call__(
         self, context: FakeContext, **kwargs: t.Any
     ) -> Result[FakeOut]:
         return Result.ok(FakeOut())
 
 
 class FailureUnit(BaseUnit[FakeContext, FakeOut]):
-    async def __call__(
+    def __call__(
         self, context: FakeContext, **kwargs: t.Any
     ) -> Result[FakeOut]:
         return Result.error(Exception("Something went wrong"))
 
 
 class FakeTransaction(BaseTransaction[Mock]):
-    async def rollback(self) -> None:
-        await self._transaction_provider.rollback()
+    def rollback(self) -> None:
+        self._transaction_provider.rollback()
 
-    async def commit(self) -> None:
-        await self._transaction_provider.commit()
+    def commit(self) -> None:
+        self._transaction_provider.commit()
 
 
 class FakeTransactionManager(BaseTransactionManager[FakeTransaction]):
     def __init__(self, trx_provider_factory: t.Callable[[], Mock]):
         self._trx_provider_factory = trx_provider_factory
 
-    @asynccontextmanager
-    async def transaction(self) -> t.AsyncIterator[FakeTransaction]:
+    @contextmanager
+    def transaction(self) -> t.Iterator[FakeTransaction]:
         yield FakeTransaction(self._trx_provider_factory())
 
 
 class TestTransactionalUnitProxy:
-    async def test_do_with_should_commit_on_success(self):
+    def test_do_with_should_commit_on_success(self):
         # given
         unit = SuccessUnit()
         params = FakeParams()
         context = FakeContext(params=params)
-        transaction = AsyncMock()
+        transaction = Mock()
         transaction_manager = FakeTransactionManager(lambda: transaction)
         work_proxy = TransactionalUnitProxy(
             transaction_manager=transaction_manager, unit=unit
         )
         # when
-        result = await work_proxy.do_with(context=context)
+        result = work_proxy.do_with(context=context)
         # then
         assert result.is_ok()
-        transaction.commit.assert_awaited_once()
+        transaction.commit.assert_called_once()
 
-    async def test_do_with_should_rollback_on_error(self):
+    def test_do_with_should_rollback_on_error(self):
         # given
         unit = FailureUnit()
         params = FakeParams()
         context = FakeContext(params=params)
-        transaction = AsyncMock()
+        transaction = Mock()
         transaction_manager = FakeTransactionManager(lambda: transaction)
         work_proxy = TransactionalUnitProxy(
             transaction_manager=transaction_manager, unit=unit
         )
         # when
-        result = await work_proxy.do_with(context=context)
+        result = work_proxy.do_with(context=context)
         # then
         assert result.is_error()
-        transaction.rollback.assert_awaited_once()
+        transaction.rollback.assert_called_once()
 
 
 class TestTransactionalWorkManager:
@@ -105,18 +105,18 @@ class TestTransactionalWorkManager:
         # then
         assert isinstance(proxy, TransactionalUnitProxy)
 
-    async def test_example_fake_flow_should_pass(self):
+    def test_example_fake_flow_should_pass(self):
         # given
         unit = SuccessUnit()
         params = FakeParams()
         context = FakeContext(params=params)
-        transaction = AsyncMock()
+        transaction = Mock()
         transaction_manager = FakeTransactionManager(lambda: transaction)
         work = TransactionalWorkManager(
             transaction_manager=transaction_manager
         )
         # when
-        result = await work.by(unit).do_with(context)
+        result = work.by(unit).do_with(context)
         # then
         assert result.is_ok()
         assert result.get() == FakeOut()

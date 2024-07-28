@@ -38,13 +38,15 @@ PyUow officially supports Python >= 3.9.
 import typing as t
 from dataclasses import dataclass
 
+from pyuow.aio import (
+   ConditionalUnit,
+   RunUnit,
+   FinalUnit,
+   ErrorUnit,
+)
 from pyuow import (
     BaseContext,
-    ConditionalUnit,
-    RunUnit,
-    FinalUnit,
     Result,
-    ErrorUnit,
 )
 
 
@@ -142,26 +144,29 @@ from uuid import UUID, uuid4
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import Mapped
 
-from pyuow import (
-    BaseContext,
-    ConditionalUnit,
-    RunUnit,
-    FinalUnit,
-    Result,
-    ErrorUnit,
+from pyuow.aio import (
+   ConditionalUnit,
+   RunUnit,
+   FinalUnit,
+   ErrorUnit,
 )
+from pyuow import (
+   BaseContext,
+   Result,
+)
+
 from pyuow.contrib.sqlalchemy.persistence.tables import AuditedEntityTable
-from pyuow.contrib.sqlalchemy.persistence.repository import (
+from pyuow.contrib.sqlalchemy.aio.persistence.repository import (
     BaseSqlAlchemyRepositoryFactory,
     BaseSqlAlchemyEntityRepository,
 )
-from pyuow.contrib.sqlalchemy.work import (
+from pyuow.contrib.sqlalchemy.aio.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
 from pyuow.persistence.entities import Entity, AuditedEntity
-from pyuow.persistence.repository import BaseEntityRepository
-from pyuow.work.transactional import TransactionalWorkManager
+from pyuow.persistence.aio.repository import BaseEntityRepository
+from pyuow.work.aio.transactional import TransactionalWorkManager
 
 ExampleEntityId = t.NewType("ExampleEntityId", UUID)
 
@@ -256,7 +261,7 @@ class ExampleRunUnit(RunUnit[ExampleContext, ExampleOutput]):
 
     async def run(self, context: ExampleContext, **kwargs: t.Any) -> None:
         entity = ExampleAuditedEntity(
-            id=ExampleEntityId(uuid4()), field=context.params.field
+            id=ExampleEntityId(str(uuid4())), field=context.params.field
         )
         await self._example_entity_repository.add(entity)
 
@@ -298,7 +303,54 @@ async def main() -> None:
     result.get()
 
 ```
+## Async compatibility
+This package provides robust support for both asynchronous (async) and synchronous (sync) versions of code execution, catering to diverse development needs.
+The package follows the convention where each module with async code has an aio/ folder in the same directory, allowing you to easily import the async version.
 
+For example:
+```python
+# Async code imports
+from pyuow.aio import (
+   ConditionalUnit,
+   RunUnit,
+   FinalUnit,
+   ErrorUnit,
+)
+from pyuow import (
+   BaseContext,
+   Result,
+)
+from pyuow.persistence.aio.repository.base import (
+    BaseEntityRepository
+)
+
+# Sync code imports
+from pyuow import (
+   BaseContext,
+   Result,
+   ConditionalUnit,
+   RunUnit,
+   FinalUnit,
+   ErrorUnit,
+)
+from pyuow.persistence.repository.base import (
+   BaseEntityRepository
+)
+```
+Same with contributing modules:
+```python
+# Async code imports
+from pyuow.contrib.sqlalchemy.aio.work.impl import (
+   SqlAlchemyTransaction,
+   SqlAlchemyReadOnlyTransactionManager,
+)
+
+# Sync code imports
+from pyuow.contrib.sqlalchemy.work.impl import (
+   SqlAlchemyTransaction,
+   SqlAlchemyReadOnlyTransactionManager,
+)
+```
 ## For Contributors
 
 This project is managed with `poetry`. All python dependencies have to be specified inside `pyproject.toml` file. Don't use `pip` directly, as the installed dependencies will be overridden by poetry during next `poetry install` run.

@@ -6,8 +6,8 @@ from ..units import CONTEXT, BaseUnit
 
 
 class BaseUnitProxy(BaseUnit[CONTEXT, OUT], ABC):
-    async def do_with(self, context: CONTEXT) -> Result[OUT]:
-        return await self(context)
+    def do_with(self, context: CONTEXT) -> Result[OUT]:
+        return self(context)
 
 
 class BaseWorkManager(ABC):

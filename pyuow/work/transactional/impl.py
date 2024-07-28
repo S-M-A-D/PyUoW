@@ -16,14 +16,14 @@ class TransactionalUnitProxy(BaseUnitProxy[CONTEXT, OUT]):
         self._transaction_manager = transaction_manager
         self._unit = unit
 
-    async def __call__(self, context: CONTEXT) -> Result[OUT]:
-        async with self._transaction_manager.transaction() as trx:
-            result = await self._unit(context)
+    def __call__(self, context: CONTEXT) -> Result[OUT]:
+        with self._transaction_manager.transaction() as trx:
+            result = self._unit(context)
 
             if result.is_error():
-                await trx.rollback()
+                trx.rollback()
             else:
-                await trx.commit()
+                trx.commit()
 
             return result
 

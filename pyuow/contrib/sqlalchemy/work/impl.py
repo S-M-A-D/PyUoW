@@ -1,14 +1,9 @@
 import typing as t
-from asyncio import current_task
-from contextlib import asynccontextmanager
+from contextlib import contextmanager
 
 try:
-    from sqlalchemy.ext.asyncio import (
-        AsyncEngine,
-        AsyncSession,
-        async_scoped_session,
-        async_sessionmaker,
-    )
+    from sqlalchemy import Engine
+    from sqlalchemy.orm import Session, scoped_session, sessionmaker
 except ImportError:  # pragma: no cover
     raise ImportError(
         "Seems that you are trying to import extra module that was not installed,"
@@ -18,40 +13,39 @@ except ImportError:  # pragma: no cover
 from ....work.transactional import BaseTransaction, BaseTransactionManager
 
 
-class SqlAlchemyTransaction(BaseTransaction[AsyncSession]):
-    async def rollback(self) -> None:
-        await self._transaction_provider.rollback()
+class SqlAlchemyTransaction(BaseTransaction[Session]):
+    def rollback(self) -> None:
+        self._transaction_provider.rollback()
 
-    async def commit(self) -> None:
-        await self._transaction_provider.commit()
+    def commit(self) -> None:
+        self._transaction_provider.commit()
 
 
 class SqlAlchemyTransactionManager(
     BaseTransactionManager[SqlAlchemyTransaction]
 ):
-    def __init__(self, engine: AsyncEngine) -> None:
-        self._session_factory = async_scoped_session(
-            async_sessionmaker(engine, expire_on_commit=False),
-            scopefunc=current_task,
+    def __init__(self, engine: Engine) -> None:
+        self._session_factory = scoped_session(
+            sessionmaker(engine, expire_on_commit=False)
         )
 
-    @asynccontextmanager
-    async def transaction(self) -> t.AsyncIterator[SqlAlchemyTransaction]:
+    @contextmanager
+    def transaction(self) -> t.Iterator[SqlAlchemyTransaction]:
         session = self._session_factory()
         if session.in_transaction():
             yield SqlAlchemyTransaction(session)
         else:
-            async with session.begin():
+            with session.begin():
                 yield SqlAlchemyTransaction(session)
 
 
 class SqlAlchemyReadOnlyTransactionManager(SqlAlchemyTransactionManager):
-    def __init__(self, engine: AsyncEngine) -> None:
+    def __init__(self, engine: Engine) -> None:
         super().__init__(
             engine.execution_options(isolation_level="AUTOCOMMIT")
         )
 
-    @asynccontextmanager
-    async def transaction(self) -> t.AsyncIterator[SqlAlchemyTransaction]:
-        async with self._session_factory() as session:
+    @contextmanager
+    def transaction(self) -> t.Iterator[SqlAlchemyTransaction]:
+        with self._session_factory() as session:
             yield SqlAlchemyTransaction(session)
