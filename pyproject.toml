@@ -54,6 +54,7 @@ safety = "^3.2.3"
 greenlet = "^3.0.3"
 testcontainers = {version = "^4.0.0", extras = ["postgres"]}
 asyncpg = "^0.29.0"
+psycopg2-binary = "^2.9.8"
 
 [tool.poetry.extras]
 sqlalchemy = ["sqlalchemy"]

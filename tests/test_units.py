@@ -1,32 +1,31 @@
 import typing as t
 from dataclasses import dataclass
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
 from pyuow import (
     BaseContext,
     CannotReassignUnitError,
-    ConditionalAsyncUnit,
-    ErrorAsyncUnit,
-    FinalAsyncUnit,
+    ConditionalUnit,
+    ErrorUnit,
+    FinalUnit,
     FinalUnitError,
-    FlowAsyncUnit,
+    FlowUnit,
     Result,
-    RunAsyncUnit,
+    RunUnit,
 )
 from pyuow.types import MISSING
 
 
 class TestUnits:
-    async def test_flow_unit_rshift_should_properly_assign_units(
+
+    def test_flow_unit_rshift_should_properly_assign_units(
         self,
     ):
         # given
-        class FakeUnit(FlowAsyncUnit[Mock, None]):
-            async def __call__(
-                self, context: Mock, **kwargs: t.Any
-            ) -> Result[None]:
+        class FakeUnit(FlowUnit[Mock, None]):
+            def __call__(self, context: Mock, **kwargs: t.Any) -> Result[None]:
                 pass
 
         unit1 = FakeUnit()
@@ -39,14 +38,12 @@ class TestUnits:
         assert unit2._root == unit1
         assert unit2._next == MISSING
 
-    async def test_flow_unit_rshift_should_raise_on_unit_reassignment(
+    def test_flow_unit_rshift_should_raise_on_unit_reassignment(
         self,
     ):
         # given
-        class FakeUnit(FlowAsyncUnit[Mock, None]):
-            async def __call__(
-                self, context: Mock, **kwargs: t.Any
-            ) -> Result[None]:
+        class FakeUnit(FlowUnit[Mock, None]):
+            def __call__(self, context: Mock, **kwargs: t.Any) -> Result[None]:
                 pass
 
         unit1 = FakeUnit()
@@ -55,14 +52,12 @@ class TestUnits:
         with pytest.raises(CannotReassignUnitError):
             unit1 >> unit2 >> unit1
 
-    async def test_flow_unit_build_should_return_flow_root(
+    def test_flow_unit_build_should_return_flow_root(
         self,
     ):
         # given
-        class FakeUnit(FlowAsyncUnit[Mock, None]):
-            async def __call__(
-                self, context: Mock, **kwargs: t.Any
-            ) -> Result[None]:
+        class FakeUnit(FlowUnit[Mock, None]):
+            def __call__(self, context: Mock, **kwargs: t.Any) -> Result[None]:
                 pass
 
         unit1 = FakeUnit()
@@ -72,7 +67,7 @@ class TestUnits:
         # then
         assert flow.build() == unit1
 
-    async def test_complex_units_flow_should_behave_properly(self):
+    def test_complex_units_flow_should_behave_properly(self):
         # given
         @dataclass
         class FakeParams:
@@ -86,28 +81,22 @@ class TestUnits:
         class FakeOut:
             result_field: str
 
-        class FakeConditionalUnit(ConditionalAsyncUnit[FakeContext, FakeOut]):
-            async def condition(
-                self, context: FakeContext, **kwargs: t.Any
-            ) -> bool:
+        class FakeConditionalUnit(ConditionalUnit[FakeContext, FakeOut]):
+            def condition(self, context: FakeContext, **kwargs: t.Any) -> bool:
                 return context.context_field == "test"
 
-        class FakeRunUnit(RunAsyncUnit[FakeContext, FakeOut]):
-            async def run(
-                self, context: FakeContext, **kwargs: t.Any
-            ) -> None: ...
+        class FakeRunUnit(RunUnit[FakeContext, FakeOut]):
+            def run(self, context: FakeContext, **kwargs: t.Any) -> None: ...
 
-        class SuccessUnit(FinalAsyncUnit[FakeContext, FakeOut]):
-            async def finish(
+        class SuccessUnit(FinalUnit[FakeContext, FakeOut]):
+            def finish(
                 self, context: FakeContext, **kwargs: t.Any
             ) -> Result[FakeOut]:
                 return Result.ok(FakeOut(result_field="success"))
 
         # when
         flow = (
-            FakeConditionalUnit(
-                on_failure=ErrorAsyncUnit(exc=Exception("test"))
-            )
+            FakeConditionalUnit(on_failure=ErrorUnit(exc=Exception("test")))
             >> FakeRunUnit()
             >> SuccessUnit()
         ).build()
@@ -118,13 +107,13 @@ class TestUnits:
             params=fake_params, context_field="qwerty"
         )
         # then
-        passed_result = await flow(passed_context)
-        failed_result = await flow(failed_context)
+        passed_result = flow(passed_context)
+        failed_result = flow(failed_context)
         # then
         assert passed_result.get() == FakeOut(result_field="success")
         assert failed_result.is_error() is True
 
-    async def test_conditional_unit_should_behave_properly(self):
+    def test_conditional_unit_should_behave_properly(self):
         # given
         class FakeContext(BaseContext[Mock]):
             context_field: str
@@ -133,10 +122,8 @@ class TestUnits:
                 super().__init__(params)
                 self.context_field = context_field
 
-        class FakeConditionalUnit(ConditionalAsyncUnit[FakeContext, None]):
-            async def condition(
-                self, context: FakeContext, **kwargs: t.Any
-            ) -> bool:
+        class FakeConditionalUnit(ConditionalUnit[FakeContext, None]):
+            def condition(self, context: FakeContext, **kwargs: t.Any) -> bool:
                 return context.context_field == "test"
 
         mock_params = Mock()
@@ -146,131 +133,129 @@ class TestUnits:
         )
         unit = FakeConditionalUnit(on_failure=Mock())
         # then
-        passed_condition = await unit.condition(passed_context)
-        failed_condition = await unit.condition(failed_context)
+        passed_condition = unit.condition(passed_context)
+        failed_condition = unit.condition(failed_context)
         # then
         assert passed_condition is True
         assert failed_condition is False
 
-    async def test_conditional_unit_in_flow_should_raise_if_next_unit_is_not_set(
+    def test_conditional_unit_in_flow_should_raise_if_next_unit_is_not_set(
         self,
     ):
         # given
-        class FakeUnit(ConditionalAsyncUnit[Mock, None]):
-            async def condition(self, context: Mock, **kwargs: t.Any) -> bool:
+        class FakeUnit(ConditionalUnit[Mock, None]):
+            def condition(self, context: Mock, **kwargs: t.Any) -> bool:
                 return False
 
         flow = FakeUnit(on_failure=Mock()).build()
         # when
         with pytest.raises(NotImplementedError):
-            await flow(Mock())
+            flow(Mock())
 
-    async def test_conditional_unit_in_flow_should_return_result_when_error_occurs(
+    def test_conditional_unit_in_flow_should_return_result_when_error_occurs(
         self,
     ):
         # given
-        class FakeUnit(ConditionalAsyncUnit[Mock, None]):
-            async def condition(self, context: Mock, **kwargs: t.Any) -> bool:
+        class FakeUnit(ConditionalUnit[Mock, None]):
+            def condition(self, context: Mock, **kwargs: t.Any) -> bool:
                 raise Exception
 
         flow = (
             FakeUnit(on_failure=Mock()) >> FakeUnit(on_failure=Mock())
         ).build()
         # when
-        result = await flow(Mock())
+        result = flow(Mock())
         # then
         assert result.is_error() is True
 
-    async def test_conditional_unit_in_flow_should_call_failure_if_condition_failed(
+    def test_conditional_unit_in_flow_should_call_failure_if_condition_failed(
         self,
     ):
         # given
         mock_context = Mock()
-        mock_on_failure = AsyncMock()
+        mock_on_failure = Mock()
 
-        class FakeUnit(ConditionalAsyncUnit[Mock, None]):
-            async def condition(self, context: Mock, **kwargs: t.Any) -> bool:
+        class FakeUnit(ConditionalUnit[Mock, None]):
+            def condition(self, context: Mock, **kwargs: t.Any) -> bool:
                 return False
 
         flow = (
             FakeUnit(on_failure=mock_on_failure) >> FakeUnit(on_failure=Mock())
         ).build()
         # when
-        await flow(mock_context)
+        flow(mock_context)
         # then
         mock_on_failure.assert_called_once_with(mock_context)
 
-    async def test_run_unit_should_behave_properly(self):
+    def test_run_unit_should_behave_properly(self):
         # given
         mock_context = Mock()
         mock_logic = Mock()
 
-        class FakeUnit(RunAsyncUnit[Mock, None]):
-            async def run(self, context: Mock, **kwargs: t.Any) -> None:
+        class FakeUnit(RunUnit[Mock, None]):
+            def run(self, context: Mock, **kwargs: t.Any) -> None:
                 mock_logic(context)
 
         unit = FakeUnit()
         # when
-        await unit.run(mock_context)
+        unit.run(mock_context)
         # then
         mock_logic.assert_called_once_with(mock_context)
 
-    async def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(self):
+    def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(self):
         # given
-        class FakeUnit(RunAsyncUnit[Mock, None]):
-            async def run(self, context: Mock, **kwargs: t.Any) -> None: ...
+        class FakeUnit(RunUnit[Mock, None]):
+            def run(self, context: Mock, **kwargs: t.Any) -> None: ...
 
         flow = FakeUnit().build()
         # when
         with pytest.raises(NotImplementedError):
-            await flow(Mock())
+            flow(Mock())
 
-    async def test_run_unit_in_flow_should_return_result_when_error_occurs(
+    def test_run_unit_in_flow_should_return_result_when_error_occurs(
         self,
     ):
         # given
-        class FakeUnit(RunAsyncUnit[Mock, None]):
-            async def run(self, context: Mock, **kwargs: t.Any) -> None:
+        class FakeUnit(RunUnit[Mock, None]):
+            def run(self, context: Mock, **kwargs: t.Any) -> None:
                 raise Exception
 
         flow = (FakeUnit() >> FakeUnit()).build()
         # when
-        result = await flow(Mock())
+        result = flow(Mock())
         # then
         assert result.is_error() is True
 
-    async def test_final_unit_should_raise_on_next_assigned(self):
+    def test_final_unit_should_raise_on_next_assigned(self):
         # given
-        class FakeUnit(FinalAsyncUnit[Mock, None]):
-            async def finish(
-                self, context: Mock, **kwargs: t.Any
-            ) -> Result[None]:
+        class FakeUnit(FinalUnit[Mock, None]):
+            def finish(self, context: Mock, **kwargs: t.Any) -> Result[None]:
                 return Result.empty()
 
         # when
         with pytest.raises(FinalUnitError):
             FakeUnit() >> FakeUnit()
 
-    async def test_final_unit_in_flow_should_return_result_when_error_occurs(
+    def test_final_unit_in_flow_should_return_result_when_error_occurs(
         self,
     ):
         # given
-        class FakeUnit(FinalAsyncUnit[Mock, None]):
-            async def finish(self, context: Mock, **kwargs: t.Any) -> bool:
+        class FakeUnit(FinalUnit[Mock, None]):
+            def finish(self, context: Mock, **kwargs: t.Any) -> bool:
                 raise Exception
 
         flow = FakeUnit().build()
         # when
-        result = await flow(Mock())
+        result = flow(Mock())
         # then
         assert result.is_error() is True
 
-    async def test_error_unit_should_behave_properly(self):
+    def test_error_unit_should_behave_properly(self):
         # given
         mock_context = Mock()
-        unit = ErrorAsyncUnit(exc=Exception("test"))
+        unit = ErrorUnit(exc=Exception("test"))
         # when
-        result = await unit.finish(mock_context)
+        result = unit.finish(mock_context)
         # then
         assert result.is_error() is True
         mock_context.assert_not_called()

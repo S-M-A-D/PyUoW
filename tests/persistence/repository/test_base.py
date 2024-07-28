@@ -8,8 +8,8 @@ import pytest
 from pyuow.persistence.entities import Entity
 from pyuow.persistence.entities.base import ENTITY_ID
 from pyuow.persistence.repository import (
-    BaseAsyncEntityRepository,
-    BaseAsyncRepositoryFactory,
+    BaseEntityRepository,
+    BaseRepositoryFactory,
 )
 
 
@@ -18,48 +18,44 @@ class FakeEntity(Entity[UUID]):
     pass
 
 
-class FakeBaseEntityRepository(BaseAsyncEntityRepository[UUID, UUID]):
-    async def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
+class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
+    def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
         return None
 
-    async def find_all(
-        self, entity_ids: t.Iterable[UUID]
-    ) -> t.Iterable[FakeEntity]:
+    def find_all(self, entity_ids: t.Iterable[UUID]) -> t.Iterable[FakeEntity]:
         return []
 
-    async def get(self, entity_id: UUID) -> FakeEntity:
+    def get(self, entity_id: UUID) -> FakeEntity:
         return FakeEntity(id=entity_id)
 
-    async def add(self, entity: FakeEntity) -> FakeEntity:
+    def add(self, entity: FakeEntity) -> FakeEntity:
         return entity
 
-    async def add_all(
+    def add_all(
         self, entities: t.Sequence[FakeEntity]
     ) -> t.Iterable[FakeEntity]:
         return entities
 
-    async def update(self, entity: FakeEntity) -> FakeEntity:
+    def update(self, entity: FakeEntity) -> FakeEntity:
         return entity
 
-    async def update_all(
+    def update_all(
         self, entities: t.Sequence[FakeEntity]
     ) -> t.Iterable[FakeEntity]:
         return entities
 
-    async def delete(self, entity: FakeEntity) -> bool:
+    def delete(self, entity: FakeEntity) -> bool:
         return True
 
-    async def exists(self, entity_id: ENTITY_ID) -> bool:
+    def exists(self, entity_id: ENTITY_ID) -> bool:
         pass
 
 
-class FakeRepositoryFactory(BaseAsyncRepositoryFactory):
+class FakeRepositoryFactory(BaseRepositoryFactory):
     @property
     def repositories(
         self,
-    ) -> t.Mapping[
-        t.Type[Entity[t.Any]], BaseAsyncEntityRepository[t.Any, t.Any]
-    ]:
+    ) -> t.Mapping[t.Type[Entity[t.Any]], BaseEntityRepository[t.Any, t.Any]]:
         return {FakeEntity: FakeBaseEntityRepository()}
 
 
