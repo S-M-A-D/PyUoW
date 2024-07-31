@@ -30,4 +30,7 @@ __all__ = (
     "FinalUnit",
     "FlowUnit",
     "RunUnit",
+    "FinalUnitError",
+    "MissingOutError",
+    "Result",
 )

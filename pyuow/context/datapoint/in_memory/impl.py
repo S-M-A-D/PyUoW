@@ -18,7 +18,7 @@ class InMemoryDataPointContext(BaseDataPointContext[PARAMS]):
         init=False, repr=False, default_factory=DataPointDict
     )
 
-    async def add(
+    def add(
         self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
     ) -> None:
         for datapoint in datapoints:
@@ -27,9 +27,7 @@ class InMemoryDataPointContext(BaseDataPointContext[PARAMS]):
             else:
                 self._storage[datapoint.name] = datapoint.value
 
-    async def get(
-        self, *names: BaseDataPointName[t.Any]
-    ) -> DataPointDict[t.Any]:
+    def get(self, *names: BaseDataPointName[t.Any]) -> DataPointDict[t.Any]:
         missing = {name for name in names if name not in self._storage}
 
         if len(missing) > 0:

@@ -12,8 +12,8 @@ class NoOpUnitProxy(BaseUnitProxy[CONTEXT, OUT]):  # pragma: no cover
     ) -> None:
         self._unit = unit
 
-    async def __call__(self, context: CONTEXT) -> Result[OUT]:
-        return await self._unit(context)
+    def __call__(self, context: CONTEXT) -> Result[OUT]:
+        return self._unit(context)
 
 
 class NoOpWorkManager(BaseWorkManager):  # pragma: no cover

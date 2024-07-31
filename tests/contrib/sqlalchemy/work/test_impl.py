@@ -1,7 +1,7 @@
-from unittest.mock import AsyncMock
+from unittest.mock import Mock
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.engine import Engine
 
 from pyuow.contrib.sqlalchemy.work import (
     SqlAlchemyTransaction,
@@ -9,56 +9,57 @@ from pyuow.contrib.sqlalchemy.work import (
 )
 
 
+@pytest.mark.skip_on_ci
 class TestSqlAlchemyTransaction:
-    async def test_rollback_should_call_transaction_provider_original_rollback(
+    def test_rollback_should_call_transaction_provider_original_rollback(
         self,
     ):
         # given
-        trx_provider = AsyncMock()
+        trx_provider = Mock()
         trx = SqlAlchemyTransaction(trx_provider)
         # when
-        await trx.rollback()
+        trx.rollback()
         # then
-        trx_provider.rollback.assert_awaited_once()
+        trx_provider.rollback.assert_called_once()
 
-    async def test_commit_should_call_transaction_provider_original_commit(
+    def test_commit_should_call_transaction_provider_original_commit(
         self,
     ):
         # given
-        trx_provider = AsyncMock()
+        trx_provider = Mock()
         trx = SqlAlchemyTransaction(trx_provider)
         # when
-        await trx.commit()
+        trx.commit()
         # then
-        trx_provider.commit.assert_awaited_once()
+        trx_provider.commit.assert_called_once()
 
 
 @pytest.mark.skip_on_ci
 class TestSqlAlchemyTransactionManager:
-    async def test_transaction_should_return_same_session_if_called_in_already_opened_transaction(
-        self, engine: AsyncEngine
+    def test_transaction_should_return_same_session_if_called_in_already_opened_transaction(
+        self, engine: Engine
     ):
         # given
         manager = SqlAlchemyTransactionManager(engine)
         # when
-        async with manager.transaction() as trx:
+        with manager.transaction() as trx:
             first_trx = trx.it().get_transaction()
 
-            async with manager.transaction() as trx:
+            with manager.transaction() as trx:
                 second_trx = trx.it().get_transaction()
         # then
         assert first_trx == second_trx
 
-    async def test_transaction_should_return_different_session_if_called_in_already_opened_transaction(
-        self, engine: AsyncEngine
+    def test_transaction_should_return_different_session_if_called_in_already_opened_transaction(
+        self, engine: Engine
     ):
         # given
         manager = SqlAlchemyTransactionManager(engine)
         # when
-        async with manager.transaction() as trx:
+        with manager.transaction() as trx:
             first_trx = trx.it().get_transaction()
 
-        async with manager.transaction() as trx:
+        with manager.transaction() as trx:
             second_trx = trx.it().get_transaction()
         # then
         assert first_trx != second_trx

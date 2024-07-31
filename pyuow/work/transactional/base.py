@@ -14,15 +14,15 @@ class BaseTransaction(t.Generic[TRANSACTION_PROVIDER], ABC):
         return self._transaction_provider
 
     @abc.abstractmethod
-    async def rollback(self) -> None:
+    def rollback(self) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def commit(self) -> None:
+    def commit(self) -> None:
         raise NotImplementedError
 
 
 class BaseTransactionManager(t.Generic[TRANSACTION], ABC):
     @abc.abstractmethod
-    def transaction(self) -> t.AsyncContextManager[TRANSACTION]:
+    def transaction(self) -> t.ContextManager[TRANSACTION]:
         raise NotImplementedError

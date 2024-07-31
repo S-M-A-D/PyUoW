@@ -34,13 +34,13 @@ AnyDataPointName = BaseDataPointName[t.Any]
 
 class BaseDataPointProducer(ABC):
     @abstractmethod
-    async def add(self, *datapoints: AnyDatapoint) -> None:
+    def add(self, *datapoints: AnyDatapoint) -> None:
         raise NotImplementedError
 
 
 class BaseDataPointConsumer(ABC):
     @abstractmethod
-    async def get(self, *names: AnyDataPointName) -> DataPointDict[t.Any]:
+    def get(self, *names: AnyDataPointName) -> DataPointDict[t.Any]:
         raise NotImplementedError
 
 
@@ -52,10 +52,8 @@ class ConsumesDataPoints(ABC):
     ) -> t.Set[BaseDataPointName[t.Any]]:
         raise NotImplementedError
 
-    async def out_of(
-        self, consumer: BaseDataPointConsumer
-    ) -> DataPointDict[t.Any]:
-        return await consumer.get(*self._consumes)
+    def out_of(self, consumer: BaseDataPointConsumer) -> DataPointDict[t.Any]:
+        return consumer.get(*self._consumes)
 
 
 class ProducesDataPoints(ABC):
@@ -64,14 +62,14 @@ class ProducesDataPoints(ABC):
         _producer: BaseDataPointProducer
         _required_names: t.Set[AnyDataPointName]
 
-        async def add(self, *datapoints: AnyDatapoint) -> None:
+        def add(self, *datapoints: AnyDatapoint) -> None:
             actual_names = {datapoint.name for datapoint in datapoints}
             missing = self._required_names - actual_names
 
             if len(missing) > 0:
                 raise DataPointIsNotProducedError(missing)
 
-            await self._producer.add(*datapoints)
+            self._producer.add(*datapoints)
 
     @property
     @abstractmethod
