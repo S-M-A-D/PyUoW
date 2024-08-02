@@ -2,10 +2,13 @@ from dataclasses import dataclass
 
 import pytest
 
-from pyuow import DataPointCannotBeOverriddenError, DataPointIsNotProducedError
 from pyuow.context import BaseParams
 from pyuow.context.datapoint.in_memory import InMemoryDataPointContext
-from pyuow.datapoint import BaseDataPointName
+from pyuow.datapoint import (
+    BaseDataPointName,
+    DataPointCannotBeOverriddenError,
+    DataPointIsNotProducedError,
+)
 
 
 @dataclass(frozen=True)

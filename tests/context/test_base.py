@@ -2,8 +2,11 @@ from dataclasses import dataclass
 
 import pytest
 
-from pyuow import AttributeCannotBeOverriddenError
-from pyuow.context import BaseMutableContext, BaseParams
+from pyuow.context import (
+    AttributeCannotBeOverriddenError,
+    BaseMutableContext,
+    BaseParams,
+)
 
 
 @dataclass(frozen=True)

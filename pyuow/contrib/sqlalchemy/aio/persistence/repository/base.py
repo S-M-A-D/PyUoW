@@ -15,13 +15,15 @@ from ......persistence.aio.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
 )
-from ......persistence.entity.base import ENTITY_ID, ENTITY_TYPE
+from ......persistence.entity import Entity
 from ....persistence.tables import AuditedEntityTable, EntityTable
 from ...work.impl import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
 
+ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
+ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
 ENTITY_TABLE = t.TypeVar("ENTITY_TABLE", bound=EntityTable)
 
 

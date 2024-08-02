@@ -3,8 +3,9 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from unittest.mock import Mock
 
-from pyuow import BaseUnit, Result
 from pyuow.context import BaseMutableContext, BaseParams
+from pyuow.result import Result
+from pyuow.unit import BaseUnit
 from pyuow.work.transactional import (
     BaseTransaction,
     BaseTransactionManager,

@@ -1,9 +1,13 @@
 import abc
+import typing as t
 from abc import ABC
 
-from ...aio.unit import BaseUnit
-from ...result import OUT, Result
-from ...unit import CONTEXT
+from ...context import BaseContext
+from ...result import Result
+from ...unit.aio import BaseUnit
+
+CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
+OUT = t.TypeVar("OUT")
 
 
 class BaseUnitProxy(BaseUnit[CONTEXT, OUT], ABC):

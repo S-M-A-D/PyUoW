@@ -1,7 +1,7 @@
 import typing as t
 from dataclasses import dataclass
 
-from pyuow import AttributeCannotBeOverriddenError
+from .exceptions import AttributeCannotBeOverriddenError
 
 PARAMS = t.TypeVar("PARAMS", bound="BaseParams")
 

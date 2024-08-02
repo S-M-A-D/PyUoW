@@ -3,13 +3,20 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pyuow import CannotReassignUnitError, FinalUnitError, Result
-from pyuow.aio import ConditionalUnit, ErrorUnit, FinalUnit, FlowUnit, RunUnit
 from pyuow.context import BaseMutableContext, BaseParams
 from pyuow.context.datapoint.aio.in_memory import InMemoryDataPointContext
 from pyuow.datapoint import BaseDataPointName
 from pyuow.datapoint.aio import ConsumesDataPoints, ProducesDataPoints
+from pyuow.result import Result
 from pyuow.types import MISSING
+from pyuow.unit import CannotReassignUnitError, FinalUnitError
+from pyuow.unit.aio import (
+    ConditionalUnit,
+    ErrorUnit,
+    FinalUnit,
+    FlowUnit,
+    RunUnit,
+)
 
 
 class TestUnits:

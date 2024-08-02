@@ -1,7 +1,12 @@
-from ....aio import BaseUnit
-from ....result import OUT, Result
-from ....unit import CONTEXT
+import typing as t
+
+from ....context import BaseContext
+from ....result import Result
+from ....unit.aio import BaseUnit
 from ...aio import BaseUnitProxy, BaseWorkManager
+
+CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
+OUT = t.TypeVar("OUT")
 
 
 class NoOpUnitProxy(BaseUnitProxy[CONTEXT, OUT]):  # pragma: no cover

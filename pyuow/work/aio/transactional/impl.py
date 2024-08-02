@@ -1,10 +1,17 @@
-from ....aio import BaseUnit
-from ....result import OUT, Result
-from ....unit import CONTEXT
+import typing as t
+
+from ....context import BaseContext
+from ....result import Result
+from ....unit.aio import BaseUnit
 from ...aio import BaseWorkManager
 from ...aio.base import BaseUnitProxy
 from ...aio.transactional import BaseTransactionManager
-from .base import TRANSACTION
+from .base import BaseTransaction
+
+CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
+OUT = t.TypeVar("OUT")
+
+TRANSACTION = t.TypeVar("TRANSACTION", bound=BaseTransaction[t.Any])
 
 
 class TransactionalUnitProxy(BaseUnitProxy[CONTEXT, OUT]):

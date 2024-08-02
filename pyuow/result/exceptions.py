@@ -1,0 +1,2 @@
+class MissingOutError(Exception):
+    pass
