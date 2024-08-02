@@ -6,7 +6,7 @@ from logging import getLogger
 from ..exceptions import CannotReassignUnitError, FinalUnitError
 from ..result import OUT, Result
 from ..types import MISSING, MissingType
-from ..units import CONTEXT
+from ..unit import CONTEXT
 
 logger = getLogger(__name__)
 

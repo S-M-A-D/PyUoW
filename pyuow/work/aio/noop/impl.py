@@ -1,6 +1,6 @@
 from ....aio import BaseUnit
 from ....result import OUT, Result
-from ....units import CONTEXT
+from ....unit import CONTEXT
 from ...aio import BaseUnitProxy, BaseWorkManager
 
 

@@ -17,7 +17,7 @@ from pyuow.contrib.sqlalchemy.aio.work import (
     SqlAlchemyTransactionManager,
 )
 from pyuow.persistence.aio.repository import BaseEntityRepository
-from pyuow.persistence.entities import AuditedEntity, Entity
+from pyuow.persistence.entity import AuditedEntity, Entity
 from pyuow.types import MISSING
 
 from ...faked_entities import (

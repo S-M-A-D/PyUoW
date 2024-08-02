@@ -9,8 +9,8 @@ from pyuow.persistence.aio.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
 )
-from pyuow.persistence.entities import Entity
-from pyuow.persistence.entities.base import ENTITY_ID
+from pyuow.persistence.entity import Entity
+from pyuow.persistence.entity.base import ENTITY_ID
 
 
 @dataclass(frozen=True)

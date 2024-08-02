@@ -16,7 +16,7 @@ from pyuow.contrib.sqlalchemy.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.persistence.entities import AuditedEntity, Entity
+from pyuow.persistence.entity import AuditedEntity, Entity
 from pyuow.persistence.repository import BaseEntityRepository
 from pyuow.types import MISSING
 
@@ -44,14 +44,12 @@ class FakeEntity(Entity[FakeEntityId]):
 
 
 class FakeEntityRepository(
-    BaseSqlAlchemyEntityRepository[
-        FakeEntityId, FakeEntity, FakeAuditedEntityTable
-    ]
+    BaseSqlAlchemyEntityRepository[FakeEntityId, FakeEntity, FakeEntityTable]
 ):
     @staticmethod
     def to_entity(record: FakeEntityTable) -> FakeEntity:
         return FakeEntity(
-            id=record.id,
+            id=FakeEntityId(record.id),
             field=record.field,
         )
 
@@ -71,7 +69,7 @@ class FakeAuditedEntityRepository(
     @staticmethod
     def to_entity(record: FakeAuditedEntityTable) -> FakeAuditedEntity:
         return FakeAuditedEntity(
-            id=record.id,
+            id=FakeEntityId(record.id),
             field=record.field,
             created_date=record.created_date,
             updated_date=record.updated_date,
@@ -89,7 +87,9 @@ class FakeAuditedEntityRepository(
 
 class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
     @property
-    def repositories(self) -> t.Mapping[
+    def repositories(
+        self,
+    ) -> t.Mapping[
         t.Type[Entity[t.Any]],
         BaseEntityRepository[t.Any, t.Any],
     ]:
@@ -122,18 +122,18 @@ class TestSqlAlchemyEntityRepository:
     @pytest.fixture
     def audited_entity_repository(
         self, repository_factory: FakeRepositoryFactory
-    ) -> BaseEntityRepository:
+    ) -> BaseEntityRepository[FakeEntityId, FakeAuditedEntity]:
         return repository_factory.repo_for(FakeAuditedEntity)
 
     @pytest.fixture
     def entity_repository(
         self, repository_factory: FakeRepositoryFactory
-    ) -> BaseEntityRepository:
+    ) -> BaseEntityRepository[FakeEntityId, FakeEntity]:
         return repository_factory.repo_for(FakeEntity)
 
     def test_find_should_find_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ) -> None:
+    ):
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)
@@ -144,7 +144,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_find_all_should_find_all_entities(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ) -> None:
+    ):
         # given
         entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
@@ -156,7 +156,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_get_should_get_existing_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ) -> None:
+    ):
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)
@@ -167,7 +167,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_get_should_raise_if_no_entity_exists(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ) -> None:
+    ):
         # given
         entity_id = FakeEntityId(uuid4())
         # when / then
@@ -176,7 +176,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_exists_should_return_true_if_entity_exists(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ) -> None:
+    ):
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)
@@ -187,7 +187,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_exists_should_return_false_if_no_entity_found(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ) -> None:
+    ):
         # given
         entity_id = FakeEntityId(uuid4())
         # when

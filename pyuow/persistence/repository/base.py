@@ -2,8 +2,8 @@ import abc
 import typing as t
 from abc import ABC
 
-from ..entities import Entity
-from ..entities.base import ENTITY_ID, ENTITY_TYPE
+from ..entity import Entity
+from ..entity.base import ENTITY_ID, ENTITY_TYPE
 
 
 class BaseReadOnlyEntityRepository(t.Generic[ENTITY_ID, ENTITY_TYPE], ABC):

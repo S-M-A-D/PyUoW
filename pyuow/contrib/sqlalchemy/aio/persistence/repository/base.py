@@ -15,7 +15,7 @@ from ......persistence.aio.repository import (
     BaseEntityRepository,
     BaseRepositoryFactory,
 )
-from ......persistence.entities.base import ENTITY_ID, ENTITY_TYPE
+from ......persistence.entity.base import ENTITY_ID, ENTITY_TYPE
 from ....persistence.tables import AuditedEntityTable, EntityTable
 from ...work.impl import (
     SqlAlchemyReadOnlyTransactionManager,

@@ -1,6 +1,6 @@
 from ... import BaseUnit
 from ...result import OUT, Result
-from ...units import CONTEXT
+from ...unit import CONTEXT
 from ..base import BaseUnitProxy, BaseWorkManager
 
 
