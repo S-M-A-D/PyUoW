@@ -4,10 +4,12 @@ from .base import (
     BaseMutableContext,
     BaseParams,
 )
+from .exceptions import AttributeCannotBeOverriddenError
 
 __all__ = (
     "BaseContext",
     "BaseImmutableContext",
     "BaseMutableContext",
     "BaseParams",
+    "AttributeCannotBeOverriddenError",
 )

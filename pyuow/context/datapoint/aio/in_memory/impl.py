@@ -1,13 +1,16 @@
 import typing as t
 from dataclasses import dataclass, field
 
-from .....datapoint import BaseDataPoint, BaseDataPointName, DataPointDict
-from .....exceptions import (
+from .....datapoint import (
+    BaseDataPoint,
+    BaseDataPointName,
     DataPointCannotBeOverriddenError,
+    DataPointDict,
     DataPointIsNotProducedError,
 )
-from .. import BaseDataPointContext
-from ..base import PARAMS
+from ..base import BaseDataPointContext, BaseParams
+
+PARAMS = t.TypeVar("PARAMS", bound=BaseParams)
 
 
 @dataclass(frozen=True)

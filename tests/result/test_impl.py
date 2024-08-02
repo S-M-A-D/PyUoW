@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from pyuow import MissingOutError, Result
+from pyuow.result import MissingOutError, Result
 
 
 class TestResult:

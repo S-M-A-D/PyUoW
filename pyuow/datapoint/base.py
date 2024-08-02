@@ -2,10 +2,10 @@ import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from pyuow import DataPointIsNotProducedError
+from .exceptions import DataPointIsNotProducedError
 
 VALUE = t.TypeVar("VALUE", bound=t.Any)
-NAME = t.TypeVar("NAME", bound="AnyDataPointName")
+NAME = t.TypeVar("NAME", bound="BaseDataPointName[t.Any]")
 
 
 @dataclass(frozen=True)
@@ -28,19 +28,17 @@ class DataPointDict(t.Dict[BaseDataPointName[VALUE], VALUE]):
     pass
 
 
-AnyDatapoint = BaseDataPoint[BaseDataPointName[t.Any], t.Any]
-AnyDataPointName = BaseDataPointName[t.Any]
-
-
 class BaseDataPointProducer(ABC):
     @abstractmethod
-    def add(self, *datapoints: AnyDatapoint) -> None:
+    def add(
+        self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
+    ) -> None:
         raise NotImplementedError
 
 
 class BaseDataPointConsumer(ABC):
     @abstractmethod
-    def get(self, *names: AnyDataPointName) -> DataPointDict[t.Any]:
+    def get(self, *names: BaseDataPointName[t.Any]) -> DataPointDict[t.Any]:
         raise NotImplementedError
 
 
@@ -48,7 +46,7 @@ class ConsumesDataPoints(ABC):
     @property
     @abstractmethod
     def _consumes(
-        self, *names: AnyDataPointName
+        self, *names: BaseDataPointName[t.Any]
     ) -> t.Set[BaseDataPointName[t.Any]]:
         raise NotImplementedError
 
@@ -60,9 +58,11 @@ class ProducesDataPoints(ABC):
     @dataclass(frozen=True)
     class ProducerProxy:
         _producer: BaseDataPointProducer
-        _required_names: t.Set[AnyDataPointName]
+        _required_names: t.Set[BaseDataPointName[t.Any]]
 
-        def add(self, *datapoints: AnyDatapoint) -> None:
+        def add(
+            self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
+        ) -> None:
             actual_names = {datapoint.name for datapoint in datapoints}
             missing = self._required_names - actual_names
 
@@ -74,7 +74,7 @@ class ProducesDataPoints(ABC):
     @property
     @abstractmethod
     def _produces(
-        self, *names: AnyDataPointName
+        self, *names: BaseDataPointName[t.Any]
     ) -> t.Set[BaseDataPointName[t.Any]]:
         raise NotImplementedError
 

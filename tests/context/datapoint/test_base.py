@@ -2,10 +2,10 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pyuow import DataPointIsNotProducedError
 from pyuow.datapoint import (
     BaseDataPointName,
     ConsumesDataPoints,
+    DataPointIsNotProducedError,
     ProducesDataPoints,
 )
 

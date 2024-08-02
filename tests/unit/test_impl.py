@@ -3,16 +3,6 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pyuow import (
-    CannotReassignUnitError,
-    ConditionalUnit,
-    ErrorUnit,
-    FinalUnit,
-    FinalUnitError,
-    FlowUnit,
-    Result,
-    RunUnit,
-)
 from pyuow.context import BaseMutableContext, BaseParams
 from pyuow.context.datapoint.in_memory import InMemoryDataPointContext
 from pyuow.datapoint import (
@@ -20,7 +10,17 @@ from pyuow.datapoint import (
     ConsumesDataPoints,
     ProducesDataPoints,
 )
+from pyuow.result import Result
 from pyuow.types import MISSING
+from pyuow.unit import (
+    CannotReassignUnitError,
+    ConditionalUnit,
+    ErrorUnit,
+    FinalUnit,
+    FinalUnitError,
+    FlowUnit,
+    RunUnit,
+)
 
 
 class TestUnits:

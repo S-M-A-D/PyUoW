@@ -1,8 +1,8 @@
 import typing as t
 from dataclasses import dataclass
 
+from ..types import MISSING, MissingType
 from .exceptions import MissingOutError
-from .types import MISSING, MissingType
 
 OUT = t.TypeVar("OUT")
 

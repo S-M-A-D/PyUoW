@@ -7,6 +7,10 @@ from .base import (
     DataPointDict,
     ProducesDataPoints,
 )
+from .exceptions import (
+    DataPointCannotBeOverriddenError,
+    DataPointIsNotProducedError,
+)
 
 __all__ = (
     "BaseDataPoint",
@@ -16,4 +20,6 @@ __all__ = (
     "ConsumesDataPoints",
     "DataPointDict",
     "ProducesDataPoints",
+    "DataPointCannotBeOverriddenError",
+    "DataPointIsNotProducedError",
 )

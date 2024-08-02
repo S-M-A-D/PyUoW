@@ -1,0 +1,2 @@
+class AttributeCannotBeOverriddenError(Exception):
+    pass

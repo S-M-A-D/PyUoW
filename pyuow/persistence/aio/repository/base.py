@@ -3,7 +3,9 @@ import typing as t
 from abc import ABC
 
 from ...entity import Entity
-from ...entity.base import ENTITY_ID, ENTITY_TYPE
+
+ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
+ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
 
 
 class BaseReadOnlyEntityRepository(t.Generic[ENTITY_ID, ENTITY_TYPE], ABC):

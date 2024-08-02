@@ -1,9 +1,12 @@
+import typing as t
 from abc import ABC
 from dataclasses import dataclass
 
 from ....context import BaseContext
 from ....datapoint.aio import BaseDataPointConsumer, BaseDataPointProducer
-from ..base import PARAMS
+from ..base import BaseParams
+
+PARAMS = t.TypeVar("PARAMS", bound=BaseParams)
 
 
 @dataclass(frozen=True)
