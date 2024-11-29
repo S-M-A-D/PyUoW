@@ -38,23 +38,23 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-sqlalchemy = {version = "^2.0.31", optional = true}
+sqlalchemy = {version = "^2.0.36", optional = true}
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.2"
-pytest-cov = "^5.0.0"
+pytest = "^8.3.3"
+pytest-cov = "^6.0.0"
 isort = "^5.13.2"
-pre-commit = "^3.8.0"
-pytest-asyncio = "^0.23.7"
+pre-commit = "^4.0.1"
+pytest-asyncio = "^0.24.0"
 autoflake = "^2.3.1"
-mypy = "^1.11.1"
-coverage = { version = "^7.6.0", extras = ["toml"] }
-black = "^24.4.2"
-safety = "^3.2.4"
-greenlet = "^3.0.3"
-testcontainers = {version = "^4.7.2", extras = ["postgres"]}
-asyncpg = "^0.29.0"
-psycopg2-binary = "^2.9.9"
+mypy = "^1.13.0"
+coverage = { version = "^7.6.8", extras = ["toml"] }
+black = "^24.10.0"
+safety = "^3.2.11"
+greenlet = "^3.1.1"
+testcontainers = {version = "^4.8.2", extras = ["postgres"]}
+asyncpg = "^0.30.0"
+psycopg2-binary = "^2.9.10"
 
 [tool.poetry.extras]
 sqlalchemy = ["sqlalchemy"]
