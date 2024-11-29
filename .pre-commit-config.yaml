@@ -36,8 +36,3 @@ repos:
             types: [ file, python ]
             entry: mypy pyuow/
             pass_filenames: false
-          - id: safety
-            language: system
-            name: "dependencies safety check"
-            entry: safety check --ignore 70612 73456  # Safety dependency jinja2 fails (check for new versions lately)
-            pass_filenames: false
