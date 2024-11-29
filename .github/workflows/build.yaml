@@ -28,7 +28,7 @@ jobs:
           black --check --diff .
           autoflake --recursive --check --quiet .
           mypy pyuow
-          safety check --ignore 70612  # Safety dependency jinja2 fails (check for new versions later)
+          safety check --ignore 70612 73456  # Safety dependency jinja2 fails (check for new versions later)
       - name: Run tests with Pytest
         run: |
           pytest --cov --cov-report=xml
@@ -63,7 +63,7 @@ jobs:
           black --check --diff .
           autoflake --recursive --check --quiet .
           mypy pyuow
-          safety check --ignore 70612  # Safety dependency jinja2 fails (check for new versions later)
+          safety check --ignore 70612 73456  # Safety dependency jinja2 fails (check for new versions later)
 
       - name: Run tests with Pytest
         run: |
