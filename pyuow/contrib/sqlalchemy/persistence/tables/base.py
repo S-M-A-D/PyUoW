@@ -2,8 +2,8 @@ from datetime import datetime
 from uuid import UUID
 
 try:
+    from sqlalchemy import UUID as SA_UUID
     from sqlalchemy import DateTime
-    from sqlalchemy.dialects import postgresql
     from sqlalchemy.orm import (
         DeclarativeBase,
         Mapped,
@@ -20,7 +20,7 @@ except ImportError:  # pragma: no cover
 class BaseTable(MappedAsDataclass, DeclarativeBase):
     __abstract__ = True
     type_annotation_map = {
-        UUID: postgresql.UUID(as_uuid=True),
+        UUID: SA_UUID(as_uuid=True),
     }
 
 
