@@ -2,7 +2,7 @@
 name = "pyuow"
 version = "0.2.1"
 description = "Python custom implementation of unit of work pattern"
-authors = ["SMED"]
+authors = ["SMAD"]
 maintainers = [
     "Sviatoslav Mosorko <slavikmosorko@gmail.com>",
     "Andrii Divnych <divnycha05@gmail.com>",
