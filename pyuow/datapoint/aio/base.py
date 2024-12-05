@@ -2,7 +2,7 @@ import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from ..base import BaseDataPointContainer, BaseDataPoint, DataPointDict
+from ..base import BaseDataPoint, BaseDataPointContainer, DataPointDict
 from ..exceptions import DataPointIsNotProducedError
 
 

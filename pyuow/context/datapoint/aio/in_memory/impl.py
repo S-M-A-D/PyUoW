@@ -2,8 +2,8 @@ import typing as t
 from dataclasses import dataclass, field
 
 from .....datapoint import (
-    BaseDataPointContainer,
     BaseDataPoint,
+    BaseDataPointContainer,
     DataPointCannotBeOverriddenError,
     DataPointDict,
     DataPointIsNotProducedError,

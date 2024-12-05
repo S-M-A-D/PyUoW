@@ -1,7 +1,7 @@
 from .base import (
-    BaseDataPointContainer,
-    BaseDataPointConsumer,
     BaseDataPoint,
+    BaseDataPointConsumer,
+    BaseDataPointContainer,
     BaseDataPointProducer,
     ConsumesDataPoints,
     DataPointDict,
