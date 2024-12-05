@@ -1,7 +1,7 @@
 from .base import (
-    BaseDataPoint,
+    BaseDataPointContainer,
     BaseDataPointConsumer,
-    BaseDataPointName,
+    BaseDataPoint,
     BaseDataPointProducer,
     ConsumesDataPoints,
     DataPointDict,
@@ -13,9 +13,9 @@ from .exceptions import (
 )
 
 __all__ = (
-    "BaseDataPoint",
+    "BaseDataPointContainer",
     "BaseDataPointConsumer",
-    "BaseDataPointName",
+    "BaseDataPoint",
     "BaseDataPointProducer",
     "ConsumesDataPoints",
     "DataPointDict",

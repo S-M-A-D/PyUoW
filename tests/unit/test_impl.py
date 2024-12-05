@@ -6,7 +6,7 @@ import pytest
 from pyuow.context import BaseMutableContext, BaseParams
 from pyuow.context.datapoint.in_memory import InMemoryDataPointContext
 from pyuow.datapoint import (
-    BaseDataPointName,
+    BaseDataPoint,
     ConsumesDataPoints,
     ProducesDataPoints,
 )
@@ -85,7 +85,7 @@ class TestUnits:
         class FakeOut:
             result_field: str
 
-        FakeDatapoint = BaseDataPointName[str]("fake_datapoint")
+        FakeDatapoint = BaseDataPoint("fake_datapoint", str)
 
         class FakeRunUnit(RunUnit[FakeContext, FakeOut], ProducesDataPoints):
             _produces = {FakeDatapoint}
