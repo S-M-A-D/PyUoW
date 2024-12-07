@@ -2,10 +2,10 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from pyuow.datapoint import BaseDataPointName, DataPointIsNotProducedError
+from pyuow.datapoint import BaseDataPoint, DataPointIsNotProducedError
 from pyuow.datapoint.aio import ConsumesDataPoints, ProducesDataPoints
 
-FakeDatapoint = BaseDataPointName[int]("fake_datapoint")
+FakeDatapoint = BaseDataPoint("fake_datapoint", int)
 
 
 class FakeObjThatProducesDataPoints(ProducesDataPoints):

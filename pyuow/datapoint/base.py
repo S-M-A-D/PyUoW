@@ -5,40 +5,36 @@ from dataclasses import dataclass
 from .exceptions import DataPointIsNotProducedError
 
 VALUE = t.TypeVar("VALUE", bound=t.Any)
-NAME = t.TypeVar("NAME", bound="BaseDataPointName[t.Any]")
 
 
 @dataclass(frozen=True)
-class BaseDataPointName(t.Generic[VALUE]):
-    raw: str
+class BaseDataPoint(t.Generic[VALUE]):
+    name: str
+    ref_type: t.Type[VALUE]
 
-    def __call__(
-        self, value: VALUE
-    ) -> "BaseDataPoint[BaseDataPointName[VALUE], VALUE]":
-        return BaseDataPoint(self, value)
+    def __call__(self, value: VALUE) -> "BaseDataPointContainer[VALUE]":
+        return BaseDataPointContainer(self, value)
 
 
 @dataclass(frozen=True)
-class BaseDataPoint(t.Generic[NAME, VALUE]):
-    name: NAME
+class BaseDataPointContainer(t.Generic[VALUE]):
+    spec: BaseDataPoint[VALUE]
     value: VALUE
 
 
-class DataPointDict(t.Dict[BaseDataPointName[VALUE], VALUE]):
+class DataPointDict(t.Dict[BaseDataPoint[VALUE], VALUE]):
     pass
 
 
 class BaseDataPointProducer(ABC):
     @abstractmethod
-    def add(
-        self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
-    ) -> None:
+    def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
         raise NotImplementedError
 
 
 class BaseDataPointConsumer(ABC):
     @abstractmethod
-    def get(self, *names: BaseDataPointName[t.Any]) -> DataPointDict[t.Any]:
+    def get(self, *specs: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
         raise NotImplementedError
 
 
@@ -46,8 +42,8 @@ class ConsumesDataPoints(ABC):
     @property
     @abstractmethod
     def _consumes(
-        self, *names: BaseDataPointName[t.Any]
-    ) -> t.Set[BaseDataPointName[t.Any]]:
+        self, *specs: BaseDataPoint[t.Any]
+    ) -> t.Set[BaseDataPoint[t.Any]]:
         raise NotImplementedError
 
     def out_of(self, consumer: BaseDataPointConsumer) -> DataPointDict[t.Any]:
@@ -58,12 +54,10 @@ class ProducesDataPoints(ABC):
     @dataclass(frozen=True)
     class ProducerProxy:
         _producer: BaseDataPointProducer
-        _required_names: t.Set[BaseDataPointName[t.Any]]
+        _required_names: t.Set[BaseDataPoint[t.Any]]
 
-        def add(
-            self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
-        ) -> None:
-            actual_names = {datapoint.name for datapoint in datapoints}
+        def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
+            actual_names = {datapoint.spec for datapoint in datapoints}
             missing = self._required_names - actual_names
 
             if len(missing) > 0:
@@ -74,8 +68,8 @@ class ProducesDataPoints(ABC):
     @property
     @abstractmethod
     def _produces(
-        self, *names: BaseDataPointName[t.Any]
-    ) -> t.Set[BaseDataPointName[t.Any]]:
+        self, *names: BaseDataPoint[t.Any]
+    ) -> t.Set[BaseDataPoint[t.Any]]:
         raise NotImplementedError
 
     def to(self, producer: BaseDataPointProducer) -> ProducerProxy:

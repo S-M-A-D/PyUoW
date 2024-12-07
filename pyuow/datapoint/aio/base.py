@@ -2,23 +2,19 @@ import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from ..base import BaseDataPoint, BaseDataPointName, DataPointDict
+from ..base import BaseDataPoint, BaseDataPointContainer, DataPointDict
 from ..exceptions import DataPointIsNotProducedError
 
 
 class BaseDataPointProducer(ABC):
     @abstractmethod
-    async def add(
-        self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
-    ) -> None:
+    async def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
         raise NotImplementedError
 
 
 class BaseDataPointConsumer(ABC):
     @abstractmethod
-    async def get(
-        self, *names: BaseDataPointName[t.Any]
-    ) -> DataPointDict[t.Any]:
+    async def get(self, *names: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
         raise NotImplementedError
 
 
@@ -26,8 +22,8 @@ class ConsumesDataPoints(ABC):
     @property
     @abstractmethod
     def _consumes(
-        self, *names: BaseDataPointName[t.Any]
-    ) -> t.Set[BaseDataPointName[t.Any]]:
+        self, *names: BaseDataPoint[t.Any]
+    ) -> t.Set[BaseDataPoint[t.Any]]:
         raise NotImplementedError
 
     async def out_of(
@@ -40,12 +36,12 @@ class ProducesDataPoints(ABC):
     @dataclass(frozen=True)
     class ProducerProxy:
         _producer: BaseDataPointProducer
-        _required_names: t.Set[BaseDataPointName[t.Any]]
+        _required_names: t.Set[BaseDataPoint[t.Any]]
 
         async def add(
-            self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
+            self, *datapoints: BaseDataPointContainer[t.Any]
         ) -> None:
-            actual_names = {datapoint.name for datapoint in datapoints}
+            actual_names = {datapoint.spec for datapoint in datapoints}
             missing = self._required_names - actual_names
 
             if len(missing) > 0:
@@ -56,8 +52,8 @@ class ProducesDataPoints(ABC):
     @property
     @abstractmethod
     def _produces(
-        self, *names: BaseDataPointName[t.Any]
-    ) -> t.Set[BaseDataPointName[t.Any]]:
+        self, *names: BaseDataPoint[t.Any]
+    ) -> t.Set[BaseDataPoint[t.Any]]:
         raise NotImplementedError
 
     def to(self, producer: BaseDataPointProducer) -> ProducerProxy:

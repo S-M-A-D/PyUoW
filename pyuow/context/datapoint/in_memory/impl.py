@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from ....datapoint import (
     BaseDataPoint,
-    BaseDataPointName,
+    BaseDataPointContainer,
     DataPointCannotBeOverriddenError,
     DataPointDict,
     DataPointIsNotProducedError,
@@ -21,22 +21,20 @@ class InMemoryDataPointContext(BaseDataPointContext[PARAMS]):
         init=False, repr=False, default_factory=DataPointDict
     )
 
-    def add(
-        self, *datapoints: BaseDataPoint[BaseDataPointName[t.Any], t.Any]
-    ) -> None:
+    def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
         for datapoint in datapoints:
-            if datapoint.name in self._storage:
-                raise DataPointCannotBeOverriddenError(datapoint.name)
+            if datapoint.spec in self._storage:
+                raise DataPointCannotBeOverriddenError(datapoint.spec)
             else:
-                self._storage[datapoint.name] = datapoint.value
+                self._storage[datapoint.spec] = datapoint.value
 
-    def get(self, *names: BaseDataPointName[t.Any]) -> DataPointDict[t.Any]:
-        missing = {name for name in names if name not in self._storage}
+    def get(self, *specs: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
+        missing = {name for name in specs if name not in self._storage}
 
         if len(missing) > 0:
             raise DataPointIsNotProducedError(missing)
 
         return t.cast(
             DataPointDict[t.Any],
-            {k: v for k, v in self._storage.items() if k in names},
+            {k: v for k, v in self._storage.items() if k in specs},
         )

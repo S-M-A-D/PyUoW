@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "pyuow"
-version = "0.2.0"
+version = "0.3.0"
 description = "Python custom implementation of unit of work pattern"
-authors = ["SMED"]
+authors = ["SMAD"]
 maintainers = [
     "Sviatoslav Mosorko <slavikmosorko@gmail.com>",
     "Andrii Divnych <divnycha05@gmail.com>",
@@ -23,6 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries",
 ]
@@ -41,20 +42,23 @@ python = "^3.9"
 sqlalchemy = {version = "^2.0.36", optional = true}
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
+pytest = "^8.3.4"
 pytest-cov = "^6.0.0"
 isort = "^5.13.2"
 pre-commit = "^4.0.1"
 pytest-asyncio = "^0.24.0"
 autoflake = "^2.3.1"
 mypy = "^1.13.0"
-coverage = { version = "^7.6.8", extras = ["toml"] }
+coverage = { version = "^7.6.9", extras = ["toml"] }
 black = "^24.10.0"
 safety = "^3.2.11"
 greenlet = "^3.1.1"
 testcontainers = {version = "^4.8.2", extras = ["postgres"]}
 asyncpg = "^0.30.0"
-psycopg2-binary = "2.9.9"
+psycopg2-binary = [
+    {version = "<=2.9.9", python = "<3.10"},
+    {version = "^2.9.10", python = ">=3.10"}
+]
 
 [tool.poetry.extras]
 sqlalchemy = ["sqlalchemy"]
