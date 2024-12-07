@@ -1,7 +1,7 @@
 import typing as t
 from abc import ABC, abstractmethod
 
-from ..base import BaseDataPoint, BaseDataPointContainer, DataPointDict
+from ..base import BaseDataPointContainer, BaseDataPointSpec, DataPointDict
 
 
 class BaseDataPointProducer(ABC):
@@ -12,5 +12,7 @@ class BaseDataPointProducer(ABC):
 
 class BaseDataPointConsumer(ABC):
     @abstractmethod
-    async def get(self, *specs: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
+    async def get(
+        self, *specs: BaseDataPointSpec[t.Any]
+    ) -> DataPointDict[t.Any]:
         raise NotImplementedError

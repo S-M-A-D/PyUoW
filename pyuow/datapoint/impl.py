@@ -3,10 +3,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from ..datapoint import (
-    BaseDataPoint,
     BaseDataPointConsumer,
     BaseDataPointContainer,
     BaseDataPointProducer,
+    BaseDataPointSpec,
     DataPointDict,
     DataPointIsNotProducedError,
 )
@@ -16,8 +16,8 @@ class ConsumesDataPoints(ABC):
     @property
     @abstractmethod
     def _consumes(
-        self, *specs: BaseDataPoint[t.Any]
-    ) -> t.Set[BaseDataPoint[t.Any]]:
+        self, *specs: BaseDataPointSpec[t.Any]
+    ) -> t.Set[BaseDataPointSpec[t.Any]]:
         raise NotImplementedError
 
     def out_of(self, consumer: BaseDataPointConsumer) -> DataPointDict[t.Any]:
@@ -28,7 +28,7 @@ class ProducesDataPoints(ABC):
     @dataclass(frozen=True)
     class ProducerProxy:
         _producer: BaseDataPointProducer
-        _required_names: t.Set[BaseDataPoint[t.Any]]
+        _required_names: t.Set[BaseDataPointSpec[t.Any]]
 
         def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
             actual_names = {datapoint.spec for datapoint in datapoints}
@@ -42,8 +42,8 @@ class ProducesDataPoints(ABC):
     @property
     @abstractmethod
     def _produces(
-        self, *specs: BaseDataPoint[t.Any]
-    ) -> t.Set[BaseDataPoint[t.Any]]:
+        self, *specs: BaseDataPointSpec[t.Any]
+    ) -> t.Set[BaseDataPointSpec[t.Any]]:
         raise NotImplementedError
 
     def to(self, producer: BaseDataPointProducer) -> ProducerProxy:

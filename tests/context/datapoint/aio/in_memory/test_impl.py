@@ -5,7 +5,7 @@ import pytest
 from pyuow.context import BaseParams
 from pyuow.context.datapoint.aio.in_memory import InMemoryDataPointContext
 from pyuow.datapoint import (
-    BaseDataPoint,
+    BaseDataPointSpec,
     DataPointCannotBeOverriddenError,
     DataPointIsNotProducedError,
 )
@@ -21,8 +21,8 @@ class FakeComplexType:
     fake_field: int
 
 
-FakeDatapointOne = BaseDataPoint("fake_datapoint_one", FakeComplexType)
-FakeDatapointTwo = BaseDataPoint("fake_datapoint_two", FakeComplexType)
+FakeDatapointOne = BaseDataPointSpec("fake_datapoint_one", FakeComplexType)
+FakeDatapointTwo = BaseDataPointSpec("fake_datapoint_two", FakeComplexType)
 
 
 class TestInMemoryDataPointContext:

@@ -6,7 +6,7 @@ VALUE = t.TypeVar("VALUE", bound=t.Any)
 
 
 @dataclass(frozen=True)
-class BaseDataPoint(t.Generic[VALUE]):
+class BaseDataPointSpec(t.Generic[VALUE]):
     name: str
     ref_type: t.Type[VALUE]
 
@@ -16,11 +16,11 @@ class BaseDataPoint(t.Generic[VALUE]):
 
 @dataclass(frozen=True)
 class BaseDataPointContainer(t.Generic[VALUE]):
-    spec: BaseDataPoint[VALUE]
+    spec: BaseDataPointSpec[VALUE]
     value: VALUE
 
 
-class DataPointDict(t.Dict[BaseDataPoint[VALUE], VALUE]):
+class DataPointDict(t.Dict[BaseDataPointSpec[VALUE], VALUE]):
     pass
 
 
@@ -32,5 +32,5 @@ class BaseDataPointProducer(ABC):
 
 class BaseDataPointConsumer(ABC):
     @abstractmethod
-    def get(self, *specs: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
+    def get(self, *specs: BaseDataPointSpec[t.Any]) -> DataPointDict[t.Any]:
         raise NotImplementedError
