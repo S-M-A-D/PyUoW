@@ -1251,8 +1251,8 @@ files = [
 annotated-types = ">=0.6.0"
 pydantic-core = "2.23.4"
 typing-extensions = [
-    {version = ">=4.12.2", markers = "python_version >= \"3.13\""},
     {version = ">=4.6.1", markers = "python_version < \"3.13\""},
+    {version = ">=4.12.2", markers = "python_version >= \"3.13\""},
 ]
 
 [package.extras]
@@ -2057,4 +2057,4 @@ sqlalchemy = ["sqlalchemy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "7049dc610af34b685bdd251bf464405170bc945de8898fa79b9443918610e8c7"
+content-hash = "aa08cccd21e5560e17e23a6e0ed29729f7b186927174e4dcef840ef9633f5669"
