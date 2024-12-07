@@ -2,7 +2,7 @@ import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import asdict
 
-from pyuow.clock import offset_naive_utcnow
+from .....clock import offset_naive_utcnow
 
 try:
     from sqlalchemy import delete, exists, insert, select, update
@@ -12,13 +12,13 @@ except ImportError:  # pragma: no cover
         " please install pyuow[sqlalchemy]"
     )
 
-from pyuow.contrib.sqlalchemy.aio.work.impl import (
+from .....contrib.sqlalchemy.aio.work.impl import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.contrib.sqlalchemy.tables import AuditedEntityTable, EntityTable
-from pyuow.entity import Entity
-from pyuow.repository.aio import BaseEntityRepository, BaseRepositoryFactory
+from .....contrib.sqlalchemy.tables import AuditedEntityTable, EntityTable
+from .....entity import Entity
+from .....repository.aio import BaseEntityRepository, BaseRepositoryFactory
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])

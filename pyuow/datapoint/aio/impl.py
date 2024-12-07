@@ -2,13 +2,13 @@ import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from pyuow.datapoint import (
+from ...datapoint import (
     BaseDataPoint,
     BaseDataPointContainer,
     DataPointDict,
     DataPointIsNotProducedError,
 )
-from pyuow.datapoint.aio import BaseDataPointConsumer, BaseDataPointProducer
+from ...datapoint.aio import BaseDataPointConsumer, BaseDataPointProducer
 
 
 class ConsumesDataPoints(ABC):

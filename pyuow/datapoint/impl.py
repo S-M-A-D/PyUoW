@@ -2,7 +2,7 @@ import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from pyuow.datapoint import (
+from ..datapoint import (
     BaseDataPoint,
     BaseDataPointConsumer,
     BaseDataPointContainer,
