@@ -34,7 +34,7 @@ class BaseDataPointProducer(ABC):
 
 class BaseDataPointConsumer(ABC):
     @abstractmethod
-    def get(self, *names: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
+    def get(self, *specs: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
         raise NotImplementedError
 
 
@@ -42,7 +42,7 @@ class ConsumesDataPoints(ABC):
     @property
     @abstractmethod
     def _consumes(
-        self, *names: BaseDataPoint[t.Any]
+        self, *specs: BaseDataPoint[t.Any]
     ) -> t.Set[BaseDataPoint[t.Any]]:
         raise NotImplementedError
 
