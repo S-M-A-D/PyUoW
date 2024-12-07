@@ -2,7 +2,7 @@ import abc
 import typing as t
 from abc import ABC
 
-from ...entity import Entity
+from pyuow.entity import Entity
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])

@@ -3,10 +3,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Mapped
 
-from pyuow.contrib.sqlalchemy.persistence.tables import (
-    AuditedEntityTable,
-    EntityTable,
-)
+from pyuow.contrib.sqlalchemy.tables import AuditedEntityTable, EntityTable
 
 
 class FakeEntityTable(EntityTable):

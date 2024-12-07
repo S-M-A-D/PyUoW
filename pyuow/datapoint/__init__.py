@@ -3,14 +3,13 @@ from .base import (
     BaseDataPointConsumer,
     BaseDataPointContainer,
     BaseDataPointProducer,
-    ConsumesDataPoints,
     DataPointDict,
-    ProducesDataPoints,
 )
 from .exceptions import (
     DataPointCannotBeOverriddenError,
     DataPointIsNotProducedError,
 )
+from .impl import ConsumesDataPoints, ProducesDataPoints
 
 __all__ = (
     "BaseDataPointContainer",

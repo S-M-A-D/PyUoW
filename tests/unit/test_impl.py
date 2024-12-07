@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
@@ -181,7 +181,7 @@ class TestUnits:
     ):
         # given
         mock_context = Mock()
-        mock_on_failure = AsyncMock()
+        mock_on_failure = Mock()
 
         class FakeUnit(ConditionalUnit[Mock, None]):
             def condition(self, context: Mock) -> bool:

@@ -1,7 +1,8 @@
 import typing as t
 from abc import ABC, abstractmethod
 from dataclasses import asdict
-from datetime import datetime
+
+from pyuow.clock import offset_naive_utcnow
 
 try:
     from sqlalchemy import delete, exists, insert, select, update
@@ -11,16 +12,13 @@ except ImportError:  # pragma: no cover
         " please install pyuow[sqlalchemy]"
     )
 
-from .....persistence.entity import Entity
-from .....persistence.repository import (
-    BaseEntityRepository,
-    BaseRepositoryFactory,
-)
-from ...work.impl import (
+from pyuow.contrib.sqlalchemy.aio.work.impl import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from ..tables import AuditedEntityTable, EntityTable
+from pyuow.contrib.sqlalchemy.tables import AuditedEntityTable, EntityTable
+from pyuow.entity import Entity
+from pyuow.repository.aio import BaseEntityRepository, BaseRepositoryFactory
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
@@ -52,62 +50,62 @@ class BaseSqlAlchemyEntityRepository(
     def to_record(entity: ENTITY_TYPE) -> ENTITY_TABLE:
         raise NotImplementedError
 
-    def find(self, entity_id: ENTITY_ID) -> t.Optional[ENTITY_TYPE]:
+    async def find(self, entity_id: ENTITY_ID) -> t.Optional[ENTITY_TYPE]:
         statement = select(self._table).where(self._table.id == entity_id)
 
-        with self._readonly_transaction_manager.transaction() as trx:
-            result = (trx.it().execute(statement)).scalar_one_or_none()
+        async with self._readonly_transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalar_one_or_none()
 
         return self.to_entity(result) if result else None
 
-    def find_all(
+    async def find_all(
         self, entity_ids: t.Iterable[ENTITY_ID]
     ) -> t.Iterable[ENTITY_TYPE]:
         statement = select(self._table).where(self._table.id.in_(entity_ids))
 
-        with self._readonly_transaction_manager.transaction() as trx:
-            result = (trx.it().execute(statement)).scalars().all()
+        async with self._readonly_transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalars().all()
 
         return [self.to_entity(record) for record in result]
 
-    def get(self, entity_id: ENTITY_ID) -> ENTITY_TYPE:
+    async def get(self, entity_id: ENTITY_ID) -> ENTITY_TYPE:
         statement = select(self._table).where(self._table.id == entity_id)
 
-        with self._readonly_transaction_manager.transaction() as trx:
-            result = (trx.it().execute(statement)).scalar_one()
+        async with self._readonly_transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalar_one()
 
         return self.to_entity(result)
 
-    def exists(self, entity_id: ENTITY_ID) -> bool:
+    async def exists(self, entity_id: ENTITY_ID) -> bool:
         statement = (
             exists(self._table).where(self._table.id == entity_id).select()
         )
 
-        with self._readonly_transaction_manager.transaction() as trx:
-            return (trx.it().execute(statement)).scalar() or False
+        async with self._readonly_transaction_manager.transaction() as trx:
+            return (await trx.it().execute(statement)).scalar() or False
 
-    def add(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
+    async def add(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         statement = (
             insert(self._table)
             .values(**asdict(self.to_record(entity)))
             .returning(self._table)
         )
 
-        with self._transaction_manager.transaction() as trx:
-            result = (trx.it().execute(statement)).scalar_one()
+        async with self._transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalar_one()
 
         return self.to_entity(result)
 
-    def add_all(
+    async def add_all(
         self, entities: t.Sequence[ENTITY_TYPE]
     ) -> t.Iterable[ENTITY_TYPE]:
-        return [self.add(entity) for entity in entities]
+        return [await self.add(entity) for entity in entities]
 
-    def update(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
+    async def update(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         record = self.to_record(entity)
 
         if isinstance(record, AuditedEntityTable):
-            record.updated_date = datetime.utcnow()
+            record.updated_date = offset_naive_utcnow()
 
         statement = (
             update(self._table)
@@ -116,25 +114,25 @@ class BaseSqlAlchemyEntityRepository(
             .returning(self._table)
         )
 
-        with self._transaction_manager.transaction() as trx:
-            result = (trx.it().execute(statement)).scalar_one()
+        async with self._transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalar_one()
 
         return self.to_entity(result)
 
-    def update_all(
+    async def update_all(
         self, entities: t.Sequence[ENTITY_TYPE]
     ) -> t.Iterable[ENTITY_TYPE]:
-        return [self.update(entity) for entity in entities]
+        return [await self.update(entity) for entity in entities]
 
-    def delete(self, entity: ENTITY_TYPE) -> bool:
+    async def delete(self, entity: ENTITY_TYPE) -> bool:
         statement = (
             delete(self._table)
             .where(self._table.id == entity.id)
             .returning(self._table.id)
         )
 
-        with self._transaction_manager.transaction() as trx:
-            identifier = (trx.it().execute(statement)).scalar_one()
+        async with self._transaction_manager.transaction() as trx:
+            identifier = (await trx.it().execute(statement)).scalar_one()
 
         return t.cast(bool, identifier == entity.id)
 

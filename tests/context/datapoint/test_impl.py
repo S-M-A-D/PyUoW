@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
@@ -32,7 +32,7 @@ class TestConsumesDataPoints:
 
     def test_to_add_should_delegate_datapoints_to_producer(self):
         # given
-        fake_producer = AsyncMock()
+        fake_producer = Mock()
         obj_that_produces = FakeObjThatProducesDataPoints()
         datapoint = FakeDatapoint(1)
         # when
@@ -44,7 +44,7 @@ class TestConsumesDataPoints:
         self,
     ):
         # given
-        fake_producer = AsyncMock()
+        fake_producer = Mock()
         obj_that_produces = FakeObjThatProducesDataPoints()
         # when / then
         with pytest.raises(DataPointIsNotProducedError):
@@ -52,7 +52,7 @@ class TestConsumesDataPoints:
 
     def test_out_of_should_delegate_names_to_consumer(self):
         # given
-        fake_consumer = AsyncMock()
+        fake_consumer = Mock()
         obj_that_consumes = FakeObjThatConsumesDataPoints()
         # when
         obj_that_consumes.out_of(fake_consumer)

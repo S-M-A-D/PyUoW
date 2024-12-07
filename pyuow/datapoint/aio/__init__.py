@@ -1,9 +1,5 @@
-from .base import (
-    BaseDataPointConsumer,
-    BaseDataPointProducer,
-    ConsumesDataPoints,
-    ProducesDataPoints,
-)
+from .base import BaseDataPointConsumer, BaseDataPointProducer
+from .impl import ConsumesDataPoints, ProducesDataPoints
 
 __all__ = (
     "BaseDataPointConsumer",
