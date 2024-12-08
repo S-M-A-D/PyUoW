@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
 
-from pyuow.contrib.sqlalchemy.persistence.repository import (
+from pyuow.contrib.sqlalchemy.repository import (
     BaseSqlAlchemyEntityRepository,
     BaseSqlAlchemyRepositoryFactory,
 )
@@ -16,8 +16,8 @@ from pyuow.contrib.sqlalchemy.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.persistence.entity import AuditedEntity, Entity
-from pyuow.persistence.repository import BaseEntityRepository
+from pyuow.entity import AuditedEntity, Entity
+from pyuow.repository import BaseEntityRepository
 from pyuow.types import MISSING
 
 from ..faked_entities import (

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID, uuid4
 
-from pyuow.persistence.entity import AuditedEntity
+from pyuow.entity import AuditedEntity
 
 
 @dataclass(frozen=True)

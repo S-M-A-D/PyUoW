@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
 from pyuow.context import BaseMutableContext, BaseParams
 from pyuow.context.datapoint.in_memory import InMemoryDataPointContext
 from pyuow.datapoint import (
-    BaseDataPoint,
+    BaseDataPointSpec,
     ConsumesDataPoints,
     ProducesDataPoints,
 )
@@ -85,7 +85,7 @@ class TestUnits:
         class FakeOut:
             result_field: str
 
-        FakeDatapoint = BaseDataPoint("fake_datapoint", str)
+        FakeDatapoint = BaseDataPointSpec("fake_datapoint", str)
 
         class FakeRunUnit(RunUnit[FakeContext, FakeOut], ProducesDataPoints):
             _produces = {FakeDatapoint}
@@ -181,7 +181,7 @@ class TestUnits:
     ):
         # given
         mock_context = Mock()
-        mock_on_failure = AsyncMock()
+        mock_on_failure = Mock()
 
         class FakeUnit(ConditionalUnit[Mock, None]):
             def condition(self, context: Mock) -> bool:

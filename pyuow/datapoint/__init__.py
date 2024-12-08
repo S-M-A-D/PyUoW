@@ -1,21 +1,20 @@
 from .base import (
-    BaseDataPoint,
     BaseDataPointConsumer,
     BaseDataPointContainer,
     BaseDataPointProducer,
-    ConsumesDataPoints,
+    BaseDataPointSpec,
     DataPointDict,
-    ProducesDataPoints,
 )
 from .exceptions import (
     DataPointCannotBeOverriddenError,
     DataPointIsNotProducedError,
 )
+from .impl import ConsumesDataPoints, ProducesDataPoints
 
 __all__ = (
     "BaseDataPointContainer",
     "BaseDataPointConsumer",
-    "BaseDataPoint",
+    "BaseDataPointSpec",
     "BaseDataPointProducer",
     "ConsumesDataPoints",
     "DataPointDict",

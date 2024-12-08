@@ -2,8 +2,8 @@ import typing as t
 from dataclasses import dataclass, field
 
 from ....datapoint import (
-    BaseDataPoint,
     BaseDataPointContainer,
+    BaseDataPointSpec,
     DataPointCannotBeOverriddenError,
     DataPointDict,
     DataPointIsNotProducedError,
@@ -28,7 +28,7 @@ class InMemoryDataPointContext(BaseDataPointContext[PARAMS]):
             else:
                 self._storage[datapoint.spec] = datapoint.value
 
-    def get(self, *specs: BaseDataPoint[t.Any]) -> DataPointDict[t.Any]:
+    def get(self, *specs: BaseDataPointSpec[t.Any]) -> DataPointDict[t.Any]:
         missing = {name for name in specs if name not in self._storage}
 
         if len(missing) > 0:

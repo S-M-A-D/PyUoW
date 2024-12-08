@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyuow"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python custom implementation of unit of work pattern"
 authors = ["SMAD"]
 maintainers = [
@@ -65,6 +65,7 @@ sqlalchemy = ["sqlalchemy"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
 addopts = "-xvrs --color=yes"
 junit_family = "xunit2"
 testpaths = [
