@@ -20,7 +20,7 @@ class FakeContext(BaseMutableContext[FakeParams]):
 
 
 class TestBaseMutableContext:
-    def test_should_raise_on_attribute_override(self):
+    def test_should_raise_on_attribute_override(self) -> None:
         # given
         context = FakeContext(params=FakeParams(), context_field="test")
         # when / then

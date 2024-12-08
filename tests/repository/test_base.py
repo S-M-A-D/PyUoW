@@ -59,7 +59,7 @@ class FakeRepositoryFactory(BaseRepositoryFactory):
 class TestRepositoryFactory:
     def test_repo_for_should_return_proper_repository_for_entity_type(
         self,
-    ):
+    ) -> None:
         # given
         factory = FakeRepositoryFactory()
         # then
@@ -69,7 +69,7 @@ class TestRepositoryFactory:
 
     def test_repo_for_should_raise_if_no_repository_for_entity_type(
         self,
-    ):
+    ) -> None:
         # given
         factory = FakeRepositoryFactory()
         # when / then

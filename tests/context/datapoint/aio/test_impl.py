@@ -17,7 +17,7 @@ class FakeObjThatConsumesDataPoints(ConsumesDataPoints):
 
 
 class TestConsumesDataPoints:
-    def test_async_to_should_delegate_to_provider_proxy(self):
+    def test_async_to_should_delegate_to_provider_proxy(self) -> None:
         # given
         fake_producer = Mock()
         obj_that_produces = FakeObjThatProducesDataPoints()
@@ -26,7 +26,9 @@ class TestConsumesDataPoints:
         # then
         assert isinstance(proxy, FakeObjThatProducesDataPoints.ProducerProxy)
 
-    async def test_async_to_add_should_delegate_datapoints_to_producer(self):
+    async def test_async_to_add_should_delegate_datapoints_to_producer(
+        self,
+    ) -> None:
         # given
         fake_producer = AsyncMock()
         obj_that_produces = FakeObjThatProducesDataPoints()
@@ -38,7 +40,7 @@ class TestConsumesDataPoints:
 
     async def test_async_to_add_should_fail_if_at_least_one_required_datapoint_is_missing(
         self,
-    ):
+    ) -> None:
         # given
         fake_producer = AsyncMock()
         obj_that_produces = FakeObjThatProducesDataPoints()
@@ -46,7 +48,9 @@ class TestConsumesDataPoints:
         with pytest.raises(DataPointIsNotProducedError):
             await obj_that_produces.to(fake_producer).add()
 
-    async def test_async_out_of_should_delegate_names_to_consumer(self):
+    async def test_async_out_of_should_delegate_names_to_consumer(
+        self,
+    ) -> None:
         # given
         fake_consumer = AsyncMock()
         obj_that_consumes = FakeObjThatConsumesDataPoints()

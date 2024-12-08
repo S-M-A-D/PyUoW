@@ -4,19 +4,21 @@ from typing import Iterator
 import pytest
 from sqlalchemy import text
 from sqlalchemy.engine import Engine, create_engine
-from testcontainers.postgres import PostgresContainer
+from testcontainers.postgres import (  # type: ignore[import-untyped]
+    PostgresContainer,
+)
 
 TEST_DB_SCHEMA = Path(__file__).parent / "test_db_schema.sql"
 
 
 @pytest.fixture(scope="session")
-def postgres() -> Iterator[PostgresContainer]:
+def postgres() -> Iterator[PostgresContainer]:  # type: ignore[no-any-unimported]
     with PostgresContainer("postgres:15") as postgres:
         yield postgres
 
 
 @pytest.fixture(scope="session")
-def engine(postgres: PostgresContainer) -> Iterator[Engine]:
+def engine(postgres: PostgresContainer) -> Iterator[Engine]:  # type: ignore[no-any-unimported]
     engine = create_engine(
         postgres.get_connection_url(),
         echo=True,

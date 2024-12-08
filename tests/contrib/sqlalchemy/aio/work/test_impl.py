@@ -13,7 +13,7 @@ from pyuow.contrib.sqlalchemy.aio.work import (
 class TestSqlAlchemyTransaction:
     async def test_async_rollback_should_call_transaction_provider_original_rollback(
         self,
-    ):
+    ) -> None:
         # given
         trx_provider = AsyncMock()
         trx = SqlAlchemyTransaction(trx_provider)
@@ -24,7 +24,7 @@ class TestSqlAlchemyTransaction:
 
     async def test_async_commit_should_call_transaction_provider_original_commit(
         self,
-    ):
+    ) -> None:
         # given
         trx_provider = AsyncMock()
         trx = SqlAlchemyTransaction(trx_provider)
@@ -38,7 +38,7 @@ class TestSqlAlchemyTransaction:
 class TestSqlAlchemyTransactionManager:
     async def test_async_transaction_should_return_same_session_if_called_in_already_opened_transaction(
         self, async_engine: AsyncEngine
-    ):
+    ) -> None:
         # given
         manager = SqlAlchemyTransactionManager(async_engine)
         # when
@@ -52,7 +52,7 @@ class TestSqlAlchemyTransactionManager:
 
     async def test_async_transaction_should_return_different_session_if_called_in_already_opened_transaction(
         self, async_engine: AsyncEngine
-    ):
+    ) -> None:
         # given
         manager = SqlAlchemyTransactionManager(async_engine)
         # when

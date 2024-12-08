@@ -38,7 +38,7 @@ class TestInMemoryDataPointContext:
 
     async def test_async_should_properly_add_and_get_datapoints(
         self, context: InMemoryDataPointContext[FakeParams]
-    ):
+    ) -> None:
         # given
         complex_obj_one = FakeComplexType(fake_field=123)
         complex_obj_two = FakeComplexType(fake_field=456)
@@ -53,7 +53,7 @@ class TestInMemoryDataPointContext:
 
     async def test_async_add_should_raise_if_duplicated_datapoint_added(
         self, context: InMemoryDataPointContext[FakeParams]
-    ):
+    ) -> None:
         # given
         complex_obj_one = FakeComplexType(fake_field=123)
         fake_datapoint = FakeDatapointOne(complex_obj_one)
@@ -63,7 +63,7 @@ class TestInMemoryDataPointContext:
 
     async def test_async_get_should_raise_if_no_datapoint_exists(
         self, context: InMemoryDataPointContext[FakeParams]
-    ):
+    ) -> None:
         # given / when / then
         with pytest.raises(DataPointIsNotProducedError):
             await context.get(FakeDatapointOne)
