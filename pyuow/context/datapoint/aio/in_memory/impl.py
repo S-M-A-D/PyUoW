@@ -5,7 +5,6 @@ from .....datapoint import (
     BaseDataPointContainer,
     BaseDataPointSpec,
     DataPointCannotBeOverriddenError,
-    DataPointDict,
     DataPointIsNotProducedError,
 )
 from ..base import BaseDataPointContext, BaseParams
@@ -14,11 +13,15 @@ PARAMS = t.TypeVar("PARAMS", bound=BaseParams)
 
 
 @dataclass(frozen=True)
-class InMemoryDataPointContext(BaseDataPointContext[PARAMS]):
+class InMemoryDataPointContext(
+    BaseDataPointContext[
+        PARAMS, BaseDataPointContainer[t.Any], BaseDataPointSpec[t.Any]
+    ]
+):
     params: PARAMS
 
-    _storage: DataPointDict[t.Any] = field(
-        init=False, repr=False, default_factory=DataPointDict
+    _storage: t.Dict[BaseDataPointSpec[t.Any], t.Any] = field(
+        init=False, repr=False, default_factory=dict
     )
 
     async def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
@@ -30,13 +33,10 @@ class InMemoryDataPointContext(BaseDataPointContext[PARAMS]):
 
     async def get(
         self, *specs: BaseDataPointSpec[t.Any]
-    ) -> DataPointDict[t.Any]:
+    ) -> t.Dict[BaseDataPointSpec[t.Any], t.Any]:
         missing = {name for name in specs if name not in self._storage}
 
         if len(missing) > 0:
             raise DataPointIsNotProducedError(missing)
 
-        return t.cast(
-            DataPointDict[t.Any],
-            {k: v for k, v in self._storage.items() if k in specs},
-        )
+        return {k: v for k, v in self._storage.items() if k in specs}

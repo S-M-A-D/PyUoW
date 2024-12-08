@@ -3,7 +3,6 @@ from .base import (
     BaseDataPointContainer,
     BaseDataPointProducer,
     BaseDataPointSpec,
-    DataPointDict,
 )
 from .exceptions import (
     DataPointCannotBeOverriddenError,
@@ -17,7 +16,6 @@ __all__ = (
     "BaseDataPointSpec",
     "BaseDataPointProducer",
     "ConsumesDataPoints",
-    "DataPointDict",
     "ProducesDataPoints",
     "DataPointCannotBeOverriddenError",
     "DataPointIsNotProducedError",

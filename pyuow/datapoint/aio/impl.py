@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from ...datapoint import (
     BaseDataPointContainer,
     BaseDataPointSpec,
-    DataPointDict,
     DataPointIsNotProducedError,
 )
 from ...datapoint.aio import BaseDataPointConsumer, BaseDataPointProducer
@@ -20,15 +19,15 @@ class ConsumesDataPoints(ABC):
         raise NotImplementedError
 
     async def out_of(
-        self, consumer: BaseDataPointConsumer
-    ) -> DataPointDict[t.Any]:
+        self, consumer: BaseDataPointConsumer[t.Any]
+    ) -> t.Dict[BaseDataPointSpec[t.Any], t.Any]:
         return await consumer.get(*self._consumes)
 
 
 class ProducesDataPoints(ABC):
     @dataclass(frozen=True)
     class ProducerProxy:
-        _producer: BaseDataPointProducer
+        _producer: BaseDataPointProducer[t.Any]
         _required_names: t.Set[BaseDataPointSpec[t.Any]]
 
         async def add(
@@ -49,5 +48,5 @@ class ProducesDataPoints(ABC):
     ) -> t.Set[BaseDataPointSpec[t.Any]]:
         raise NotImplementedError
 
-    def to(self, producer: BaseDataPointProducer) -> ProducerProxy:
+    def to(self, producer: BaseDataPointProducer[t.Any]) -> ProducerProxy:
         return self.ProducerProxy(producer, self._produces)

@@ -26,8 +26,8 @@ ENTITY_TABLE = t.TypeVar("ENTITY_TABLE", bound=EntityTable)
 
 
 class BaseSqlAlchemyEntityRepository(
-    BaseEntityRepository[ENTITY_ID, ENTITY_TYPE],
     t.Generic[ENTITY_ID, ENTITY_TYPE, ENTITY_TABLE],
+    BaseEntityRepository[ENTITY_ID, ENTITY_TYPE],
     ABC,
 ):
     def __init__(

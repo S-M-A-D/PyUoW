@@ -10,7 +10,7 @@ class FakeAuditedEntity(AuditedEntity[UUID]):
 
 
 class TestAuditedEntity:
-    def test_post_init_should_properly_set_defaults_to_audited(self):
+    def test_post_init_should_properly_set_defaults_to_audited(self) -> None:
         # given
         entity_id = uuid4()
         # when

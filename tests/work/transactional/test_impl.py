@@ -61,7 +61,7 @@ class FakeTransactionManager(BaseTransactionManager[FakeTransaction]):
 
 
 class TestTransactionalUnitProxy:
-    def test_do_with_should_commit_on_success(self):
+    def test_do_with_should_commit_on_success(self) -> None:
         # given
         unit = SuccessUnit()
         params = FakeParams()
@@ -77,7 +77,7 @@ class TestTransactionalUnitProxy:
         assert result.is_ok()
         transaction.commit.assert_called_once()
 
-    def test_do_with_should_rollback_on_error(self):
+    def test_do_with_should_rollback_on_error(self) -> None:
         # given
         unit = FailureUnit()
         params = FakeParams()
@@ -95,7 +95,7 @@ class TestTransactionalUnitProxy:
 
 
 class TestTransactionalWorkManager:
-    def test_by_should_delegate_unit_to_work_proxy(self):
+    def test_by_should_delegate_unit_to_work_proxy(self) -> None:
         # given
         transaction_manager = Mock(spec=BaseTransactionManager)
         work_manager = TransactionalWorkManager(
@@ -107,7 +107,7 @@ class TestTransactionalWorkManager:
         # then
         assert isinstance(proxy, TransactionalUnitProxy)
 
-    def test_example_fake_flow_should_pass(self):
+    def test_example_fake_flow_should_pass(self) -> None:
         # given
         unit = SuccessUnit()
         params = FakeParams()

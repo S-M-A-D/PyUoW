@@ -1,3 +1,4 @@
+import typing as t
 from dataclasses import dataclass
 from unittest.mock import Mock
 
@@ -24,9 +25,7 @@ from pyuow.unit import (
 
 
 class TestUnits:
-    def test_flow_unit_rshift_should_properly_assign_units(
-        self,
-    ):
+    def test_flow_unit_rshift_should_properly_assign_units(self) -> None:
         # given
         class FakeUnit(FlowUnit[Mock, None]):
             def __call__(self, context: Mock) -> Result[None]:
@@ -42,9 +41,7 @@ class TestUnits:
         assert unit2._root == unit1
         assert unit2._next == MISSING
 
-    def test_flow_unit_rshift_should_raise_on_unit_reassignment(
-        self,
-    ):
+    def test_flow_unit_rshift_should_raise_on_unit_reassignment(self) -> None:
         # given
         class FakeUnit(FlowUnit[Mock, None]):
             def __call__(self, context: Mock) -> Result[None]:
@@ -56,9 +53,7 @@ class TestUnits:
         with pytest.raises(CannotReassignUnitError):
             unit1 >> unit2 >> unit1
 
-    def test_flow_unit_build_should_return_flow_root(
-        self,
-    ):
+    def test_flow_unit_build_should_return_flow_root(self) -> None:
         # given
         class FakeUnit(FlowUnit[Mock, None]):
             def __call__(self, context: Mock) -> Result[None]:
@@ -71,7 +66,7 @@ class TestUnits:
         # then
         assert flow.build() == unit1
 
-    def test_complex_units_flow_should_behave_properly(self):
+    def test_complex_units_flow_should_behave_properly(self) -> None:
         # given
         @dataclass(frozen=True)
         class FakeParams(BaseParams):
@@ -124,7 +119,7 @@ class TestUnits:
         assert passed_result.get() == FakeOut(result_field="success")
         assert failed_result.is_error() is True
 
-    def test_conditional_unit_should_behave_properly(self):
+    def test_conditional_unit_should_behave_properly(self) -> None:
         # given
         @dataclass
         class FakeContext(BaseMutableContext[Mock]):
@@ -149,7 +144,7 @@ class TestUnits:
 
     def test_conditional_unit_in_flow_should_raise_if_next_unit_is_not_set(
         self,
-    ):
+    ) -> None:
         # given
         class FakeUnit(ConditionalUnit[Mock, None]):
             def condition(self, context: Mock) -> bool:
@@ -162,7 +157,7 @@ class TestUnits:
 
     def test_conditional_unit_in_flow_should_return_result_when_error_occurs(
         self,
-    ):
+    ) -> None:
         # given
         class FakeUnit(ConditionalUnit[Mock, None]):
             def condition(self, context: Mock) -> bool:
@@ -178,7 +173,7 @@ class TestUnits:
 
     def test_conditional_unit_in_flow_should_call_failure_if_condition_failed(
         self,
-    ):
+    ) -> None:
         # given
         mock_context = Mock()
         mock_on_failure = Mock()
@@ -195,7 +190,7 @@ class TestUnits:
         # then
         mock_on_failure.assert_called_once_with(mock_context)
 
-    def test_run_unit_should_behave_properly(self):
+    def test_run_unit_should_behave_properly(self) -> None:
         # given
         mock_context = Mock()
         mock_logic = Mock()
@@ -210,7 +205,9 @@ class TestUnits:
         # then
         mock_logic.assert_called_once_with(mock_context)
 
-    def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(self):
+    def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(
+        self,
+    ) -> None:
         # given
         class FakeUnit(RunUnit[Mock, None]):
             def run(self, context: Mock) -> None: ...
@@ -222,7 +219,7 @@ class TestUnits:
 
     def test_run_unit_in_flow_should_return_result_when_error_occurs(
         self,
-    ):
+    ) -> None:
         # given
         class FakeUnit(RunUnit[Mock, None]):
             def run(self, context: Mock) -> None:
@@ -234,7 +231,7 @@ class TestUnits:
         # then
         assert result.is_error() is True
 
-    def test_final_unit_should_raise_on_next_assigned(self):
+    def test_final_unit_should_raise_on_next_assigned(self) -> None:
         # given
         class FakeUnit(FinalUnit[Mock, None]):
             def finish(self, context: Mock) -> Result[None]:
@@ -246,7 +243,7 @@ class TestUnits:
 
     def test_final_unit_in_flow_should_return_result_when_error_occurs(
         self,
-    ):
+    ) -> None:
         # given
         class FakeUnit(FinalUnit[Mock, None]):
             def finish(self, context: Mock) -> Result[None]:
@@ -258,10 +255,10 @@ class TestUnits:
         # then
         assert result.is_error() is True
 
-    def test_error_unit_should_behave_properly(self):
+    def test_error_unit_should_behave_properly(self) -> None:
         # given
         mock_context = Mock()
-        unit = ErrorUnit(exc=Exception("test"))
+        unit: ErrorUnit[Mock, t.Any] = ErrorUnit(exc=Exception("test"))
         # when
         result = unit.finish(mock_context)
         # then

@@ -133,7 +133,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_find_should_find_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)
@@ -144,7 +144,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_find_all_should_find_all_entities(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
@@ -156,7 +156,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_get_should_get_existing_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)
@@ -167,7 +167,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_get_should_raise_if_no_entity_exists(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity_id = FakeEntityId(uuid4())
         # when / then
@@ -176,7 +176,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_exists_should_return_true_if_entity_exists(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)
@@ -187,7 +187,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_exists_should_return_false_if_no_entity_found(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity_id = FakeEntityId(uuid4())
         # when
@@ -197,7 +197,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_update_non_audited_entity_should_update_both_entity_and_date(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)
@@ -211,7 +211,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_update_non_audited_entity_should_update_only_entity(
         self, entity_repository: FakeEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeEntity(id=FakeEntityId(uuid4()), field="test")
         entity_repository.add(entity)
@@ -222,7 +222,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_update_all_should_update_all_entities(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
@@ -240,7 +240,7 @@ class TestSqlAlchemyEntityRepository:
 
     def test_delete_should_delete_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         audited_entity_repository.add(entity)

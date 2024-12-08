@@ -27,8 +27,7 @@ jobs:
           isort --check --diff .
           black --check --diff .
           autoflake --recursive --check --quiet .
-          mypy pyuow
-          # safety check --ignore 70612 73456  # Safety dependency jinja2 fails (check for new versions later)
+          mypy .
       - name: Run tests with Pytest
         run: |
           pytest --cov --cov-report=xml
@@ -65,8 +64,7 @@ jobs:
           isort --check --diff .
           black --check --diff .
           autoflake --recursive --check --quiet .
-          mypy pyuow
-          # safety check --ignore 70612 73456  # Safety dependency jinja2 fails (check for new versions later)
+          mypy .
 
       - name: Run tests with Pytest
         run: |

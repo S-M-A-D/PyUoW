@@ -44,14 +44,12 @@ class FakeEntity(Entity[FakeEntityId]):
 
 
 class FakeEntityRepository(
-    BaseSqlAlchemyEntityRepository[
-        FakeEntityId, FakeEntity, FakeAuditedEntityTable
-    ]
+    BaseSqlAlchemyEntityRepository[FakeEntityId, FakeEntity, FakeEntityTable]
 ):
     @staticmethod
     def to_entity(record: FakeEntityTable) -> FakeEntity:
         return FakeEntity(
-            id=record.id,
+            id=FakeEntityId(record.id),
             field=record.field,
         )
 
@@ -71,7 +69,7 @@ class FakeAuditedEntityRepository(
     @staticmethod
     def to_entity(record: FakeAuditedEntityTable) -> FakeAuditedEntity:
         return FakeAuditedEntity(
-            id=record.id,
+            id=FakeEntityId(record.id),
             field=record.field,
             created_date=record.created_date,
             updated_date=record.updated_date,
@@ -122,13 +120,13 @@ class TestSqlAlchemyEntityRepository:
     @pytest.fixture
     def audited_entity_repository(
         self, repository_factory: FakeRepositoryFactory
-    ) -> BaseEntityRepository:
+    ) -> BaseEntityRepository[FakeEntityId, FakeAuditedEntity]:
         return repository_factory.repo_for(FakeAuditedEntity)
 
     @pytest.fixture
     def entity_repository(
         self, repository_factory: FakeRepositoryFactory
-    ) -> BaseEntityRepository:
+    ) -> BaseEntityRepository[FakeEntityId, FakeEntity]:
         return repository_factory.repo_for(FakeEntity)
 
     async def test_async_find_should_find_entity(
@@ -199,7 +197,7 @@ class TestSqlAlchemyEntityRepository:
 
     async def test_async_update_non_audited_entity_should_update_both_entity_and_date(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await audited_entity_repository.add(entity)
@@ -213,7 +211,7 @@ class TestSqlAlchemyEntityRepository:
 
     async def test_async_update_non_audited_entity_should_update_only_entity(
         self, entity_repository: FakeEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeEntity(id=FakeEntityId(uuid4()), field="test")
         await entity_repository.add(entity)
@@ -224,7 +222,7 @@ class TestSqlAlchemyEntityRepository:
 
     async def test_async_update_all_should_update_all_entities(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
@@ -242,7 +240,7 @@ class TestSqlAlchemyEntityRepository:
 
     async def test_async_delete_should_delete_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
-    ):
+    ) -> None:
         # given
         entity = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
         await audited_entity_repository.add(entity)

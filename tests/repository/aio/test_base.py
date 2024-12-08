@@ -15,7 +15,7 @@ class FakeEntity(Entity[UUID]):
     pass
 
 
-class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
+class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
     async def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
         return None
 
@@ -47,7 +47,7 @@ class FakeBaseEntityRepository(BaseEntityRepository[UUID, UUID]):
         return True
 
     async def exists(self, entity_id: ENTITY_ID) -> bool:
-        pass
+        return True
 
 
 class FakeRepositoryFactory(BaseRepositoryFactory):
@@ -61,7 +61,7 @@ class FakeRepositoryFactory(BaseRepositoryFactory):
 class TestRepositoryFactory:
     def test_async_repo_for_should_return_proper_repository_for_entity_type(
         self,
-    ):
+    ) -> None:
         # given
         factory = FakeRepositoryFactory()
         # then
@@ -71,7 +71,7 @@ class TestRepositoryFactory:
 
     def test_async_repo_for_should_raise_if_no_repository_for_entity_type(
         self,
-    ):
+    ) -> None:
         # given
         factory = FakeRepositoryFactory()
         # when
