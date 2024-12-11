@@ -9,6 +9,17 @@ ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound="Entity[t.Any]")
 
 
+class Version(int):
+    def __new__(cls, value: int) -> "Version":
+        if value < 0:
+            raise ValueError("Version cannot be negative")
+
+        return super().__new__(cls, value)
+
+    def next(self) -> "Version":
+        return Version(self + 1)
+
+
 @dataclass(frozen=True)
 class Entity(t.Generic[ENTITY_ID]):
     id: ENTITY_ID
@@ -26,3 +37,8 @@ class AuditedEntity(Entity[ENTITY_ID]):
             object.__setattr__(self, "created_date", now)
         if self.updated_date is MISSING:
             object.__setattr__(self, "updated_date", now)
+
+
+@dataclass(frozen=True)
+class VersionedEntity(Entity[ENTITY_ID]):
+    version: Version = Version(0)

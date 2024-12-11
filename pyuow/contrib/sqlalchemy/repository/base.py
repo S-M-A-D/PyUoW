@@ -12,12 +12,16 @@ except ImportError:  # pragma: no cover
         " please install pyuow[sqlalchemy]"
     )
 
-from ....contrib.sqlalchemy.tables import AuditedEntityTable, EntityTable
+from ....contrib.sqlalchemy.tables import (
+    AuditedEntityTable,
+    EntityTable,
+    VersionedEntityTable,
+)
 from ....contrib.sqlalchemy.work.impl import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from ....entity import Entity
+from ....entity import AuditedEntity, Entity, VersionedEntity
 from ....repository import BaseEntityRepository, BaseRepositoryFactory
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
@@ -103,14 +107,29 @@ class BaseSqlAlchemyEntityRepository(
 
     def update(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         record = self.to_record(entity)
+        conditions = []
 
-        if isinstance(record, AuditedEntityTable):
+        if (
+            isinstance(record, AuditedEntityTable)
+            and issubclass(self._table, AuditedEntityTable)
+            and isinstance(entity, AuditedEntity)
+        ):
             record.updated_date = offset_naive_utcnow()
+            conditions.append(self._table.created_date == entity.created_date)
+            conditions.append(self._table.updated_date == entity.updated_date)
+
+        if (
+            isinstance(record, VersionedEntityTable)
+            and issubclass(self._table, VersionedEntityTable)
+            and isinstance(entity, VersionedEntity)
+        ):
+            record.version = entity.version.next()
+            conditions.append(self._table.version == entity.version)
 
         statement = (
             update(self._table)
             .values(**asdict(record))
-            .where(self._table.id == entity.id)
+            .where(self._table.id == record.id, *conditions)
             .returning(self._table)
         )
 
