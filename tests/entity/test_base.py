@@ -1,11 +1,18 @@
 from dataclasses import dataclass
 from uuid import UUID, uuid4
 
-from pyuow.entity import AuditedEntity
+import pytest
+
+from pyuow.entity import AuditedEntity, Version, VersionedEntity
 
 
 @dataclass(frozen=True)
 class FakeAuditedEntity(AuditedEntity[UUID]):
+    pass
+
+
+@dataclass(frozen=True)
+class FakeVersionedEntity(VersionedEntity[UUID]):
     pass
 
 
@@ -18,3 +25,30 @@ class TestAuditedEntity:
         # then
         assert entity.id == entity_id
         assert entity.created_date == entity.updated_date
+
+
+class TestVersion:
+    def test_init_should_raise_if_version_is_negative(self) -> None:
+        # when / then
+        with pytest.raises(ValueError, match="Version cannot be negative"):
+            Version(-1)
+
+    def test_next_should_properly_produce_next_version(self) -> None:
+        # given
+        version = Version(3)
+        # when
+        next_version = version.next()
+        # when
+        assert next_version == 4
+        assert isinstance(next_version, Version)
+
+
+class TestVersionedEntity:
+    def test_init_should_properly_set_versions(self) -> None:
+        # given
+        entity_id = uuid4()
+        # when
+        entity = FakeVersionedEntity(id=entity_id)
+        # then
+        assert entity.id == entity_id
+        assert entity.version == Version(0)

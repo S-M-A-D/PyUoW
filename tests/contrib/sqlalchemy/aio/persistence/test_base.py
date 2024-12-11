@@ -16,7 +16,7 @@ from pyuow.contrib.sqlalchemy.aio.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.entity import AuditedEntity, Entity
+from pyuow.entity import AuditedEntity, Entity, Version, VersionedEntity
 from pyuow.repository.aio import BaseEntityRepository
 from pyuow.types import MISSING
 
@@ -24,7 +24,16 @@ from ...faked_entities import (
     FakeAuditedEntityTable,
     FakeEntityId,
     FakeEntityTable,
+    FakeVersionedEntityTable,
 )
+
+
+@dataclass(frozen=True)
+class FakeVersionedEntity(VersionedEntity[FakeEntityId]):
+    field: str = t.cast(t.Any, MISSING)
+
+    def change_field(self, value: str) -> FakeVersionedEntity:
+        return replace(self, field=value)
 
 
 @dataclass(frozen=True)
@@ -85,6 +94,28 @@ class FakeAuditedEntityRepository(
         )
 
 
+class FakeVersionedEntityRepository(
+    BaseSqlAlchemyEntityRepository[
+        FakeEntityId, FakeVersionedEntity, FakeVersionedEntityTable
+    ]
+):
+    @staticmethod
+    def to_entity(record: FakeVersionedEntityTable) -> FakeVersionedEntity:
+        return FakeVersionedEntity(
+            id=FakeEntityId(record.id),
+            field=record.field,
+            version=Version(record.version),
+        )
+
+    @staticmethod
+    def to_record(entity: FakeVersionedEntity) -> FakeVersionedEntityTable:
+        return FakeVersionedEntityTable(
+            id=entity.id,
+            field=entity.field,
+            version=entity.version,
+        )
+
+
 class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
     @property
     def repositories(self) -> t.Mapping[
@@ -92,6 +123,11 @@ class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
         BaseEntityRepository[t.Any, t.Any],
     ]:
         return {
+            FakeVersionedEntity: FakeVersionedEntityRepository(
+                FakeVersionedEntityTable,
+                self._transaction_manager,
+                self._readonly_transaction_manager,
+            ),
             FakeAuditedEntity: FakeAuditedEntityRepository(
                 FakeAuditedEntityTable,
                 self._transaction_manager,
@@ -117,6 +153,12 @@ def repository_factory(async_engine: AsyncEngine) -> FakeRepositoryFactory:
 
 @pytest.mark.skip_on_ci
 class TestSqlAlchemyEntityRepository:
+    @pytest.fixture
+    def versioned_entity_repository(
+        self, repository_factory: FakeRepositoryFactory
+    ) -> BaseEntityRepository[FakeEntityId, FakeVersionedEntity]:
+        return repository_factory.repo_for(FakeVersionedEntity)
+
     @pytest.fixture
     def audited_entity_repository(
         self, repository_factory: FakeRepositoryFactory
@@ -195,7 +237,7 @@ class TestSqlAlchemyEntityRepository:
         # then
         assert result is False
 
-    async def test_async_update_non_audited_entity_should_update_both_entity_and_date(
+    async def test_async_update_audited_entity_should_update_both_entity_and_date(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
         # given
@@ -208,6 +250,32 @@ class TestSqlAlchemyEntityRepository:
         # then
         assert result.field == "changed"
         assert result.updated_date > entity.updated_date
+
+    async def test_async_update_versioned_entity_should_update_both_entity_and_version(
+        self, versioned_entity_repository: FakeVersionedEntityRepository
+    ) -> None:
+        # given
+        entity = FakeVersionedEntity(id=FakeEntityId(uuid4()), field="test")
+        await versioned_entity_repository.add(entity)
+        # when
+        result = await versioned_entity_repository.update(
+            entity.change_field("changed")
+        )
+        # then
+        assert result.field == "changed"
+        assert result.version == entity.version.next()
+
+    async def test_async_update_versioned_entity_should_raise_if_no_entity_with_current_version_exists(
+        self, versioned_entity_repository: FakeVersionedEntityRepository
+    ) -> None:
+        # given
+        entity = FakeVersionedEntity(id=FakeEntityId(uuid4()), field="test")
+        await versioned_entity_repository.add(entity)
+        # when / then
+        with pytest.raises(NoResultFound):
+            await versioned_entity_repository.update(
+                replace(entity, version=Version(123))
+            )
 
     async def test_async_update_non_audited_entity_should_update_only_entity(
         self, entity_repository: FakeEntityRepository
