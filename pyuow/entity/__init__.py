@@ -1,6 +1,8 @@
-from .base import AuditedEntity, Entity
+from .base import AuditedEntity, Entity, Version, VersionedEntity
 
 __all__ = (
-    "Entity",
     "AuditedEntity",
+    "Entity",
+    "Version",
+    "VersionedEntity",
 )

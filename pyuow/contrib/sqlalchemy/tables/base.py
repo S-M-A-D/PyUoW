@@ -3,7 +3,7 @@ from uuid import UUID
 
 try:
     from sqlalchemy import UUID as SA_UUID
-    from sqlalchemy import DateTime
+    from sqlalchemy import DateTime, Integer
     from sqlalchemy.orm import (
         DeclarativeBase,
         Mapped,
@@ -37,3 +37,8 @@ class AuditedEntityTable(EntityTable):
     updated_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=False), nullable=False
     )
+
+
+class VersionedEntityTable(EntityTable):
+    __abstract__ = True
+    version: Mapped[int] = mapped_column(Integer(), nullable=False)
