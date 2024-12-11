@@ -129,7 +129,7 @@ class BaseSqlAlchemyEntityRepository(
         statement = (
             update(self._table)
             .values(**asdict(record))
-            .where(self._table.id == record.id, *conditions)
+            .where(self._table.id == entity.id, *conditions)
             .returning(self._table)
         )
 

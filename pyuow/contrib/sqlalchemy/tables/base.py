@@ -1,3 +1,4 @@
+import typing as t
 from datetime import datetime
 from uuid import UUID
 
@@ -16,6 +17,8 @@ except ImportError:  # pragma: no cover
         " please install pyuow[sqlalchemy]"
     )
 
+TABLE_ID = t.TypeVar("TABLE_ID", bound=t.Any)
+
 
 class BaseTable(MappedAsDataclass, DeclarativeBase):
     __abstract__ = True
@@ -26,7 +29,7 @@ class BaseTable(MappedAsDataclass, DeclarativeBase):
 
 class EntityTable(BaseTable):
     __abstract__ = True
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(SA_UUID, primary_key=True)
 
 
 class AuditedEntityTable(EntityTable):
