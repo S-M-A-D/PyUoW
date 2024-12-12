@@ -6,6 +6,7 @@ from ..datapoint import (
     BaseDataPointConsumer,
     BaseDataPointContainer,
     BaseDataPointProducer,
+    BaseDataPointsDict,
     BaseDataPointSpec,
     DataPointIsNotProducedError,
 )
@@ -21,14 +22,14 @@ class ConsumesDataPoints(ABC):
 
     def out_of(
         self, consumer: BaseDataPointConsumer[t.Any]
-    ) -> t.Dict[BaseDataPointSpec[t.Any], t.Any]:
+    ) -> BaseDataPointsDict:
         consumed = consumer.get(*self._consumes)
         consumed_specs = set(consumed.keys())
 
         if not self._consumes.issubset(consumed_specs):
             raise DataPointIsNotProducedError(consumed_specs)
 
-        return consumed
+        return t.cast(BaseDataPointsDict, consumed)
 
 
 class ProducesDataPoints(ABC):

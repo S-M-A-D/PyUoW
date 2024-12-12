@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from ...datapoint import (
     BaseDataPointContainer,
+    BaseDataPointsDict,
     BaseDataPointSpec,
     DataPointIsNotProducedError,
 )
@@ -20,14 +21,14 @@ class ConsumesDataPoints(ABC):
 
     async def out_of(
         self, consumer: BaseDataPointConsumer[t.Any]
-    ) -> t.Dict[BaseDataPointSpec[t.Any], t.Any]:
+    ) -> BaseDataPointsDict:
         consumed = await consumer.get(*self._consumes)
         consumed_specs = set(consumed.keys())
 
         if not self._consumes.issubset(consumed_specs):
             raise DataPointIsNotProducedError(consumed_specs)
 
-        return consumed
+        return t.cast(BaseDataPointsDict, consumed)
 
 
 class ProducesDataPoints(ABC):
