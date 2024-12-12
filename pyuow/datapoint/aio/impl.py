@@ -34,16 +34,16 @@ class ProducesDataPoints(ABC):
     @dataclass(frozen=True)
     class ProducerProxy:
         _producer: BaseDataPointProducer[t.Any]
-        _required_names: t.Set[BaseDataPointSpec[t.Any]]
+        _required_specs: t.Set[BaseDataPointSpec[t.Any]]
 
         async def add(
             self, *datapoints: BaseDataPointContainer[t.Any]
         ) -> None:
             actual_specs = {datapoint.spec for datapoint in datapoints}
-            missing = self._required_names - actual_specs
+            missing_specs = self._required_specs - actual_specs
 
-            if len(missing) > 0:
-                raise DataPointIsNotProducedError(missing)
+            if len(missing_specs) > 0:
+                raise DataPointIsNotProducedError(missing_specs)
 
             await self._producer.add(*datapoints)
 
