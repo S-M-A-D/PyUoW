@@ -21,7 +21,7 @@ class InMemoryDataPointContext(
 ):
     params: PARAMS
 
-    _storage: BaseDataPointsDict = field(
+    _storage: t.Dict[BaseDataPointSpec[t.Any], t.Any] = field(
         init=False, repr=False, default_factory=BaseDataPointsDict
     )
 
