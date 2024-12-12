@@ -53,8 +53,21 @@ class TestConsumesDataPoints:
     ) -> None:
         # given
         fake_consumer = AsyncMock()
+        datapoint = FakeDatapoint(1)
+        fake_consumer.get.return_value = {FakeDatapoint: datapoint}
         obj_that_consumes = FakeObjThatConsumesDataPoints()
         # when
         await obj_that_consumes.out_of(fake_consumer)
         # then
         fake_consumer.get.assert_awaited_once_with(FakeDatapoint)
+
+    async def test_async_out_of_should_fail_if_at_least_one_required_datapoint_is_missing(
+        self,
+    ) -> None:
+        # given
+        fake_consumer = AsyncMock()
+        fake_consumer.get.return_value = {}
+        obj_that_consumes = FakeObjThatConsumesDataPoints()
+        # when / then
+        with pytest.raises(DataPointIsNotProducedError):
+            await obj_that_consumes.out_of(fake_consumer)

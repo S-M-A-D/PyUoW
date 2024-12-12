@@ -20,6 +20,11 @@ class BaseDataPointContainer(t.Generic[VALUE]):
     value: VALUE
 
 
+class BaseDataPointsDict(dict[BaseDataPointSpec[t.Any], t.Any]):
+    def __getitem__(self, key: BaseDataPointSpec[VALUE]) -> VALUE:
+        return t.cast(VALUE, super().__getitem__(key))
+
+
 DATA_POINT_CONTAINER = t.TypeVar(
     "DATA_POINT_CONTAINER", bound=BaseDataPointContainer[t.Any]
 )

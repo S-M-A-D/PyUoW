@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from ....datapoint import (
     BaseDataPointContainer,
+    BaseDataPointsDict,
     BaseDataPointSpec,
     DataPointCannotBeOverriddenError,
     DataPointIsNotProducedError,
@@ -21,7 +22,7 @@ class InMemoryDataPointContext(
     params: PARAMS
 
     _storage: t.Dict[BaseDataPointSpec[t.Any], t.Any] = field(
-        init=False, repr=False, default_factory=dict
+        init=False, repr=False, default_factory=BaseDataPointsDict
     )
 
     def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
