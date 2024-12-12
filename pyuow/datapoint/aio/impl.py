@@ -39,8 +39,8 @@ class ProducesDataPoints(ABC):
         async def add(
             self, *datapoints: BaseDataPointContainer[t.Any]
         ) -> None:
-            actual_names = {datapoint.spec for datapoint in datapoints}
-            missing = self._required_names - actual_names
+            actual_specs = {datapoint.spec for datapoint in datapoints}
+            missing = self._required_names - actual_specs
 
             if len(missing) > 0:
                 raise DataPointIsNotProducedError(missing)
