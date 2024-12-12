@@ -53,8 +53,21 @@ class TestConsumesDataPoints:
     def test_out_of_should_delegate_names_to_consumer(self) -> None:
         # given
         fake_consumer = Mock()
+        datapoint = FakeDatapoint(1)
+        fake_consumer.get.return_value = {FakeDatapoint: datapoint}
         obj_that_consumes = FakeObjThatConsumesDataPoints()
         # when
         obj_that_consumes.out_of(fake_consumer)
         # then
         fake_consumer.get.assert_called_once_with(FakeDatapoint)
+
+    def test_out_of_should_fail_if_at_least_one_required_datapoint_is_missing(
+        self,
+    ) -> None:
+        # given
+        fake_consumer = Mock()
+        fake_consumer.get.return_value = {}
+        obj_that_consumes = FakeObjThatConsumesDataPoints()
+        # when / then
+        with pytest.raises(DataPointIsNotProducedError):
+            obj_that_consumes.out_of(fake_consumer)

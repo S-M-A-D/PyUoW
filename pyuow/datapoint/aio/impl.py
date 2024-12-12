@@ -21,7 +21,13 @@ class ConsumesDataPoints(ABC):
     async def out_of(
         self, consumer: BaseDataPointConsumer[t.Any]
     ) -> t.Dict[BaseDataPointSpec[t.Any], t.Any]:
-        return await consumer.get(*self._consumes)
+        consumed = await consumer.get(*self._consumes)
+        consumed_specs = set(consumed.keys())
+
+        if not self._consumes.issubset(consumed_specs):
+            raise DataPointIsNotProducedError(consumed_specs)
+
+        return consumed
 
 
 class ProducesDataPoints(ABC):
