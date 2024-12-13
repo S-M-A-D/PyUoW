@@ -25,7 +25,8 @@ class ConsumesDataPoints(ABC):
         consumed_specs = set(consumed.keys())
 
         if not self._consumes.issubset(consumed_specs):
-            raise DataPointIsNotProducedError(consumed_specs)
+            missing_specs = self._consumes - consumed_specs
+            raise DataPointIsNotProducedError(missing_specs)
 
         return t.cast(BaseDataPointsDict, consumed)
 
@@ -38,10 +39,10 @@ class ProducesDataPoints(ABC):
 
         def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
             actual_specs = {datapoint.spec for datapoint in datapoints}
-            missing = self._required_specs - actual_specs
+            missing_specs = self._required_specs - actual_specs
 
-            if len(missing) > 0:
-                raise DataPointIsNotProducedError(missing)
+            if len(missing_specs) > 0:
+                raise DataPointIsNotProducedError(missing_specs)
 
             self._producer.add(*datapoints)
 
