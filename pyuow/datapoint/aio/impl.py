@@ -24,7 +24,8 @@ class ConsumesDataPoints(ABC):
         consumed_specs = set(consumed.keys())
 
         if not self._consumes.issubset(consumed_specs):
-            raise DataPointIsNotProducedError(consumed_specs)
+            missing_specs = self._consumes - consumed_specs
+            raise DataPointIsNotProducedError(missing_specs)
 
         return t.cast(BaseDataPointsDict, consumed)
 

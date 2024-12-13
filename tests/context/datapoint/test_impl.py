@@ -10,6 +10,7 @@ from pyuow.datapoint import (
 )
 
 FakeDatapoint = BaseDataPointSpec("fake_datapoint", int)
+FakeExtraDatapoint = BaseDataPointSpec("fake_extra_datapoint", float)
 
 
 class FakeObjThatProducesDataPoints(ProducesDataPoints):
@@ -64,10 +65,13 @@ class TestConsumesDataPoints:
     def test_out_of_should_fail_if_at_least_one_required_datapoint_is_missing(
         self,
     ) -> None:
-        # given
         fake_consumer = Mock()
-        fake_consumer.get.return_value = {}
+        datapoint = FakeExtraDatapoint(1.0)
+        fake_consumer.get.return_value = {FakeExtraDatapoint: datapoint}
         obj_that_consumes = FakeObjThatConsumesDataPoints()
         # when / then
-        with pytest.raises(DataPointIsNotProducedError):
+        with pytest.raises(
+            DataPointIsNotProducedError,
+            match=r"{BaseDataPointSpec\(name='[^']+', ref_type=<class '[^']+'>\)}",
+        ):
             obj_that_consumes.out_of(fake_consumer)

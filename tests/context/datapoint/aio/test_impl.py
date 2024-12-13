@@ -6,6 +6,7 @@ from pyuow.datapoint import BaseDataPointSpec, DataPointIsNotProducedError
 from pyuow.datapoint.aio import ConsumesDataPoints, ProducesDataPoints
 
 FakeDatapoint = BaseDataPointSpec("fake_datapoint", int)
+FakeExtraDatapoint = BaseDataPointSpec("fake_extra_datapoint", float)
 
 
 class FakeObjThatProducesDataPoints(ProducesDataPoints):
@@ -66,8 +67,12 @@ class TestConsumesDataPoints:
     ) -> None:
         # given
         fake_consumer = AsyncMock()
-        fake_consumer.get.return_value = {}
+        datapoint = FakeExtraDatapoint(1.0)
+        fake_consumer.get.return_value = {FakeExtraDatapoint: datapoint}
         obj_that_consumes = FakeObjThatConsumesDataPoints()
         # when / then
-        with pytest.raises(DataPointIsNotProducedError):
+        with pytest.raises(
+            DataPointIsNotProducedError,
+            match=r"{BaseDataPointSpec\(name='[^']+', ref_type=<class '[^']+'>\)}",
+        ):
             await obj_that_consumes.out_of(fake_consumer)
