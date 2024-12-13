@@ -15,9 +15,7 @@ from ..datapoint import (
 class ConsumesDataPoints(ABC):
     @property
     @abstractmethod
-    def _consumes(
-        self, *specs: BaseDataPointSpec[t.Any]
-    ) -> t.Set[BaseDataPointSpec[t.Any]]:
+    def _consumes(self) -> t.Set[BaseDataPointSpec[t.Any]]:
         raise NotImplementedError
 
     def out_of(
@@ -49,9 +47,7 @@ class ProducesDataPoints(ABC):
 
     @property
     @abstractmethod
-    def _produces(
-        self, *specs: BaseDataPointSpec[t.Any]
-    ) -> t.Set[BaseDataPointSpec[t.Any]]:
+    def _produces(self) -> t.Set[BaseDataPointSpec[t.Any]]:
         raise NotImplementedError
 
     def to(self, producer: BaseDataPointProducer[t.Any]) -> ProducerProxy:
