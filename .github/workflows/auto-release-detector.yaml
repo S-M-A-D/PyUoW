@@ -35,10 +35,21 @@ jobs:
           else
             echo "Version has changed from $prior_version to $current_version."
           fi
-      - name: Create Tag
+      - name: Create/Push a tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="v$current_version"
+          echo "formatted_tag=$tag" >> $GITHUB_ENV
           git tag $tag
           git push origin $tag
+      - name: Create/Publish a GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.current_version }}
+          name: Release ${{ env.current_version }}
+          body: |
+            Automatic Release ${{ env.current_version }}
+          draft: false
+          prerelease: false
