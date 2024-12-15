@@ -18,10 +18,9 @@ jobs:
       - name: Get Prior Version
         id: prior-version
         run: |
-          echo "$(git show)"
-          echo "$(git show HEAD~1:pyproject.toml)"
-          previous_version=$(git show HEAD~1:pyproject.toml | grep -E '^version = ' | sed -E 's/version = "(.*)"/\1/')
-          echo "previous_version=$prior_version" >> $GITHUB_ENV
+          prior_version=$(git show HEAD~1:pyproject.toml | grep -E '^version = ' | sed -E 's/version = "(.*)"/\1/')
+          echo "$(git show HEAD~1:pyproject.toml | grep -E '^version = ' | sed -E 's/version = "(.*)"/\1/')"
+          echo "prior_version=$prior_version" >> $GITHUB_ENV
       - name: Extract Current Version
         id: current-version
         run: |
@@ -30,9 +29,9 @@ jobs:
       - name: Compare versions
         id: version-check
         run: |
-          if [ "$previous_version" = "$current_version" ]; then
+          if [ "prior_version" = "$current_version" ]; then
             echo "Version has not changed. Exiting."
             exit 0
           else
-            echo "Version has changed from $previous_version to $current_version."
+            echo "Version has changed from $prior_version to $current_version."
           fi

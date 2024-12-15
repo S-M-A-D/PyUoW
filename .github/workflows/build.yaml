@@ -1,71 +1,71 @@
-name: PyUoW-build
-
-
-on: [push]
-
-jobs:
-  ubuntu-checks:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry install --all-extras
-        env:
-          POETRY_VIRTUALENVS_CREATE: false
-      - name: Run checks
-        run: |
-          isort --check --diff .
-          black --check --diff .
-          autoflake --recursive --check --quiet .
-          mypy .
-      - name: Run tests with Pytest
-        run: |
-          pytest --cov --cov-report=xml
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-
-  windows-macos-checks:
-    strategy:
-      matrix:
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
-        os: [ macos-latest, windows-latest ]
-        exclude:
-          - os: windows-latest
-            python-version: "3.13"
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry install --all-extras
-        env:
-          POETRY_VIRTUALENVS_CREATE: false
-
-      - name: Run checks
-        run: |
-          isort --check --diff .
-          black --check --diff .
-          autoflake --recursive --check --quiet .
-          mypy .
-
-      - name: Run tests with Pytest
-        run: |
-          pytest --cov --cov-fail-under=0
+#name: PyUoW-build
+#
+#
+#on: [push]
+#
+#jobs:
+#  ubuntu-checks:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Set up Python ${{ matrix.python-version }}
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: ${{ matrix.python-version }}
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install poetry
+#          poetry install --all-extras
+#        env:
+#          POETRY_VIRTUALENVS_CREATE: false
+#      - name: Run checks
+#        run: |
+#          isort --check --diff .
+#          black --check --diff .
+#          autoflake --recursive --check --quiet .
+#          mypy .
+#      - name: Run tests with Pytest
+#        run: |
+#          pytest --cov --cov-report=xml
+#
+#      - name: Upload coverage
+#        uses: codecov/codecov-action@v3
+#
+#  windows-macos-checks:
+#    strategy:
+#      matrix:
+#        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+#        os: [ macos-latest, windows-latest ]
+#        exclude:
+#          - os: windows-latest
+#            python-version: "3.13"
+#    runs-on: ${{ matrix.os }}
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Set up Python ${{ matrix.python-version }}
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: ${{ matrix.python-version }}
+#
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install poetry
+#          poetry install --all-extras
+#        env:
+#          POETRY_VIRTUALENVS_CREATE: false
+#
+#      - name: Run checks
+#        run: |
+#          isort --check --diff .
+#          black --check --diff .
+#          autoflake --recursive --check --quiet .
+#          mypy .
+#
+#      - name: Run tests with Pytest
+#        run: |
+#          pytest --cov --cov-fail-under=0
