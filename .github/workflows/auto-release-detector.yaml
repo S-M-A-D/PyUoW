@@ -40,5 +40,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="v$current_version"
-          git tag $tag_version
-          git push origin $tag_version
+          git tag $tag
+          git push origin $tag
