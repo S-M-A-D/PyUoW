@@ -35,3 +35,10 @@ jobs:
           else
             echo "Version has changed from $prior_version to $current_version."
           fi
+      - name: Create Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="v$current_version"
+          git tag $tag_version
+          git push origin $tag_version
