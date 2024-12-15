@@ -37,7 +37,7 @@ jobs:
           fi
       - name: Create/Push a tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
         run: |
           tag="v$current_version"
           echo "formatted_tag=$tag" >> $GITHUB_ENV
@@ -46,10 +46,10 @@ jobs:
       - name: Create/Publish a GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.current_version }}
-          name: Release ${{ env.current_version }}
+          token: ${{ secrets.REPO_PAT }}
+          tag: ${{ env.formatted_tag }}
+          name: Release ${{ env.formatted_tag }}
           body: |
-            Automatic Release ${{ env.current_version }}
+            Automatic Release ${{ env.formatted_tag }}
           draft: false
           prerelease: false
