@@ -1,0 +1,34 @@
+name: Auto Release Publish on Version Change
+
+on:
+  push:
+    branches:
+      - main
+      - auto-release-publish
+
+jobs:
+  release_publish:
+    name: Auto Release Publish on Version Change
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Get Prior Version
+        id: prior-version
+        run: |
+          previous_version=$(git show HEAD~1:pyproject.toml | grep -E '^version = ' | sed -E 's/version = "(.*)"/\1/')
+          echo "previous_version=$prior_version" >> $GITHUB_ENV
+      - name: Extract Current Version
+        id: current-version
+        run: |
+          current_version=$(grep -E '^version = ' pyproject.toml | sed -E 's/version = "(.*)"/\1/')
+          echo "current_version=$current_version" >> $GITHUB_ENV
+      - name: Compare versions
+        id: version-check
+        run: |
+          if [ "$previous_version" = "$current_version" ]; then
+            echo "Version has not changed. Exiting."
+            exit 0
+          else
+            echo "Version has changed from $previous_version to $current_version."
+          fi
