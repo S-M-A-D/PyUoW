@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - auto-release-publish
 
 jobs:
   release_publish:
@@ -41,7 +40,7 @@ jobs:
         with:
           token: ${{ secrets.REPO_PAT }}
           tag: ${{ env.formatted_tag }}
-          name: Release ${{ env.formatted_tag }}
+          name: Authomatic Release ${{ env.formatted_tag }}
           body: |
             Automatic Release ${{ env.formatted_tag }}
           draft: false
