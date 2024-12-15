@@ -34,15 +34,8 @@ jobs:
             exit 0
           else
             echo "Version has changed from $prior_version to $current_version."
+            echo "formatted_tag=v$current_version"" >> $GITHUB_ENV
           fi
-      - name: Create/Push a tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
-        run: |
-          tag="v$current_version"
-          echo "formatted_tag=$tag" >> $GITHUB_ENV
-          git tag $tag
-          git push origin $tag
       - name: Create/Publish a GitHub Release
         uses: ncipollo/release-action@v1
         with:
