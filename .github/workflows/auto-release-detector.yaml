@@ -14,10 +14,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Get Prior Version
         id: prior-version
         run: |
+          echo "$(git show)"
+          echo "$(git show HEAD~1:pyproject.toml)"
           previous_version=$(git show HEAD~1:pyproject.toml | grep -E '^version = ' | sed -E 's/version = "(.*)"/\1/')
           echo "previous_version=$prior_version" >> $GITHUB_ENV
       - name: Extract Current Version
