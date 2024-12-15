@@ -18,7 +18,6 @@ jobs:
       - name: Configure pypi
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
-          echo "done"
       - name: Build package
         run: |
           poetry build
