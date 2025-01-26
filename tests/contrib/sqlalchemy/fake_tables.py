@@ -1,5 +1,4 @@
-import typing as t
-from uuid import UUID
+from __future__ import annotations
 
 from sqlalchemy.orm import Mapped
 
@@ -27,6 +26,3 @@ class FakeVersionedEntityTable(VersionedEntityTable):
     __tablename__ = "fake_versioned_entities"
 
     field: Mapped[str]
-
-
-FakeEntityId = t.NewType("FakeEntityId", UUID)

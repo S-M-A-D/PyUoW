@@ -41,7 +41,7 @@ class TestConsumesDataPoints:
         # then
         fake_producer.add.assert_called_once_with(datapoint)
 
-    def test_to_add_should_fail_if_at_least_one_required_datapoint_is_missing(
+    def test_to_add_should_raise_if_at_least_one_required_datapoint_is_missing(
         self,
     ) -> None:
         # given
@@ -62,7 +62,7 @@ class TestConsumesDataPoints:
         # then
         fake_consumer.get.assert_called_once_with(FakeDatapoint)
 
-    def test_out_of_should_fail_if_at_least_one_required_datapoint_is_missing(
+    def test_out_of_should_raise_if_at_least_one_required_datapoint_is_missing(
         self,
     ) -> None:
         fake_consumer = Mock()

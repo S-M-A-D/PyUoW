@@ -1,30 +1,26 @@
 import typing as t
-from dataclasses import dataclass
-from unittest.mock import Mock
-from uuid import UUID
+from unittest.mock import AsyncMock, Mock
+from uuid import uuid4
 
 import pytest
 
+from pyuow.domain import Batch
 from pyuow.entity import Entity
-from pyuow.entity.base import ENTITY_ID
 from pyuow.repository.aio import BaseEntityRepository, BaseRepositoryFactory
+from pyuow.repository.aio.base import BaseDomainRepository
+from tests.fake_entities import FakeEntity, FakeEntityId, FakeModel
 
 
-@dataclass(frozen=True)
-class FakeEntity(Entity[UUID]):
-    pass
-
-
-class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
-    async def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
+class FakeBaseEntityRepository(BaseEntityRepository[FakeEntityId, FakeEntity]):
+    async def find(self, entity_id: FakeEntityId) -> t.Optional[FakeEntity]:
         return None
 
     async def find_all(
-        self, entity_ids: t.Iterable[UUID]
+        self, entity_ids: t.Iterable[FakeEntityId]
     ) -> t.Iterable[FakeEntity]:
         return []
 
-    async def get(self, entity_id: UUID) -> FakeEntity:
+    async def get(self, entity_id: FakeEntityId) -> FakeEntity:
         return FakeEntity(id=entity_id)
 
     async def add(self, entity: FakeEntity) -> FakeEntity:
@@ -49,7 +45,7 @@ class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
     async def delete_all(self, entities: t.Sequence[FakeEntity]) -> bool:
         return True
 
-    async def exists(self, entity_id: ENTITY_ID) -> bool:
+    async def exists(self, entity_id: FakeEntityId) -> bool:
         return True
 
 
@@ -80,3 +76,39 @@ class TestRepositoryFactory:
         # when
         with pytest.raises(KeyError):
             factory.repo_for(Mock)
+
+
+class TestBaseDomainRepository:
+    async def test_async_process_batch_should_properly_direct_changes_and_handle_events(
+        self,
+    ) -> None:
+        # given
+        add_mock = AsyncMock()
+        update_mock = AsyncMock()
+        delete_mock = AsyncMock()
+        factory_mock = Mock(
+            repo_for=lambda *_, **__: AsyncMock(
+                add=add_mock, update=update_mock, delete=delete_mock
+            )
+        )
+        events_handler_mock = AsyncMock()
+        repository = BaseDomainRepository(
+            repositories=factory_mock,
+            events_handler=events_handler_mock,
+        )
+
+        add_entity = FakeModel()
+        update_entity = FakeEntity(id=FakeEntityId(uuid4()))
+        delete_entity = FakeEntity(id=FakeEntityId(uuid4()))
+
+        batch = Batch()
+        batch.add(add_entity)
+        batch.update(update_entity)
+        batch.delete(delete_entity)
+        # when
+        await repository.process_batch(batch)
+        # then
+        add_mock.assert_awaited_once_with(add_entity)
+        update_mock.assert_awaited_once_with(update_entity)
+        delete_mock.assert_awaited_once_with(delete_entity)
+        events_handler_mock.assert_awaited_once_with(batch.events())

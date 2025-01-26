@@ -22,7 +22,7 @@ class BaseDataPointContainer(t.Generic[VALUE]):
 
 class BaseDataPointsDict(dict[BaseDataPointSpec[t.Any], t.Any]):
     def __getitem__(self, key: BaseDataPointSpec[VALUE]) -> VALUE:
-        return t.cast(VALUE, super().__getitem__(key))
+        return t.cast(VALUE, super().__getitem__(key))  # pragma: no cover
 
 
 DATA_POINT_CONTAINER = t.TypeVar(

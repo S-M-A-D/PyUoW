@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, Mock
 
-from pyuow.context import BaseMutableContext, BaseParams
+from pyuow.context import BaseImmutableContext, BaseParams
+from pyuow.context.domain import BaseDomainContext
 from pyuow.result import Result
 from pyuow.unit.aio import BaseUnit
 from pyuow.work.aio.transactional import (
@@ -12,6 +13,10 @@ from pyuow.work.aio.transactional import (
     TransactionalUnitProxy,
     TransactionalWorkManager,
 )
+from pyuow.work.aio.transactional.impl import (
+    DomainTransactionalWorkManager,
+    DomainUnit,
+)
 
 
 @dataclass(frozen=True)
@@ -19,8 +24,13 @@ class FakeParams(BaseParams):
     pass
 
 
-@dataclass
-class FakeContext(BaseMutableContext[FakeParams]):
+@dataclass(frozen=True)
+class FakeSimpleContext(BaseImmutableContext[FakeParams]):
+    pass
+
+
+@dataclass(frozen=True)
+class FakeContext(BaseDomainContext[FakeParams], FakeSimpleContext):
     pass
 
 
@@ -122,3 +132,52 @@ class TestTransactionalWorkManager:
         # then
         assert result.is_ok()
         assert result.get() == FakeOut()
+
+
+class TestDomainTransactionalWorkManager:
+    def test_by_should_delegate_unit_to_work_proxy(self) -> None:
+        # given
+        transaction_manager = Mock(spec=BaseTransactionManager)
+        batch_handler = AsyncMock()
+        work_manager = DomainTransactionalWorkManager(
+            transaction_manager=transaction_manager,
+            batch_handler=batch_handler,
+        )
+        unit = SuccessUnit()
+        # when
+        proxy = work_manager.by(unit)
+        # then
+        assert isinstance(proxy, TransactionalUnitProxy)
+
+    async def test_domain_unit_should_omit_batch_handling_if_context_with_no_batch_provided(
+        self,
+    ) -> None:
+        # given
+        params = FakeParams()
+        batch_handler = AsyncMock()
+        unit = DomainUnit(unit=SuccessUnit(), batch_handler=batch_handler)
+        # when
+        context = FakeSimpleContext(params=params)
+        result = await unit(context)  # type: ignore[arg-type]
+        # then
+        assert result.is_ok()
+        batch_handler.assert_not_awaited()
+
+    async def test_example_fake_flow_should_pass(self) -> None:
+        # given
+        unit = SuccessUnit()
+        params = FakeParams()
+        context = FakeContext(params=params)
+        transaction = AsyncMock()
+        transaction_manager = FakeTransactionManager(lambda: transaction)
+        batch_handler = AsyncMock()
+        work = DomainTransactionalWorkManager(
+            transaction_manager=transaction_manager,
+            batch_handler=batch_handler,
+        )
+        # when
+        result = await work.by(unit).do_with(context)
+        # then
+        assert result.is_ok()
+        assert result.get() == FakeOut()
+        batch_handler.assert_awaited_once_with(context.batch)

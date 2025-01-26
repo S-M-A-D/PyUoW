@@ -1,9 +1,9 @@
+import datetime
 import typing as t
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from enum import Enum, auto, unique
-from uuid import uuid4
 
 from ..clock import offset_naive_utcnow
 from ..entity import (
@@ -30,20 +30,35 @@ class Model(
     id: ENTITY_ID = t.cast(ENTITY_ID, MISSING)
 
     _events: t.Sequence[ModelEvent[ENTITY_ID]] = field(
-        default_factory=t.Sequence, repr=False, compare=False
+        default_factory=list, repr=False, compare=False
     )
     _is_new: bool = field(default=False, repr=False, compare=False)
 
     @abstractmethod
-    def generate_id(self) -> ENTITY_ID:
+    def _generate_id(self) -> ENTITY_ID:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _created_event(
+        self, date: datetime.datetime
+    ) -> ModelCreatedEvent[ENTITY_ID]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _deleted_event(
+        self, date: datetime.datetime
+    ) -> ModelDeletedEvent[ENTITY_ID]:
         raise NotImplementedError
 
     def __post_init__(self) -> None:
         super().__post_init__()
 
         if self.id is MISSING:
-            object.__setattr__(self, "id", self.generate_id())
+            object.__setattr__(self, "id", self._generate_id())
             object.__setattr__(self, "_is_new", True)
+            object.__setattr__(
+                self, "_events", [self._created_event(self.created_date)]
+            )
 
     def update(
         self: SELF,
@@ -56,25 +71,17 @@ class Model(
             **kwargs,
         )
 
-    def create(self: SELF) -> SELF:
-        return self.update(
-            ModelCreatedEvent(
-                id=uuid4(),
-                model_id=self.id,
-                created_date=self.created_date,
-            )
-        )
-
     def delete(self: SELF) -> SELF:
         now = offset_naive_utcnow()
-        return self.update(
-            ModelDeletedEvent(id=uuid4(), model_id=self.id, deleted_date=now),
-            deleted_date=now,
-        )
+        return self.update(self._deleted_event(now), deleted_date=now)
 
     @property
     def is_new(self) -> bool:
         return self._is_new
+
+    @property
+    def is_deleted(self) -> bool:
+        return self.deleted_date is not None
 
     def events(self) -> t.Sequence[ModelEvent[ENTITY_ID]]:
         return deepcopy(self._events)
@@ -105,8 +112,11 @@ class Batch:
         return [
             event
             for change in self._changes.values()
-            for event in t.cast(Model[t.Any], change.entity).events()
-            if isinstance(change.entity, Model)
+            for event in (
+                change.entity.events()
+                if isinstance(change.entity, Model)
+                else []
+            )
         ]
 
     def changes(self) -> t.Dict[ENTITY_ID, Change]:
@@ -134,7 +144,7 @@ class Batch:
         return entity
 
     def shut(self) -> None:
-        object.__setattr__(self, "shut", True)
+        object.__setattr__(self, "is_shut", True)
 
     def _add_change(
         self, change_type: ChangeType, entity: ENTITY_TYPE
@@ -144,7 +154,7 @@ class Batch:
 
         if existing := self._changes.get(entity.id):
             raise RuntimeError(
-                f"{entity.id} has already been added to batch for {existing.type.value} operation"
+                f"{entity.__class__.__name__}[{entity.id}] has already been added to batch with {existing.type.name} operation"
             )
 
         self._changes[entity.id] = Change(type=change_type, entity=entity)

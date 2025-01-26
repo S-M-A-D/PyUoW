@@ -21,10 +21,5 @@ class ModelCreatedEvent(ModelEvent[ENTITY_ID]):
 
 
 @dataclass(frozen=True)
-class ModelUpdatedEvent(ModelEvent[ENTITY_ID]):
-    updated_date: datetime.datetime
-
-
-@dataclass(frozen=True)
 class ModelDeletedEvent(ModelEvent[ENTITY_ID]):
     deleted_date: datetime.datetime

@@ -7,4 +7,4 @@ from ...base import ModelEvent
 class EventPublisher(ABC):
     @abstractmethod
     async def __call__(self, events: t.Sequence[ModelEvent[t.Any]]) -> None:
-        pass
+        raise NotImplementedError

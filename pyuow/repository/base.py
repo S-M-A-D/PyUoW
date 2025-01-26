@@ -119,10 +119,9 @@ class BaseDomainRepository(ABC):
         self._events_handler(batch.events())
 
     def _add(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
-        new_entity = entity.create() if isinstance(entity, Model) else entity
         return t.cast(
             ENTITY_TYPE,
-            self._repositories.repo_for(type(new_entity)).add(new_entity),
+            self._repositories.repo_for(type(entity)).add(entity),
         )
 
     def _add_all(
@@ -143,7 +142,9 @@ class BaseDomainRepository(ABC):
 
     def _delete(self, entity: ENTITY_TYPE) -> bool:
         deleted_entity = (
-            entity.delete() if isinstance(entity, Model) else entity
+            (entity if entity.is_deleted else entity.delete())
+            if isinstance(entity, Model)
+            else entity
         )
         return self._repositories.repo_for(type(deleted_entity)).delete(
             deleted_entity
