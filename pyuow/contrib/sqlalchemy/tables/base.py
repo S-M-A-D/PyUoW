@@ -44,8 +44,8 @@ class AuditedEntityTable(EntityTable):
 
 class SoftDeletableEntityTable(EntityTable):
     __abstract__ = True
-    deleted_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=False), nullable=True, default=None
+    deleted_date: Mapped[t.Optional[datetime]] = mapped_column(
+        DateTime(timezone=False), nullable=True
     )
 
 

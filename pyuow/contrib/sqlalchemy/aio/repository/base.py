@@ -197,10 +197,8 @@ class BaseSqlAlchemyEntityRepository(
     def _exclude_deleted(self) -> t.List[ColumnElement[bool]]:
         conditions: t.List[ColumnElement[bool]] = []
 
-        if isinstance(self._table, SoftDeletableEntityTable):
-            conditions.append(
-                t.cast(ColumnElement[bool], self._table.deleted_date == None)
-            )
+        if issubclass(self._table, SoftDeletableEntityTable):
+            conditions.append(self._table.deleted_date == None)
 
         return conditions
 

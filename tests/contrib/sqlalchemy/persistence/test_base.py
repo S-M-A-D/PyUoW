@@ -16,7 +16,13 @@ from pyuow.contrib.sqlalchemy.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.entity import AuditedEntity, Entity, Version, VersionedEntity
+from pyuow.entity import (
+    AuditedEntity,
+    Entity,
+    SoftDeletableEntity,
+    Version,
+    VersionedEntity,
+)
 from pyuow.repository import BaseEntityRepository
 from pyuow.types import MISSING
 
@@ -37,7 +43,9 @@ class FakeVersionedEntity(VersionedEntity[FakeEntityId]):
 
 
 @dataclass(frozen=True)
-class FakeAuditedEntity(AuditedEntity[FakeEntityId]):
+class FakeAuditedEntity(
+    AuditedEntity[FakeEntityId], SoftDeletableEntity[FakeEntityId]
+):
     field: str = t.cast(t.Any, MISSING)
 
     def change_field(self, value: str) -> FakeAuditedEntity:
@@ -82,6 +90,7 @@ class FakeAuditedEntityRepository(
             field=record.field,
             created_date=record.created_date,
             updated_date=record.updated_date,
+            deleted_date=record.deleted_date,
         )
 
     @staticmethod
@@ -91,6 +100,7 @@ class FakeAuditedEntityRepository(
             field=entity.field,
             created_date=entity.created_date,
             updated_date=entity.updated_date,
+            deleted_date=entity.deleted_date,
         )
 
 
