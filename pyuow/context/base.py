@@ -11,7 +11,7 @@ class BaseParams:
     pass
 
 
-class BaseContext(t.Protocol[PARAMS]):
+class BaseContext(t.Generic[PARAMS]):
     params: PARAMS
 
 

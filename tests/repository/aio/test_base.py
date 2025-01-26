@@ -46,6 +46,9 @@ class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
     async def delete(self, entity: FakeEntity) -> bool:
         return True
 
+    async def delete_all(self, entities: t.Sequence[FakeEntity]) -> bool:
+        return True
+
     async def exists(self, entity_id: ENTITY_ID) -> bool:
         return True
 

@@ -10,7 +10,6 @@ from .base import BaseTransaction
 
 CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
 OUT = t.TypeVar("OUT")
-
 TRANSACTION = t.TypeVar("TRANSACTION", bound=BaseTransaction[t.Any])
 
 

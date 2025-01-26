@@ -6,6 +6,7 @@ import pytest
 
 from pyuow.context import BaseMutableContext, BaseParams
 from pyuow.context.datapoint.in_memory import InMemoryDataPointContext
+from pyuow.context.domain import BaseDomainContext
 from pyuow.datapoint import (
     BaseDataPointSpec,
     ConsumesDataPoints,
@@ -73,7 +74,9 @@ class TestUnits:
             param_field: str
 
         @dataclass(frozen=True)
-        class FakeContext(InMemoryDataPointContext[FakeParams]):
+        class FakeContext(
+            BaseDomainContext[FakeParams], InMemoryDataPointContext[BaseParams]
+        ):
             pass
 
         @dataclass(frozen=True)

@@ -16,6 +16,7 @@ class FakeEntity(Entity[UUID]):
 
 
 class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
+
     def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
         return None
 
@@ -42,6 +43,9 @@ class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
         return entities
 
     def delete(self, entity: FakeEntity) -> bool:
+        return True
+
+    def delete_all(self, entities: t.Sequence[FakeEntity]) -> bool:
         return True
 
     def exists(self, entity_id: ENTITY_ID) -> bool:

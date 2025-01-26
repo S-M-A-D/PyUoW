@@ -316,3 +316,15 @@ class TestSqlAlchemyEntityRepository:
         result = audited_entity_repository.delete(entity)
         # then
         assert result is True
+
+    def test_delete_all_should_delete_all_entities(
+        self, audited_entity_repository: FakeAuditedEntityRepository
+    ) -> None:
+        # given
+        entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
+        entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
+        audited_entity_repository.add_all([entity1, entity2])
+        # when
+        result = audited_entity_repository.delete_all([entity1, entity2])
+        # then
+        assert result is True
