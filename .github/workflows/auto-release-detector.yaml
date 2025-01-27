@@ -30,7 +30,7 @@ jobs:
         run: |
           if [ "$prior_version" = "$current_version" ]; then
             echo "Version has not changed. Exiting."
-            exit 1
+            exit 0
           else
             echo "Version has changed from $prior_version to $current_version."
             echo "formatted_tag=v$current_version" >> $GITHUB_ENV
