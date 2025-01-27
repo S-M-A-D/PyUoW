@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS fake_audited_entities
     id           uuid NOT NULL PRIMARY KEY,
     field        varchar(255) NOT NULL,
     created_date timestamp without time zone NOT NULL,
-    updated_date timestamp without time zone NOT NULL
+    updated_date timestamp without time zone NOT NULL,
+    deleted_date timestamp without time zone
 );
 
 CREATE TABLE IF NOT EXISTS fake_entities

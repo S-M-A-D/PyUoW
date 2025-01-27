@@ -39,7 +39,7 @@ class TestConsumesDataPoints:
         # then
         fake_producer.add.assert_awaited_once_with(datapoint)
 
-    async def test_async_to_add_should_fail_if_at_least_one_required_datapoint_is_missing(
+    async def test_async_to_add_should_raise_if_at_least_one_required_datapoint_is_missing(
         self,
     ) -> None:
         # given
@@ -62,7 +62,7 @@ class TestConsumesDataPoints:
         # then
         fake_consumer.get.assert_awaited_once_with(FakeDatapoint)
 
-    async def test_async_out_of_should_fail_if_at_least_one_required_datapoint_is_missing(
+    async def test_async_out_of_should_raise_if_at_least_one_required_datapoint_is_missing(
         self,
     ) -> None:
         # given

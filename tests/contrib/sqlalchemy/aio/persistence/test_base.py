@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import typing as t
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from uuid import uuid4
 
 import pytest
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from pyuow.clock import offset_naive_utcnow
 from pyuow.contrib.sqlalchemy.aio.repository import (
     BaseSqlAlchemyEntityRepository,
     BaseSqlAlchemyRepositoryFactory,
@@ -16,40 +17,20 @@ from pyuow.contrib.sqlalchemy.aio.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
-from pyuow.entity import AuditedEntity, Entity, Version, VersionedEntity
+from pyuow.entity import Entity, Version
 from pyuow.repository.aio import BaseEntityRepository
-from pyuow.types import MISSING
-
-from ...faked_entities import (
-    FakeAuditedEntityTable,
+from tests.fake_entities import (
+    FakeAuditedEntity,
+    FakeEntity,
     FakeEntityId,
+    FakeVersionedEntity,
+)
+
+from ...fake_tables import (
+    FakeAuditedEntityTable,
     FakeEntityTable,
     FakeVersionedEntityTable,
 )
-
-
-@dataclass(frozen=True)
-class FakeVersionedEntity(VersionedEntity[FakeEntityId]):
-    field: str = t.cast(t.Any, MISSING)
-
-    def change_field(self, value: str) -> FakeVersionedEntity:
-        return replace(self, field=value)
-
-
-@dataclass(frozen=True)
-class FakeAuditedEntity(AuditedEntity[FakeEntityId]):
-    field: str = t.cast(t.Any, MISSING)
-
-    def change_field(self, value: str) -> FakeAuditedEntity:
-        return replace(self, field=value)
-
-
-@dataclass(frozen=True)
-class FakeEntity(Entity[FakeEntityId]):
-    field: str = t.cast(t.Any, MISSING)
-
-    def change_field(self, value: str) -> FakeEntity:
-        return replace(self, field=value)
 
 
 class FakeEntityRepository(
@@ -82,6 +63,7 @@ class FakeAuditedEntityRepository(
             field=record.field,
             created_date=record.created_date,
             updated_date=record.updated_date,
+            deleted_date=record.deleted_date,
         )
 
     @staticmethod
@@ -91,6 +73,7 @@ class FakeAuditedEntityRepository(
             field=entity.field,
             created_date=entity.created_date,
             updated_date=entity.updated_date,
+            deleted_date=entity.deleted_date,
         )
 
 
@@ -182,6 +165,21 @@ class TestSqlAlchemyEntityRepository:
         # then
         assert result == entity
 
+    async def test_find_should_return_none_when_entity_is_deleted(
+        self, audited_entity_repository: FakeAuditedEntityRepository
+    ) -> None:
+        # given
+        entity = FakeAuditedEntity(
+            id=FakeEntityId(uuid4()),
+            field="test",
+            deleted_date=offset_naive_utcnow(),
+        )
+        await audited_entity_repository.add(entity)
+        # when
+        result = await audited_entity_repository.find(entity.id)
+        # then
+        assert result is None
+
     async def test_async_find_all_should_find_all_entities(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
@@ -195,6 +193,28 @@ class TestSqlAlchemyEntityRepository:
         )
         # then
         assert {e for e in result} == {entity1, entity2}
+
+    async def test_find_all_should_return_empty_sequence_when_entity_is_deleted(
+        self, audited_entity_repository: FakeAuditedEntityRepository
+    ) -> None:
+        # given
+        entity1 = FakeAuditedEntity(
+            id=FakeEntityId(uuid4()),
+            field="test",
+            deleted_date=offset_naive_utcnow(),
+        )
+        entity2 = FakeAuditedEntity(
+            id=FakeEntityId(uuid4()),
+            field="test",
+            deleted_date=offset_naive_utcnow(),
+        )
+        await audited_entity_repository.add_all([entity1, entity2])
+        # when
+        result = await audited_entity_repository.find_all(
+            [entity1.id, entity2.id]
+        )
+        # then
+        assert result == []
 
     async def test_async_get_should_get_existing_entity(
         self, audited_entity_repository: FakeAuditedEntityRepository
@@ -215,6 +235,20 @@ class TestSqlAlchemyEntityRepository:
         # when / then
         with pytest.raises(NoResultFound):
             await audited_entity_repository.get(entity_id)
+
+    async def test_get_should_raise_if_entity_deleted(
+        self, audited_entity_repository: FakeAuditedEntityRepository
+    ) -> None:
+        # given
+        entity = FakeAuditedEntity(
+            id=FakeEntityId(uuid4()),
+            field="test",
+            deleted_date=offset_naive_utcnow(),
+        )
+        await audited_entity_repository.add(entity)
+        # when / then
+        with pytest.raises(NoResultFound):
+            await audited_entity_repository.get(entity.id)
 
     async def test_async_exists_should_return_true_if_entity_exists(
         self, audited_entity_repository: FakeAuditedEntityRepository
@@ -237,6 +271,21 @@ class TestSqlAlchemyEntityRepository:
         # then
         assert result is False
 
+    async def test_exists_should_return_false_if_entity_deleted(
+        self, audited_entity_repository: FakeAuditedEntityRepository
+    ) -> None:
+        # given
+        entity = FakeAuditedEntity(
+            id=FakeEntityId(uuid4()),
+            field="test",
+            deleted_date=offset_naive_utcnow(),
+        )
+        await audited_entity_repository.add(entity)
+        # when
+        result = await audited_entity_repository.exists(entity.id)
+        # then
+        assert result is False
+
     async def test_async_update_audited_entity_should_update_both_entity_and_date(
         self, audited_entity_repository: FakeAuditedEntityRepository
     ) -> None:
@@ -250,6 +299,22 @@ class TestSqlAlchemyEntityRepository:
         # then
         assert result.field == "changed"
         assert result.updated_date > entity.updated_date
+
+    async def test_update_audited_entity_should_raise_if_entity_deleted(
+        self, audited_entity_repository: FakeAuditedEntityRepository
+    ) -> None:
+        # given
+        entity = FakeAuditedEntity(
+            id=FakeEntityId(uuid4()),
+            field="test",
+            deleted_date=offset_naive_utcnow(),
+        )
+        await audited_entity_repository.add(entity)
+        # when / then
+        with pytest.raises(NoResultFound):
+            await audited_entity_repository.update(
+                entity.change_field("changed")
+            )
 
     async def test_async_update_versioned_entity_should_update_both_entity_and_version(
         self, versioned_entity_repository: FakeVersionedEntityRepository
@@ -314,5 +379,17 @@ class TestSqlAlchemyEntityRepository:
         await audited_entity_repository.add(entity)
         # when
         result = await audited_entity_repository.delete(entity)
+        # then
+        assert result is True
+
+    async def test_delete_all_should_delete_all_entities(
+        self, audited_entity_repository: FakeAuditedEntityRepository
+    ) -> None:
+        # given
+        entity1 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
+        entity2 = FakeAuditedEntity(id=FakeEntityId(uuid4()), field="test")
+        await audited_entity_repository.add_all([entity1, entity2])
+        # when
+        result = await audited_entity_repository.delete_all([entity1, entity2])
         # then
         assert result is True

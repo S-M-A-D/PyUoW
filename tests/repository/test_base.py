@@ -1,28 +1,23 @@
 import typing as t
-from dataclasses import dataclass
 from unittest.mock import Mock
-from uuid import UUID
 
 import pytest
 
 from pyuow.entity import Entity
-from pyuow.entity.base import ENTITY_ID
 from pyuow.repository import BaseEntityRepository, BaseRepositoryFactory
+from tests.fake_entities import FakeEntity, FakeEntityId
 
 
-@dataclass(frozen=True)
-class FakeEntity(Entity[UUID]):
-    pass
-
-
-class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
-    def find(self, entity_id: UUID) -> t.Optional[FakeEntity]:
+class FakeBaseEntityRepository(BaseEntityRepository[FakeEntityId, FakeEntity]):
+    def find(self, entity_id: FakeEntityId) -> t.Optional[FakeEntity]:
         return None
 
-    def find_all(self, entity_ids: t.Iterable[UUID]) -> t.Iterable[FakeEntity]:
+    def find_all(
+        self, entity_ids: t.Iterable[FakeEntityId]
+    ) -> t.Iterable[FakeEntity]:
         return []
 
-    def get(self, entity_id: UUID) -> FakeEntity:
+    def get(self, entity_id: FakeEntityId) -> FakeEntity:
         return FakeEntity(id=entity_id)
 
     def add(self, entity: FakeEntity) -> FakeEntity:
@@ -44,7 +39,10 @@ class FakeBaseEntityRepository(BaseEntityRepository[UUID, FakeEntity]):
     def delete(self, entity: FakeEntity) -> bool:
         return True
 
-    def exists(self, entity_id: ENTITY_ID) -> bool:
+    def delete_all(self, entities: t.Sequence[FakeEntity]) -> bool:
+        return True
+
+    def exists(self, entity_id: FakeEntityId) -> bool:
         return True
 
 

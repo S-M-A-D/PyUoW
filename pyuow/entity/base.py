@@ -7,6 +7,7 @@ from ..types import MISSING
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound="Entity[t.Any]")
+SELF = t.TypeVar("SELF", bound="Entity[t.Any]")
 
 
 class Version(int):
@@ -37,6 +38,11 @@ class AuditedEntity(Entity[ENTITY_ID]):
             object.__setattr__(self, "created_date", now)
         if self.updated_date is MISSING:
             object.__setattr__(self, "updated_date", now)
+
+
+@dataclass(frozen=True)
+class SoftDeletableEntity(Entity[ENTITY_ID]):
+    deleted_date: t.Optional[datetime] = None
 
 
 @dataclass(frozen=True)

@@ -53,6 +53,10 @@ class BaseWriteOnlyEntityRepository(t.Generic[ENTITY_ID, ENTITY_TYPE], ABC):
     async def delete(self, entity: ENTITY_TYPE) -> bool:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    async def delete_all(self, entities: t.Sequence[ENTITY_TYPE]) -> bool:
+        raise NotImplementedError
+
 
 class BaseEntityRepository(
     BaseReadOnlyEntityRepository[ENTITY_ID, ENTITY_TYPE],

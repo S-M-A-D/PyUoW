@@ -4,12 +4,12 @@ from ...context import BaseContext
 from ...result import Result
 from ...unit import BaseUnit
 from ...work import BaseWorkManager
-from ...work.transactional import BaseTransactionManager
-from ...work.transactional.base import TRANSACTION
+from ...work.transactional import BaseTransaction, BaseTransactionManager
 from ..base import BaseUnitProxy
 
 CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
 OUT = t.TypeVar("OUT")
+TRANSACTION = t.TypeVar("TRANSACTION", bound=BaseTransaction[t.Any])
 
 
 class TransactionalUnitProxy(BaseUnitProxy[CONTEXT, OUT]):

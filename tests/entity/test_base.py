@@ -1,25 +1,19 @@
-from dataclasses import dataclass
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 
-from pyuow.entity import AuditedEntity, Version, VersionedEntity
-
-
-@dataclass(frozen=True)
-class FakeAuditedEntity(AuditedEntity[UUID]):
-    pass
-
-
-@dataclass(frozen=True)
-class FakeVersionedEntity(VersionedEntity[UUID]):
-    pass
+from pyuow.entity import Version
+from tests.fake_entities import (
+    FakeAuditedEntity,
+    FakeEntityId,
+    FakeVersionedEntity,
+)
 
 
 class TestAuditedEntity:
     def test_post_init_should_properly_set_defaults_to_audited(self) -> None:
         # given
-        entity_id = uuid4()
+        entity_id = FakeEntityId(uuid4())
         # when
         entity = FakeAuditedEntity(id=entity_id)
         # then
@@ -46,7 +40,7 @@ class TestVersion:
 class TestVersionedEntity:
     def test_init_should_properly_set_versions(self) -> None:
         # given
-        entity_id = uuid4()
+        entity_id = FakeEntityId(uuid4())
         # when
         entity = FakeVersionedEntity(id=entity_id)
         # then
