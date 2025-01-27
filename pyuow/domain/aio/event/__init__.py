@@ -1,3 +1,3 @@
-from .dist import EventPublisher
+from .dist import EventHandler
 
-__all__ = ("EventPublisher",)
+__all__ = ("EventHandler",)

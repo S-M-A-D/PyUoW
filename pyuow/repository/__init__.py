@@ -1,5 +1,4 @@
 from .base import (
-    BaseDomainRepository,
     BaseEntityRepository,
     BaseReadOnlyEntityRepository,
     BaseRepositoryFactory,
@@ -7,7 +6,6 @@ from .base import (
 )
 
 __all__ = (
-    "BaseDomainRepository",
     "BaseEntityRepository",
     "BaseReadOnlyEntityRepository",
     "BaseRepositoryFactory",

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from ...base import ModelEvent
 
 
-class EventPublisher(ABC):
+class EventHandler(ABC):
     @abstractmethod
     async def __call__(self, events: t.Sequence[ModelEvent[t.Any]]) -> None:
         raise NotImplementedError

@@ -1,9 +1,9 @@
 from .base import ModelCreatedEvent, ModelDeletedEvent, ModelEvent
-from .dist import DomainEventPublisher
+from .dist import EventHandler
 
 __all__ = (
     "ModelCreatedEvent",
     "ModelDeletedEvent",
     "ModelEvent",
-    "DomainEventPublisher",
+    "EventHandler",
 )
