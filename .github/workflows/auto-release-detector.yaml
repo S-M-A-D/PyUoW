@@ -36,6 +36,7 @@ jobs:
             echo "formatted_tag=v$current_version" >> $GITHUB_ENV
           fi
       - name: Create/Publish a GitHub Release
+        if: env.formatted_tag != ''
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.REPO_PAT }}
