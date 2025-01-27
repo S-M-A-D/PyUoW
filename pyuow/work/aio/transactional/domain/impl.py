@@ -1,5 +1,6 @@
 import typing as t
 
+from .....context import BaseContext
 from .....context.domain import BaseDomainContext
 from .....domain import Batch
 from .....result import Result
@@ -9,7 +10,11 @@ from .....work.aio.transactional import (
     BaseTransactionManager,
     TransactionalWorkManager,
 )
-from .....work.aio.transactional.impl import CONTEXT, OUT, TRANSACTION
+from .. import BaseTransaction
+
+CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
+OUT = t.TypeVar("OUT")
+TRANSACTION = t.TypeVar("TRANSACTION", bound=BaseTransaction[t.Any])
 
 
 class DomainUnit(BaseUnit[CONTEXT, OUT]):
