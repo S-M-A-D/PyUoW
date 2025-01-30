@@ -75,6 +75,14 @@ make tests
 
 This command will execute all tests and report any failures.
 
+## Formatting codebase
+
+To ensure that your contributions follow the project's coding standards, format your code using the following command:
+
+```bash
+make fmt
+```
+
 ## Using Pre-commit Hooks
 
 We use `pre-commit` hooks to automatically check and format your code before you commit changes.
