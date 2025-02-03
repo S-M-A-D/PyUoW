@@ -1,6 +1,6 @@
 import datetime
 import typing as t
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from enum import Enum, auto, unique
@@ -25,7 +25,7 @@ class Model(
     AuditedEntity[ENTITY_ID],
     SoftDeletableEntity[ENTITY_ID],
     VersionedEntity[ENTITY_ID],
-    ABC,
+    metaclass=ABCMeta,
 ):
     id: ENTITY_ID = t.cast(ENTITY_ID, MISSING)
 
