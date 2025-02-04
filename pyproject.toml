@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyuow"
-version = "0.7.2"
+version = "0.7.3"
 description = "Python custom implementation of unit of work pattern"
 authors = ["SMAD"]
 maintainers = [
