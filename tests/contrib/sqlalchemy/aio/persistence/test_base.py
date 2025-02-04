@@ -101,7 +101,9 @@ class FakeVersionedEntityRepository(
 
 class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
     @property
-    def repositories(self) -> t.Mapping[
+    def repositories(
+        self,
+    ) -> t.Mapping[
         t.Type[Entity[t.Any]],
         BaseEntityRepository[t.Any, t.Any],
     ]:
