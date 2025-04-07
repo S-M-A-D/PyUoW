@@ -9,6 +9,7 @@ from ...datapoint import (
     DataPointIsNotProducedError,
 )
 from ...datapoint.aio import BaseDataPointConsumer, BaseDataPointProducer
+from ..exceptions import DataPointIsNotDeclaredError
 
 
 class ConsumesDataPoints(ABC):
@@ -41,9 +42,13 @@ class ProducesDataPoints(ABC):
         ) -> None:
             actual_specs = {datapoint.spec for datapoint in datapoints}
             missing_specs = self._required_specs - actual_specs
+            extra_specs = actual_specs - self._required_specs
 
             if len(missing_specs) > 0:
                 raise DataPointIsNotProducedError(missing_specs)
+
+            if len(extra_specs) > 0:
+                raise DataPointIsNotDeclaredError(extra_specs)
 
             await self._producer.add(*datapoints)
 

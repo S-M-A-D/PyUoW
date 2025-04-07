@@ -10,6 +10,7 @@ from ..datapoint import (
     BaseDataPointSpec,
     DataPointIsNotProducedError,
 )
+from .exceptions import DataPointIsNotDeclaredError
 
 
 class ConsumesDataPoints(ABC):
@@ -40,9 +41,13 @@ class ProducesDataPoints(ABC):
         def add(self, *datapoints: BaseDataPointContainer[t.Any]) -> None:
             actual_specs = {datapoint.spec for datapoint in datapoints}
             missing_specs = self._required_specs - actual_specs
+            extra_specs = actual_specs - self._required_specs
 
             if len(missing_specs) > 0:
                 raise DataPointIsNotProducedError(missing_specs)
+
+            if len(extra_specs) > 0:
+                raise DataPointIsNotDeclaredError(extra_specs)
 
             self._producer.add(*datapoints)
 

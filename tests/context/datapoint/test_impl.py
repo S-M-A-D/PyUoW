@@ -8,6 +8,7 @@ from pyuow.datapoint import (
     DataPointIsNotProducedError,
     ProducesDataPoints,
 )
+from pyuow.datapoint.exceptions import DataPointIsNotDeclaredError
 
 FakeDatapoint = BaseDataPointSpec("fake_datapoint", int)
 FakeExtraDatapoint = BaseDataPointSpec("fake_extra_datapoint", float)
@@ -50,6 +51,18 @@ class TestConsumesDataPoints:
         # when / then
         with pytest.raises(DataPointIsNotProducedError):
             obj_that_produces.to(fake_producer).add()
+
+    def test_to_add_should_raise_if_at_least_one_datapoint_declaration_is_missing(
+        self,
+    ) -> None:
+        # given
+        fake_producer = Mock()
+        obj_that_produces = FakeObjThatProducesDataPoints()
+        datapoint = FakeDatapoint(1)
+        extra_datapoint = FakeExtraDatapoint(1.0)
+        # when / then
+        with pytest.raises(DataPointIsNotDeclaredError):
+            obj_that_produces.to(fake_producer).add(datapoint, extra_datapoint)
 
     def test_out_of_should_delegate_names_to_consumer(self) -> None:
         # given
