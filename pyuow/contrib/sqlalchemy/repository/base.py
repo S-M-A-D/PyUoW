@@ -14,6 +14,7 @@ try:
         select,
         update,
     )
+    from sqlalchemy.sql.selectable import Select
 except ImportError:  # pragma: no cover
     raise ImportError(
         "Seems that you are trying to import extra module that was not installed,"
@@ -68,9 +69,7 @@ class BaseSqlAlchemyEntityRepository(
         raise NotImplementedError
 
     def find(self, entity_id: ENTITY_ID) -> t.Optional[ENTITY_TYPE]:
-        statement = select(self._table).where(
-            self._table.id == entity_id, *self._exclude_deleted()
-        )
+        statement = self.safe_select().where(self._table.id == entity_id)
 
         with self._readonly_transaction_manager.transaction() as trx:
             result = (trx.it().execute(statement)).scalar_one_or_none()
@@ -80,9 +79,7 @@ class BaseSqlAlchemyEntityRepository(
     def find_all(
         self, entity_ids: t.Iterable[ENTITY_ID]
     ) -> t.Iterable[ENTITY_TYPE]:
-        statement = select(self._table).where(
-            self._table.id.in_(entity_ids), *self._exclude_deleted()
-        )
+        statement = self.safe_select().where(self._table.id.in_(entity_ids))
 
         with self._readonly_transaction_manager.transaction() as trx:
             result = (trx.it().execute(statement)).scalars().all()
@@ -90,9 +87,7 @@ class BaseSqlAlchemyEntityRepository(
         return [self.to_entity(record) for record in result]
 
     def get(self, entity_id: ENTITY_ID) -> ENTITY_TYPE:
-        statement = select(self._table).where(
-            self._table.id == entity_id, *self._exclude_deleted()
-        )
+        statement = self.safe_select().where(self._table.id == entity_id)
 
         with self._readonly_transaction_manager.transaction() as trx:
             result = (trx.it().execute(statement)).scalar_one()
@@ -175,13 +170,13 @@ class BaseSqlAlchemyEntityRepository(
                         else offset_naive_utcnow()
                     )
                 )
-                .where(self._table.id == entity.id, *self._exclude_deleted())
+                .where(self._table.id == entity.id)
                 .returning(self._table.id)
             )
             if isinstance(entity, SoftDeletableEntity)
             else (
                 delete(self._table)
-                .where(self._table.id == entity.id, *self._exclude_deleted())
+                .where(self._table.id == entity.id)
                 .returning(self._table.id)
             )
         )
@@ -194,11 +189,14 @@ class BaseSqlAlchemyEntityRepository(
     def delete_all(self, entities: t.Sequence[ENTITY_TYPE]) -> bool:
         return all([self.update(entity) for entity in entities])
 
+    def safe_select(self) -> Select[t.Any]:
+        return select(self._table).where(*self._exclude_deleted())
+
     def _exclude_deleted(self) -> t.List[ColumnElement[bool]]:
         conditions: t.List[ColumnElement[bool]] = []
 
         if issubclass(self._table, SoftDeletableEntityTable):
-            conditions.append(self._table.deleted_date == None)
+            conditions.append(self._table.deleted_date.is_(None))
 
         return conditions
 
