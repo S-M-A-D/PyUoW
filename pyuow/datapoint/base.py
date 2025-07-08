@@ -11,6 +11,11 @@ class BaseDataPointSpec(t.Generic[VALUE]):
     ref_type: t.Type[VALUE]
 
     def __call__(self, value: VALUE) -> "BaseDataPointContainer[VALUE]":
+        if not issubclass(self.ref_type, type(value)):
+            raise TypeError(
+                f"Invalid value type: {type(value).__name__}, expected: {self.ref_type.__name__}"
+            )
+
         return BaseDataPointContainer(self, value)
 
 
