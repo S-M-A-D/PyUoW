@@ -1,14 +1,13 @@
 import typing as t
-from abc import ABC
 from itertools import groupby
 
-from ....domain import Batch, ChangeType, Model
-from ....domain.event import ModelEvent
-from ....repository.aio import BaseRepositoryFactory
-from ....repository.aio.base import ENTITY_TYPE
+from ...domain import Batch, ChangeType, Model
+from ...domain.event import ModelEvent
+from ...repository.aio import BaseRepositoryFactory
+from ...repository.aio.base import ENTITY_TYPE
 
 
-class BaseDomainRepository(ABC):
+class DomainRepository:
     def __init__(
         self,
         *,

@@ -1,19 +1,20 @@
 import typing as t
-from abc import ABC
 from itertools import groupby
 
-from ...domain import Batch, ChangeType, Model
-from ...domain.event import ModelEvent
-from ...repository import BaseRepositoryFactory
-from ...repository.base import ENTITY_TYPE
+from ..domain import Batch, ChangeType, Model
+from ..domain.event import ModelEvent
+from ..repository import BaseRepositoryFactory
+from ..repository.base import ENTITY_TYPE
 
 
-class BaseDomainRepository(ABC):
+class DomainRepository:
     def __init__(
         self,
         *,
         repositories: BaseRepositoryFactory,
-        events_handler: t.Callable[[t.Sequence[ModelEvent[t.Any]]], None],
+        events_handler: t.Callable[
+            [t.Sequence[ModelEvent[t.Any]]], t.Awaitable[None]
+        ],
     ) -> None:
         self._repositories = repositories
         self._events_handler = events_handler
