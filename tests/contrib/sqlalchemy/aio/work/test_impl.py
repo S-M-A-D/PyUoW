@@ -76,30 +76,38 @@ class TestSqlAlchemyTransaction:
 
 @pytest.mark.skip_on_ci
 class TestSqlAlchemyTransactionManager:
-    async def test_async_transaction_should_return_same_session_if_called_in_already_opened_transaction(
+    async def test_async_transaction_should_open_nested_transaction_if_called_in_already_opened_transaction(
         self, async_engine: AsyncEngine
     ) -> None:
         # given
         manager = SqlAlchemyTransactionManager(async_engine)
         # when
         async with manager.transaction() as trx:
-            first_trx = trx.it().get_transaction()
+            first_session = trx.it()
 
-            async with manager.transaction() as trx:
-                second_trx = trx.it().get_transaction()
-        # then
-        assert first_trx == second_trx
+            async with manager.transaction() as trx2:
+                second_session = trx2.it()
 
-    async def test_async_transaction_should_return_different_session_if_called_in_already_opened_transaction(
+                # then
+                assert first_session.in_transaction()
+                assert second_session.in_nested_transaction()
+
+            assert first_session.in_transaction()
+            assert not second_session.in_nested_transaction()
+
+        assert not first_session.in_transaction()
+
+    async def test_async_transaction_should_not_open_nested_transaction_if_called_in_new_transaction(
         self, async_engine: AsyncEngine
     ) -> None:
         # given
         manager = SqlAlchemyTransactionManager(async_engine)
         # when
         async with manager.transaction() as trx:
-            first_trx = trx.it().get_transaction()
+            session = trx.it()
 
-        async with manager.transaction() as trx:
-            second_trx = trx.it().get_transaction()
-        # then
-        assert first_trx != second_trx
+            # then
+            assert session.in_transaction()
+            assert not session.in_nested_transaction()
+
+        assert not session.in_transaction()
