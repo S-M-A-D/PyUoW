@@ -3,7 +3,12 @@ from contextlib import contextmanager
 
 try:
     from sqlalchemy import Engine
-    from sqlalchemy.orm import Session, scoped_session, sessionmaker
+    from sqlalchemy.orm import (
+        Session,
+        SessionTransaction,
+        scoped_session,
+        sessionmaker,
+    )
 except ImportError:  # pragma: no cover
     raise ImportError(
         "Seems that you are trying to import extra module that was not installed,"
@@ -14,11 +19,21 @@ from ....work.transactional import BaseTransaction, BaseTransactionManager
 
 
 class SqlAlchemyTransaction(BaseTransaction[Session]):
+    def _get_active_transaction(self) -> t.Union[SessionTransaction, None]:
+        if self._transaction_provider.in_nested_transaction():
+            return self._transaction_provider.get_nested_transaction()
+        if self._transaction_provider.in_transaction():
+            return self._transaction_provider.get_transaction()
+
+        return None
+
     def rollback(self) -> None:
-        self._transaction_provider.rollback()
+        if trx := self._get_active_transaction():
+            trx.rollback()
 
     def commit(self) -> None:
-        self._transaction_provider.commit()
+        if trx := self._get_active_transaction():
+            trx.commit()
 
 
 class SqlAlchemyTransactionManager(
@@ -33,7 +48,8 @@ class SqlAlchemyTransactionManager(
     def transaction(self) -> t.Iterator[SqlAlchemyTransaction]:
         session = self._session_factory()
         if session.in_transaction():
-            yield SqlAlchemyTransaction(session)
+            with session.begin_nested():
+                yield SqlAlchemyTransaction(session)
         else:
             with session.begin():
                 yield SqlAlchemyTransaction(session)

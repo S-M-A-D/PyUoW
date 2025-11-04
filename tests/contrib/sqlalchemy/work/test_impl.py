@@ -11,27 +11,67 @@ from pyuow.contrib.sqlalchemy.work import (
 
 @pytest.mark.skip_on_ci
 class TestSqlAlchemyTransaction:
-    def test_rollback_should_call_transaction_provider_original_rollback(
+    def test_async_rollback_should_call_nested_transaction_rollback(
         self,
     ) -> None:
         # given
-        trx_provider = Mock()
+        nested_trx = Mock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=True),
+            get_nested_transaction=Mock(return_value=nested_trx),
+        )
         trx = SqlAlchemyTransaction(trx_provider)
         # when
         trx.rollback()
         # then
-        trx_provider.rollback.assert_called_once()
+        nested_trx.rollback.assert_called_once()
 
-    def test_commit_should_call_transaction_provider_original_commit(
+    def test_async_rollback_should_call_root_transaction_rollback(
         self,
     ) -> None:
         # given
-        trx_provider = Mock()
+        root_trx = Mock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=True),
+            get_transaction=Mock(return_value=root_trx),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when
+        trx.rollback()
+        # then
+        root_trx.rollback.assert_called_once()
+
+    def test_async_commit_should_call_nested_transaction_commit(
+        self,
+    ) -> None:
+        # given
+        nested_trx = Mock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=True),
+            get_nested_transaction=Mock(return_value=nested_trx),
+        )
         trx = SqlAlchemyTransaction(trx_provider)
         # when
         trx.commit()
         # then
-        trx_provider.commit.assert_called_once()
+        nested_trx.commit.assert_called_once()
+
+    def test_async_commit_should_call_root_transaction_commit(
+        self,
+    ) -> None:
+        # given
+        root_trx = Mock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=True),
+            get_transaction=Mock(return_value=root_trx),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when
+        trx.commit()
+        # then
+        root_trx.commit.assert_called_once()
 
 
 @pytest.mark.skip_on_ci

@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -11,27 +11,67 @@ from pyuow.contrib.sqlalchemy.aio.work import (
 
 @pytest.mark.skip_on_ci
 class TestSqlAlchemyTransaction:
-    async def test_async_rollback_should_call_transaction_provider_original_rollback(
+    async def test_async_rollback_should_call_nested_transaction_rollback(
         self,
     ) -> None:
         # given
-        trx_provider = AsyncMock()
+        nested_trx = AsyncMock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=True),
+            get_nested_transaction=Mock(return_value=nested_trx),
+        )
         trx = SqlAlchemyTransaction(trx_provider)
         # when
         await trx.rollback()
         # then
-        trx_provider.rollback.assert_awaited_once()
+        nested_trx.rollback.assert_awaited_once()
 
-    async def test_async_commit_should_call_transaction_provider_original_commit(
+    async def test_async_rollback_should_call_root_transaction_rollback(
         self,
     ) -> None:
         # given
-        trx_provider = AsyncMock()
+        root_trx = AsyncMock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=True),
+            get_transaction=Mock(return_value=root_trx),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when
+        await trx.rollback()
+        # then
+        root_trx.rollback.assert_awaited_once()
+
+    async def test_async_commit_should_call_nested_transaction_commit(
+        self,
+    ) -> None:
+        # given
+        nested_trx = AsyncMock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=True),
+            get_nested_transaction=Mock(return_value=nested_trx),
+        )
         trx = SqlAlchemyTransaction(trx_provider)
         # when
         await trx.commit()
         # then
-        trx_provider.commit.assert_awaited_once()
+        nested_trx.commit.assert_awaited_once()
+
+    async def test_async_commit_should_call_root_transaction_commit(
+        self,
+    ) -> None:
+        # given
+        root_trx = AsyncMock()
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=True),
+            get_transaction=Mock(return_value=root_trx),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when
+        await trx.commit()
+        # then
+        root_trx.commit.assert_awaited_once()
 
 
 @pytest.mark.skip_on_ci
