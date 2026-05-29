@@ -1,0 +1,36 @@
+name: pre-commit-autoupdate
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Run pre-commit autoupdate
+        run: pre-commit autoupdate
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "build(pre-commit): bump hook versions"
+          branch: chore/pre-commit-autoupdate
+          delete-branch: true
+          title: "build(pre-commit): bump hook versions"
+          body: |
+            Automated weekly bump of pre-commit hook versions via
+            `pre-commit autoupdate`.
+          labels: |
+            dependencies
+            automated
