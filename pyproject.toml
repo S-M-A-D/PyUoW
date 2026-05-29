@@ -34,6 +34,9 @@ dependencies = []
 [project.optional-dependencies]
 sqlalchemy = ["sqlalchemy>=2.0.50,<3.0.0"]
 
+[project.scripts]
+pyuow = "pyuow._cli:main"
+
 [project.urls]
 Homepage = "https://github.com/S-M-A-D/PyUoW"
 Repository = "https://github.com/S-M-A-D/PyUoW"
@@ -70,7 +73,7 @@ docs = [
 ]
 
 [tool.poetry]
-include = ["pyuow/py.typed"]
+include = ["pyuow/py.typed", "pyuow/_skill/*.md"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

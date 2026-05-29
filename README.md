@@ -52,6 +52,18 @@ pip install "pyuow[sqlalchemy]"  # with SQLAlchemy integration
 
 Python ≥ 3.9.
 
+## AI agent skill (optional)
+
+PyUoW ships with a Claude Code / opencode skill that teaches AI agents the library's idioms — `BaseUnit` chains, the `>>` operator, work managers, the SQLAlchemy extra, and every sentinel exception with a concrete fix. Install it once per project:
+
+```bash
+pyuow install-skill              # ./.claude/skills/pyuow (default)
+pyuow install-skill --global     # ~/.claude/skills/pyuow
+pyuow install-skill --codex      # ~/.agents/skills/pyuow
+```
+
+The default creates a symlink to the installed package, so `pip install -U pyuow` keeps the skill in sync. On systems without symlink support, the installer falls back to copying — re-run with `--force` after upgrades.
+
 ## At a glance
 
 ```python

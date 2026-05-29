@@ -43,6 +43,7 @@ theme:
 nav:
   - Home: index.md
   - Installation: installation.md
+  - AI Agent Skill: ai-agent-skill.md
   - Quickstart: quickstart.md
   - Concepts:
       - Units & Flow: concepts/units.md
