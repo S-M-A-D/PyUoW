@@ -34,9 +34,9 @@ class AuditedEntity(Entity[ENTITY_ID]):
     def __post_init__(self) -> None:
         now = offset_naive_utcnow()
 
-        if self.created_date is MISSING:
+        if self.created_date is MISSING:  # type: ignore[comparison-overlap]
             object.__setattr__(self, "created_date", now)
-        if self.updated_date is MISSING:
+        if self.updated_date is MISSING:  # type: ignore[comparison-overlap]
             object.__setattr__(self, "updated_date", now)
 
 
