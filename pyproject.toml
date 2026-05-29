@@ -5,7 +5,7 @@ description = "Python custom implementation of unit of work pattern"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE*"]
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.10,<4.0"
 authors = [
     { name = "SMAD" },
 ]
@@ -20,7 +20,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -42,31 +41,22 @@ Changelog = "https://github.com/S-M-A-D/PyUoW/releases"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.2,<9.0.0; python_version < '3.10'",
-    "pytest>=9.0.3,<10.0.0; python_version >= '3.10'",
+    "pytest>=9.0.3,<10.0.0",
     "pytest-cov>=7.1.0,<8.0.0",
-    "pre-commit>=4.3.0,<5.0.0; python_version < '3.10'",
-    "pre-commit>=4.6.0,<5.0.0; python_version >= '3.10'",
-    "pytest-asyncio>=1.2.0,<2.0.0; python_version < '3.10'",
-    "pytest-asyncio>=1.4.0,<2.0.0; python_version >= '3.10'",
-    "mypy>=1.19.1,<2.0.0; python_version < '3.10'",
-    "mypy>=2.1.0,<3.0.0; python_version >= '3.10'",
-    "coverage[toml]>=7.10.0,<8.0.0; python_version < '3.10'",
-    "coverage[toml]>=7.14.1,<8.0.0; python_version >= '3.10'",
+    "pre-commit>=4.6.0,<5.0.0",
+    "pytest-asyncio>=1.4.0,<2.0.0",
+    "mypy>=2.1.0,<3.0.0",
+    "coverage[toml]>=7.14.1,<8.0.0",
     "ruff>=0.15.15,<0.16.0",
-    "greenlet>=3.1.1,<4.0.0; python_version < '3.10'",
-    "greenlet>=3.5.1,<4.0.0; python_version >= '3.10'",
-    "testcontainers[postgres]>=4.13.0,<5.0.0; python_version < '3.10'",
-    "testcontainers[postgres]>=4.14.2,<5.0.0; python_version >= '3.10'",
+    "greenlet>=3.5.1,<4.0.0",
+    "testcontainers[postgres]>=4.14.2,<5.0.0",
     "asyncpg>=0.31.0,<0.32.0",
-    "psycopg2-binary<=2.9.9; python_version < '3.10'",
-    "psycopg2-binary>=2.9.12,<3.0.0; python_version >= '3.10'",
+    "psycopg2-binary>=2.9.12,<3.0.0",
 ]
 docs = [
     "mkdocs>=1.6.1,<2.0.0",
     "mkdocs-material>=9.7.6,<10.0.0",
-    "mkdocstrings[python]>=0.27.0,<0.28.0; python_version < '3.10'",
-    "mkdocstrings[python]>=1.0.4,<2.0.0; python_version >= '3.10'",
+    "mkdocstrings[python]>=1.0.4,<2.0.0",
 ]
 
 [tool.poetry]
@@ -103,7 +93,7 @@ fail_under = 99
 
 [tool.ruff]
 line-length = 79
-target-version = "py39"
+target-version = "py310"
 extend-exclude = [".venv"]
 
 [tool.ruff.lint]

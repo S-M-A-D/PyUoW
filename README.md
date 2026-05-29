@@ -39,7 +39,7 @@ The result: business logic that reads top-to-bottom, separates orchestration fro
 - **Transactional out of the box** — a SQLAlchemy adapter ships in `pyuow.contrib.sqlalchemy` (sync + async), with nested-transaction support.
 - **Domain-first** — `Entity`, `AuditedEntity`, `SoftDeletableEntity`, `VersionedEntity`, and an event-emitting `Model` base, all immutable dataclasses.
 - **Sync and async parity** — every primitive has an `aio/` twin; pick one per flow.
-- **Strict types** — passes `mypy --strict`; runs on Python 3.9 through 3.14.
+- **Strict types** — passes `mypy --strict`; runs on Python 3.10 through 3.14.
 
 ---
 
@@ -50,7 +50,7 @@ pip install pyuow                # core
 pip install "pyuow[sqlalchemy]"  # with SQLAlchemy integration
 ```
 
-Python ≥ 3.9.
+Python ≥ 3.10.
 
 ## At a glance
 

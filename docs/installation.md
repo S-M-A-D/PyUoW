@@ -1,6 +1,6 @@
 # Installation
 
-PyUoW is on PyPI and supports Python 3.9 through 3.14.
+PyUoW is on PyPI and supports Python 3.10 through 3.14.
 
 ## Core install
 

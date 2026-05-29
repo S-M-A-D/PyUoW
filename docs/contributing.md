@@ -29,7 +29,7 @@ make docs-serve   # mkdocs serve - live preview at http://127.0.0.1:8000
 1. Open an issue first if the change is non-trivial.
 2. Add a unit test mirroring the existing structure under `tests/`.
 3. Run `make fmt` and `make tests` locally.
-4. Open a PR — CI will run ruff, mypy, the full test matrix across Python 3.9–3.14, and pip-audit.
+4. Open a PR — CI will run ruff, mypy, the full test matrix across Python 3.10–3.14, and pip-audit.
 
 ## Code style
 
