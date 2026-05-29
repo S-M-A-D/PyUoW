@@ -936,43 +936,6 @@ files = [
 colorama = ">=0.4"
 
 [[package]]
-name = "griffe"
-version = "2.0.2"
-description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
-optional = false
-python-versions = ">=3.10"
-groups = ["docs"]
-markers = "python_version >= \"3.10\""
-files = [
-    {file = "griffe-2.0.2-py3-none-any.whl", hash = "sha256:2b31816460aee1996af26050a1fc6927a2e5936486856707f55508e4c9b5960b"},
-    {file = "griffe-2.0.2.tar.gz", hash = "sha256:c5d56326d159f274492e9bf93a9895cec101155d944caa66d0fc4e0c13751b92"},
-]
-
-[package.dependencies]
-griffecli = "2.0.2"
-griffelib = "2.0.2"
-
-[package.extras]
-pypi = ["griffelib[pypi] (==2.0.2)"]
-
-[[package]]
-name = "griffecli"
-version = "2.0.2"
-description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
-optional = false
-python-versions = ">=3.10"
-groups = ["docs"]
-markers = "python_version >= \"3.10\""
-files = [
-    {file = "griffecli-2.0.2-py3-none-any.whl", hash = "sha256:0d44d39e59afa81e288a3e1c3bf352cc4fa537483326ac06b8bb6a51fd8303a0"},
-    {file = "griffecli-2.0.2.tar.gz", hash = "sha256:40a1ad4181fc39685d025e119ae2c5b669acdc1f19b705fb9bf971f4e6f6dffb"},
-]
-
-[package.dependencies]
-colorama = ">=0.4"
-griffelib = "2.0.2"
-
-[[package]]
 name = "griffelib"
 version = "2.0.2"
 description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
@@ -1469,6 +1432,7 @@ description = "Automatic documentation from sources, for MkDocs."
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
+markers = "python_version == \"3.9\""
 files = [
     {file = "mkdocstrings-0.27.0-py3-none-any.whl", hash = "sha256:6ceaa7ea830770959b55a16203ac63da24badd71325b96af950e59fd37366332"},
     {file = "mkdocstrings-0.27.0.tar.gz", hash = "sha256:16adca6d6b0a1f9e0c07ff0b02ced8e16f228a9d65a37c063ec4c14d7b76a657"},
@@ -1493,12 +1457,40 @@ python = ["mkdocstrings-python (>=0.5.2)"]
 python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
 
 [[package]]
+name = "mkdocstrings"
+version = "1.0.4"
+description = "Automatic documentation from sources, for MkDocs."
+optional = false
+python-versions = ">=3.10"
+groups = ["docs"]
+markers = "python_version >= \"3.10\""
+files = [
+    {file = "mkdocstrings-1.0.4-py3-none-any.whl", hash = "sha256:63464b4b29053514f32a1dbbf604e52876d5e638111b0c295ab7ed3cac73ca9b"},
+    {file = "mkdocstrings-1.0.4.tar.gz", hash = "sha256:3969a6515b77db65fd097b53c1b7aa4ae840bd71a2ee62a6a3e89503446d7172"},
+]
+
+[package.dependencies]
+Jinja2 = ">=3.1"
+Markdown = ">=3.6"
+MarkupSafe = ">=1.1"
+mkdocs = ">=1.6"
+mkdocs-autorefs = ">=1.4"
+mkdocstrings-python = {version = ">=1.16.2", optional = true, markers = "extra == \"python\""}
+pymdown-extensions = ">=6.3"
+
+[package.extras]
+crystal = ["mkdocstrings-crystal (>=0.3.4)"]
+python = ["mkdocstrings-python (>=1.16.2)"]
+python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
+
+[[package]]
 name = "mkdocstrings-python"
 version = "1.13.0"
 description = "A Python handler for mkdocstrings."
 optional = false
 python-versions = ">=3.9"
 groups = ["docs"]
+markers = "python_version == \"3.9\""
 files = [
     {file = "mkdocstrings_python-1.13.0-py3-none-any.whl", hash = "sha256:b88bbb207bab4086434743849f8e796788b373bd32e7bfefbf8560ac45d88f97"},
     {file = "mkdocstrings_python-1.13.0.tar.gz", hash = "sha256:2dbd5757e8375b9720e81db16f52f1856bf59905428fd7ef88005d1370e2f64c"},
@@ -1508,6 +1500,25 @@ files = [
 griffe = ">=0.49"
 mkdocs-autorefs = ">=1.2"
 mkdocstrings = ">=0.26"
+
+[[package]]
+name = "mkdocstrings-python"
+version = "2.0.3"
+description = "A Python handler for mkdocstrings."
+optional = false
+python-versions = ">=3.10"
+groups = ["docs"]
+markers = "python_version >= \"3.10\""
+files = [
+    {file = "mkdocstrings_python-2.0.3-py3-none-any.whl", hash = "sha256:0b83513478bdfd803ff05aa43e9b1fca9dd22bcd9471f09ca6257f009bc5ee12"},
+    {file = "mkdocstrings_python-2.0.3.tar.gz", hash = "sha256:c518632751cc869439b31c9d3177678ad2bfa5c21b79b863956ad68fc92c13b8"},
+]
+
+[package.dependencies]
+griffelib = ">=2.0"
+mkdocs-autorefs = ">=1.4"
+mkdocstrings = ">=0.30"
+typing-extensions = {version = ">=4.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "mypy"
@@ -2671,7 +2682,7 @@ files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
-markers = {main = "extra == \"sqlalchemy\"", docs = "python_version == \"3.9\""}
+markers = {main = "extra == \"sqlalchemy\"", docs = "python_version < \"3.11\""}
 
 [[package]]
 name = "urllib3"
@@ -2906,4 +2917,4 @@ sqlalchemy = ["sqlalchemy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "47b9cb3324da744efe898cc212df965cd8899d2afb95679f2f27237481dad062"
+content-hash = "21ac74c7f923562e15f0cec737f063d210e9694747231fab47f42bac9ee1223b"
