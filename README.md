@@ -1,375 +1,108 @@
 <p align="center">
-  <a href="https://github.com/S-M-A-D/PyUoW"><img src="https://raw.githubusercontent.com/S-M-A-D/PyUoW/main/static/logo.png" alt="pyUoW" width="500"></a>
+  <a href="https://github.com/S-M-A-D/PyUoW">
+    <img src="https://raw.githubusercontent.com/S-M-A-D/PyUoW/main/static/logo.png" alt="pyUoW" width="500">
+  </a>
 </p>
+
 <p align="center">
-    <em>Unit of Work: A Behavioral Pattern in Software Development Implemented in Python.</em>
+  <em>Unit of Work for Python — composable units, transactional work managers, and a domain model toolkit.</em>
+</p>
+
 <p align="center">
-    <a href="https://pepy.tech/project/pyuow" target="_blank">
-        <img src="https://static.pepy.tech/badge/pyuow" alt="Downloads">
-    </a>
-    <a href="https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml" target="_blank">
-        <img src="https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml/badge.svg" alt="Build">
-    </a>
-    <a href="https://codecov.io/gh/S-M-A-D/PyUoW" target="_blank">
-        <img src="https://codecov.io/gh/S-M-A-D/PyUoW/graph/badge.svg?token=L1Y13VT30W" alt="Codecov">
-    </a>
-    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
-    <img src="https://img.shields.io/pypi/pyversions/pyuow" alt="Python versions">
-    <img src="https://img.shields.io/pypi/l/pyuow" alt="License">
+  <a href="https://s-m-a-d.github.io/PyUoW/"><strong>📖 Read the docs</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://s-m-a-d.github.io/PyUoW/quickstart/">Quickstart</a>
+  &nbsp;·&nbsp;
+  <a href="https://pypi.org/project/pyuow/">PyPI</a>
+</p>
+
+<p align="center">
+  <a href="https://pepy.tech/project/pyuow"><img src="https://static.pepy.tech/badge/pyuow" alt="Downloads"></a>
+  <a href="https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml"><img src="https://github.com/S-M-A-D/PyUoW/actions/workflows/build.yaml/badge.svg" alt="Build"></a>
+  <a href="https://codecov.io/gh/S-M-A-D/PyUoW"><img src="https://codecov.io/gh/S-M-A-D/PyUoW/graph/badge.svg?token=L1Y13VT30W" alt="Codecov"></a>
+  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
+  <img src="https://img.shields.io/pypi/pyversions/pyuow" alt="Python versions">
+  <img src="https://img.shields.io/pypi/l/pyuow" alt="License">
 </p>
 
 ---
 
-## Table of Contents
+## Install
 
-1. [Installation](#installation)
-2. [Usage examples](#usage-examples)
-   - [Simple unit](#simple-unit-usage-example)
-   - [Unit of Work manager](#example-with-unit-of-work-manager)
-   - [SqlAlchemy based Unit of Work manager](#example-with-sqlalchemy-based-unit-of-work-manager)
-3. [Async compatibility](#async-compatibility)
-4. [Contributors guide](#for-pyuow-contributors)
-
----
-
-## Installation
-
-PyUow package is available on PyPI:
-```console
-$ python -m pip install pyuow
+```bash
+pip install pyuow                # core
+pip install "pyuow[sqlalchemy]"  # with SQLAlchemy integration
 ```
-PyUow officially supports Python >= 3.9.
 
-PyPi link - https://pypi.org/project/pyuow/
+Python ≥ 3.9.
 
----
+## At a glance
 
-## Usage examples
-
-### Simple unit usage example:
-
-#### Definition:
 ```python
-import typing as t
 from dataclasses import dataclass
 
-from pyuow.aio import (
-   ConditionalUnit,
-   RunUnit,
-   FinalUnit,
-   ErrorUnit,
-)
 from pyuow import (
-    BaseContext,
-    Result,
+    BaseContext, BaseParams, ConditionalUnit, ErrorUnit,
+    FinalUnit, Result, RunUnit,
 )
-
-
-@dataclass(frozen=True)
-class ExampleParams:
-    field: str
-
-
-@dataclass
-class ExampleContext(BaseContext[ExampleParams]):
-    field: str
-
-
-@dataclass(frozen=True)
-class ExampleOutput:
-    field: str
-
-
-class ExampleConditionalUnit(ConditionalUnit[ExampleContext, ExampleOutput]):
-    async def condition(
-        self, context: ExampleContext, **kwargs: t.Any
-    ) -> bool:
-        return context.field == "context field value"
-
-
-class ExampleRunUnit(RunUnit[ExampleContext, ExampleOutput]):
-    async def run(self, context: ExampleContext, **kwargs: t.Any) -> None:
-        print(
-            f"I'm just running a logic, and displaying: {context.params.field}"
-        )
-
-
-class SuccessUnit(FinalUnit[ExampleContext, ExampleOutput]):
-    async def finish(
-        self, context: ExampleContext, **kwargs: t.Any
-    ) -> Result[ExampleOutput]:
-        return Result.ok(ExampleOutput(field="success"))
-
-
-flow = (
-    ExampleConditionalUnit(
-        on_failure=ErrorUnit(exc=Exception("example error"))
-    )
-    >> ExampleRunUnit()
-    >> SuccessUnit()
-).build()
-```
-
-#### Success scenario:
-```python
-async def main() -> None:
-    params = ExampleParams(field="params field value")
-    context = ExampleContext(params=params, field="context field value")
-    result = await flow(context)
-    result.get()
-```
-
-#### Failure scenario:
-```python
-async def main() -> None:
-    params = ExampleParams(field="params field value")
-    context = ExampleContext(params=params, field="invalid field value")
-    result = await flow(context)
-    result.get()
-```
-
-### Example with Unit of Work manager
-
-:warning: NoOp - No Operations, can be replaced with your own implementation of UoW.
-
-```python
-...
 from pyuow.work.noop import NoOpWorkManager
 
-...
-
-work = NoOpWorkManager()
-
-...
-
-async def main() -> None:
-    ...
-    result = await work.by(flow).do_with(context)
-    ...
-```
-
-### Example with SqlAlchemy based Unit of Work manager:
-
-```python
-from __future__ import annotations
-
-import typing as t
-from dataclasses import dataclass, replace
-from uuid import UUID, uuid4
-
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import Mapped
-
-from pyuow.aio import (
-   ConditionalUnit,
-   RunUnit,
-   FinalUnit,
-   ErrorUnit,
-)
-from pyuow import (
-   BaseContext,
-   Result,
-)
-
-from pyuow.contrib.sqlalchemy.tables import AuditedEntityTable
-from pyuow.contrib.sqlalchemy.aio.repository import (
-   BaseSqlAlchemyRepositoryFactory,
-   BaseSqlAlchemyEntityRepository,
-)
-from pyuow.contrib.sqlalchemy.aio.work import (
-   SqlAlchemyReadOnlyTransactionManager,
-   SqlAlchemyTransactionManager,
-)
-from pyuow.entity import Entity, AuditedEntity
-from pyuow.repository.aio import BaseEntityRepository
-from pyuow.work.aio.transactional import TransactionalWorkManager
-
-ExampleEntityId = t.NewType("ExampleEntityId", UUID)
-
-
-@dataclass(frozen=True, kw_only=True)
-class ExampleAuditedEntity(AuditedEntity[ExampleEntityId]):
-   field: str
-
-   def change_field(self, value: str) -> ExampleAuditedEntity:
-      return replace(self, field=value)
-
-
-class ExampleEntityTable(AuditedEntityTable):
-   __tablename__ = "example_entities"
-
-   field: Mapped[str]
-
-
-class ExampleEntityRepository(
-   BaseSqlAlchemyEntityRepository[
-      ExampleEntityId, ExampleAuditedEntity, ExampleEntityTable
-   ]
-):
-   @staticmethod
-   def to_entity(record: ExampleEntityTable) -> ExampleAuditedEntity:
-      return ExampleAuditedEntity(
-         id=record.id,
-         field=record.field,
-         created_date=record.created_date,
-         updated_date=record.updated_date,
-      )
-
-   @staticmethod
-   def to_record(entity: ExampleAuditedEntity) -> ExampleEntityTable:
-      return ExampleEntityTable(
-         id=entity.id,
-         field=entity.field,
-         created_date=entity.created_date,
-         updated_date=entity.updated_date,
-      )
-
-
-class ExampleRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
-   @property
-   def repositories(self) -> t.Mapping[
-      t.Type[Entity[t.Any]],
-      BaseEntityRepository[t.Any, t.Any],
-   ]:
-      return {
-         ExampleAuditedEntity: ExampleEntityRepository(
-            ExampleEntityTable,
-            self._transaction_manager,
-            self._readonly_transaction_manager,
-         ),
-      }
-
-   def example_entity_repository(self) -> ExampleEntityRepository:
-      return t.cast(
-         ExampleEntityRepository,
-         repositories.repo_for(ExampleAuditedEntity),
-      )
-
 
 @dataclass(frozen=True)
-class ExampleParams:
-   field: str
+class Greeting(BaseParams):
+    name: str
 
 
 @dataclass
-class ExampleContext(BaseContext[ExampleParams]):
-   field: str
+class Ctx(BaseContext[Greeting]):
+    params: Greeting
 
 
-@dataclass(frozen=True)
-class ExampleOutput:
-   field: str
+class IsNamePresent(ConditionalUnit[Ctx, str]):
+    def condition(self, ctx: Ctx) -> bool:
+        return bool(ctx.params.name)
 
 
-class ExampleConditionalUnit(ConditionalUnit[ExampleContext, ExampleOutput]):
-   async def condition(
-           self, context: ExampleContext, **kwargs: t.Any
-   ) -> bool:
-      return context.field == "context field value"
+class Greet(RunUnit[Ctx, str]):
+    def run(self, ctx: Ctx) -> None:
+        print(f"Hello, {ctx.params.name}!")
 
 
-class ExampleRunUnit(RunUnit[ExampleContext, ExampleOutput]):
-   def __init__(
-           self, *, example_entity_repository: ExampleEntityRepository
-   ) -> None:
-      super().__init__()
-      self._example_entity_repository = example_entity_repository
+class Done(FinalUnit[Ctx, str]):
+    def finish(self, ctx: Ctx) -> Result[str]:
+        return Result.ok("greeted")
 
-   async def run(self, context: ExampleContext, **kwargs: t.Any) -> None:
-      entity = ExampleAuditedEntity(
-         id=ExampleEntityId(str(uuid4())), field=context.params.field
-      )
-      await self._example_entity_repository.add(entity)
-
-
-class SuccessUnit(FinalUnit[ExampleContext, ExampleOutput]):
-   async def finish(
-           self, context: ExampleContext, **kwargs: t.Any
-   ) -> Result[ExampleOutput]:
-      return Result.ok(ExampleOutput(field="success"))
-
-
-engine = create_async_engine("postgresql://postgres:postgres@db:5432/postgres")
-
-transaction_manager = SqlAlchemyTransactionManager(engine)
-readonly_transaction_manager = SqlAlchemyReadOnlyTransactionManager(engine)
-
-repositories = ExampleRepositoryFactory(
-   transaction_manager=transaction_manager,
-   readonly_transaction_manager=readonly_transaction_manager,
-)
-
-work = TransactionalWorkManager(transaction_manager=transaction_manager)
 
 flow = (
-        ExampleConditionalUnit(
-           on_failure=ErrorUnit(exc=Exception("example error"))
-        )
-        >> ExampleRunUnit(
-   example_entity_repository=repositories.example_entity_repository()
-)
-        >> SuccessUnit()
+    IsNamePresent(on_failure=ErrorUnit(exc=ValueError("name required")))
+    >> Greet()
+    >> Done()
 ).build()
 
-
-async def main() -> None:
-   params = ExampleParams(field="params field value")
-   context = ExampleContext(params=params, field="context field value")
-   result = await work.by(flow).do_with(context)
-   result.get()
-
+result = NoOpWorkManager().by(flow).do_with(Ctx(params=Greeting(name="Alice")))
+assert result.get() == "greeted"
 ```
-## Async compatibility
-This package provides robust support for both asynchronous (async) and synchronous (sync) versions of code execution, catering to diverse development needs.
-The package follows the convention where each module with async code has an aio/ folder in the same directory, allowing you to easily import the async version.
 
-For example:
+## What's in the box
 
-```python
-# Async code imports
-from pyuow.aio import (
-   ConditionalUnit,
-   RunUnit,
-   FinalUnit,
-   ErrorUnit,
-)
-from pyuow import (
-   BaseContext,
-   Result,
-)
-from pyuow.repository.aio.base import (
-   BaseEntityRepository
-)
+| Concept                                                                       | What it gives you                                                            |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [Units & Flow](https://s-m-a-d.github.io/PyUoW/concepts/units/)               | `ConditionalUnit` / `RunUnit` / `FinalUnit` / `ErrorUnit`, chained with `>>` |
+| [Result](https://s-m-a-d.github.io/PyUoW/concepts/result/)                    | `ok` / `error` / `empty` plus `.map`, `.and_then`, `.unwrap_or`              |
+| [Context](https://s-m-a-d.github.io/PyUoW/concepts/context/)                  | Mutable, immutable, and domain-aware context bases                           |
+| [Work Manager](https://s-m-a-d.github.io/PyUoW/concepts/work/)                | NoOp, transactional, and domain-transactional managers                       |
+| [Domain Model](https://s-m-a-d.github.io/PyUoW/concepts/domain/)              | `Entity`, `AuditedEntity`, `Model`, `Batch`, events, typed exceptions        |
+| [DataPoints](https://s-m-a-d.github.io/PyUoW/concepts/datapoints/)            | Typed producer / consumer contracts between units                            |
+| [SQLAlchemy](https://s-m-a-d.github.io/PyUoW/integrations/sqlalchemy/)        | Ready-made repositories, table mixins, and transaction manager               |
+| [Async](https://s-m-a-d.github.io/PyUoW/async/)                               | A sync and an `aio/` twin for every primitive                                |
 
-# Sync code imports
-from pyuow import (
-   BaseContext,
-   Result,
-   ConditionalUnit,
-   RunUnit,
-   FinalUnit,
-   ErrorUnit,
-)
-from pyuow.repository import (
-   BaseEntityRepository
-)
+## Contributing
+
+PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for the dev setup, or run:
+
+```bash
+poetry install --with docs
+make tests        # pytest + coverage
+make fmt          # ruff + mypy
+make docs-serve   # live preview at http://127.0.0.1:8000
 ```
-Same with contributing modules:
-```python
-# Async code imports
-from pyuow.contrib.sqlalchemy.aio.work.impl import (
-   SqlAlchemyTransaction,
-   SqlAlchemyReadOnlyTransactionManager,
-)
-
-# Sync code imports
-from pyuow.contrib.sqlalchemy.work.impl import (
-   SqlAlchemyTransaction,
-   SqlAlchemyReadOnlyTransactionManager,
-)
-```
----
-
-## For PyUoW contributors:
-For guidance on setting up a development environment and how to make a contribution to PyUow,
-please see [CONTRIBUTING.md](https://github.com/S-M-A-D/PyUoW/blob/main/CONTRIBUTING.md) for more information.
