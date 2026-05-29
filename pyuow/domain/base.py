@@ -15,7 +15,7 @@ from ..entity import (
 from ..types import MISSING
 from .event import ModelCreatedEvent, ModelDeletedEvent, ModelEvent
 
-ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
+ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Hashable)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
 SELF = t.TypeVar("SELF", bound="Model[t.Any]")
 

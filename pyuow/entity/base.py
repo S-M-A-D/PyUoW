@@ -5,7 +5,7 @@ from datetime import datetime
 from ..clock import offset_naive_utcnow
 from ..types import MISSING
 
-ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
+ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Hashable)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound="Entity[t.Any]")
 SELF = t.TypeVar("SELF", bound="Entity[t.Any]")
 

@@ -4,7 +4,7 @@ from abc import ABC
 
 from ...entity import Entity
 
-ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
+ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Hashable)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
 
 
