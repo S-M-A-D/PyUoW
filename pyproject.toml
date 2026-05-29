@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyuow"
-version = "0.8.0"
+version = "0.8.1"
 description = "Python custom implementation of unit of work pattern"
 authors = ["SMAD"]
 maintainers = [
@@ -24,6 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Libraries",
 ]
@@ -39,22 +40,51 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-sqlalchemy = {version = "^2.0.44", optional = true}
+sqlalchemy = {version = "^2.0.50", optional = true}
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-pytest-cov = "^6.0.0"
-isort = "^5.13.2"
-pre-commit = "^4.0.1"
-pytest-asyncio = "^0.24.0"
-autoflake = "^2.3.1"
-mypy = "^1.13.0"
-coverage = { version = "^7.6.9", extras = ["toml"] }
-black = "^24.10.0"
-safety = "^3.2.11"
-greenlet = "^3.1.1"
-testcontainers = {version = "^4.8.2", extras = ["postgres"]}
-asyncpg = "^0.30.0"
+pytest = [
+    {version = "^8.4.2", python = "<3.10"},
+    {version = "^9.0.3", python = ">=3.10"}
+]
+pytest-cov = "^7.1.0"
+isort = [
+    {version = "^6.1.0", python = "<3.10"},
+    {version = "^8.0.1", python = ">=3.10"}
+]
+pre-commit = [
+    {version = "^4.3.0", python = "<3.10"},
+    {version = "^4.6.0", python = ">=3.10"}
+]
+pytest-asyncio = [
+    {version = "^1.2.0", python = "<3.10"},
+    {version = "^1.4.0", python = ">=3.10"}
+]
+autoflake = [
+    {version = "^2.3.1", python = "<3.10"},
+    {version = "^2.3.3", python = ">=3.10"}
+]
+mypy = [
+    {version = "^1.19.1", python = "<3.10"},
+    {version = "^2.1.0", python = ">=3.10"}
+]
+coverage = [
+    { version = "^7.10.0", extras = ["toml"], python = "<3.10" },
+    { version = "^7.14.1", extras = ["toml"], python = ">=3.10" }
+]
+black = [
+    {version = "^25.9.0", python = "<3.10"},
+    {version = "^26.5.1", python = ">=3.10"}
+]
+greenlet = [
+    {version = "^3.1.1", python = "<3.10"},
+    {version = "^3.5.1", python = ">=3.10"}
+]
+testcontainers = [
+    {version = "^4.13.0", extras = ["postgres"], python = "<3.10"},
+    {version = "^4.14.2", extras = ["postgres"], python = ">=3.10"}
+]
+asyncpg = "^0.31.0"
 psycopg2-binary = [
     {version = "<=2.9.9", python = "<3.10"},
     {version = "^2.9.10", python = ">=3.10"}
@@ -121,7 +151,6 @@ remove-duplicate-keys = true
 remove-unused-variables = true
 
 [tool.mypy]
-python_version = "3.9"
 strict_optional = true
 strict_equality = true
 check_untyped_defs = true

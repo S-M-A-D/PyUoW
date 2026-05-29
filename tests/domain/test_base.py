@@ -215,7 +215,7 @@ class TestBatch:
         # when / then
         with pytest.raises(
             RuntimeError,
-            match=f"{model.__class__.__name__}\[{model.id}\] has already been added to batch with UPDATE operation",
+            match=rf"{model.__class__.__name__}\[{model.id}\] has already been added to batch with UPDATE operation",
         ):
             batch.delete(model)
 
