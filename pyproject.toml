@@ -156,6 +156,7 @@ remove-duplicate-keys = true
 remove-unused-variables = true
 
 [tool.mypy]
+strict = true
 strict_optional = true
 strict_equality = true
 check_untyped_defs = true

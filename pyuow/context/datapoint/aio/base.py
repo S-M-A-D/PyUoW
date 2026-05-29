@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from ....context import BaseContext
 from ....datapoint import BaseDataPointContainer, BaseDataPointSpec
 from ....datapoint.aio import BaseDataPointConsumer, BaseDataPointProducer
-from ..base import BaseParams
+from ...base import BaseParams
 
 PARAMS = t.TypeVar("PARAMS", bound=BaseParams)
 

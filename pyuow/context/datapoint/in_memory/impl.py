@@ -8,7 +8,8 @@ from ....datapoint import (
     DataPointCannotBeOverriddenError,
     DataPointIsNotProducedError,
 )
-from ..base import BaseDataPointContext, BaseParams
+from ...base import BaseParams
+from ..base import BaseDataPointContext
 
 PARAMS = t.TypeVar("PARAMS", bound=BaseParams)
 
