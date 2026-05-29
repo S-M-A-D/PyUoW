@@ -84,7 +84,7 @@ class Model(
         return self.deleted_date is not None
 
     def events(self) -> t.Sequence[ModelEvent[ENTITY_ID]]:
-        return deepcopy(self._events)
+        return tuple(self._events)
 
 
 @unique
@@ -109,15 +109,15 @@ class Batch:
     )
 
     def events(self) -> t.Sequence[ModelEvent[t.Any]]:
-        return [
+        return tuple(
             event
             for change in self._changes.values()
             for event in (
                 change.entity.events()
                 if isinstance(change.entity, Model)
-                else []
+                else ()
             )
-        ]
+        )
 
     def changes(self) -> t.Dict[ENTITY_ID, Change]:
         return deepcopy(self._changes)
