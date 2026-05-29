@@ -1,4 +1,4 @@
-.PHONY: fmt tests
+.PHONY: fmt tests docs-serve
 
 fmt:
 	ruff check --fix .
@@ -7,3 +7,6 @@ fmt:
 
 tests:
 	pytest --cov --cov-report term-missing
+
+docs-serve:
+	uv run mkdocs serve
