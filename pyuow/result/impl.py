@@ -5,6 +5,7 @@ from ..types import MISSING, MissingType
 from .exceptions import MissingOutError
 
 OUT = t.TypeVar("OUT")
+NEW = t.TypeVar("NEW")
 
 
 @dataclass(frozen=True, repr=False)
@@ -31,6 +32,21 @@ class Result(t.Generic[OUT]):
 
     def is_error(self) -> bool:
         return isinstance(self._out, Exception)
+
+    def map(self, fn: t.Callable[[OUT], NEW]) -> "Result[NEW]":
+        if isinstance(self._out, (MissingType, Exception)):
+            return t.cast("Result[NEW]", self)
+        return Result.ok(fn(self._out))
+
+    def and_then(self, fn: t.Callable[[OUT], "Result[NEW]"]) -> "Result[NEW]":
+        if isinstance(self._out, (MissingType, Exception)):
+            return t.cast("Result[NEW]", self)
+        return fn(self._out)
+
+    def unwrap_or(self, default: OUT) -> OUT:
+        if isinstance(self._out, (MissingType, Exception)):
+            return default
+        return self._out
 
     @staticmethod
     def ok(out: OUT) -> "Result[OUT]":

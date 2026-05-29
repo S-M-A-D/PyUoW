@@ -60,3 +60,91 @@ class TestResult:
         _repr = result.__repr__()
         # then
         assert _repr == repr(mock_out)
+
+    async def test_map_should_transform_ok_value(self) -> None:
+        # given
+        result = Result.ok(2)
+        # when
+        mapped = result.map(lambda v: v * 3)
+        # then
+        assert mapped.get() == 6
+
+    async def test_map_should_pass_through_error(self) -> None:
+        # given
+        error = ValueError("test")
+        result: Result[int] = Result.error(error)
+        fn = Mock()
+        # when
+        mapped = result.map(fn)
+        # then
+        assert mapped.is_error() is True
+        fn.assert_not_called()
+        with pytest.raises(ValueError, match="test"):
+            mapped.get()
+
+    async def test_map_should_pass_through_empty(self) -> None:
+        # given
+        result: Result[int] = Result.empty()
+        fn = Mock()
+        # when
+        mapped = result.map(fn)
+        # then
+        assert mapped.is_empty() is True
+        fn.assert_not_called()
+
+    async def test_and_then_should_bind_ok_value(self) -> None:
+        # given
+        result = Result.ok(2)
+        # when
+        bound = result.and_then(lambda v: Result.ok(v * 3))
+        # then
+        assert bound.get() == 6
+
+    async def test_and_then_should_propagate_returned_error(self) -> None:
+        # given
+        result = Result.ok(2)
+        error = ValueError("inner")
+        # when
+        bound = result.and_then(lambda _: Result[int].error(error))
+        # then
+        assert bound.is_error() is True
+        with pytest.raises(ValueError, match="inner"):
+            bound.get()
+
+    async def test_and_then_should_pass_through_error(self) -> None:
+        # given
+        result: Result[int] = Result.error(ValueError("outer"))
+        fn = Mock()
+        # when
+        bound = result.and_then(fn)
+        # then
+        assert bound.is_error() is True
+        fn.assert_not_called()
+
+    async def test_and_then_should_pass_through_empty(self) -> None:
+        # given
+        result: Result[int] = Result.empty()
+        fn = Mock()
+        # when
+        bound = result.and_then(fn)
+        # then
+        assert bound.is_empty() is True
+        fn.assert_not_called()
+
+    async def test_unwrap_or_should_return_value_for_ok(self) -> None:
+        # given
+        result = Result.ok(42)
+        # when / then
+        assert result.unwrap_or(0) == 42
+
+    async def test_unwrap_or_should_return_default_for_error(self) -> None:
+        # given
+        result: Result[int] = Result.error(ValueError("test"))
+        # when / then
+        assert result.unwrap_or(0) == 0
+
+    async def test_unwrap_or_should_return_default_for_empty(self) -> None:
+        # given
+        result: Result[int] = Result.empty()
+        # when / then
+        assert result.unwrap_or(0) == 0
