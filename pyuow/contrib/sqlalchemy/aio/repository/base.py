@@ -38,7 +38,7 @@ from .....entity import (
 )
 from .....repository.aio import BaseEntityRepository, BaseRepositoryFactory
 
-ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
+ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Hashable)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
 ENTITY_TABLE = t.TypeVar("ENTITY_TABLE", bound=EntityTable)
 

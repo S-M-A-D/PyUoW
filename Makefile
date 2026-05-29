@@ -1,10 +1,12 @@
-.PHONY: fmt tests
+.PHONY: fmt tests docs-serve
 
 fmt:
-	isort .
-	black .
-	autoflake --recursive .
+	ruff check --fix .
+	ruff format .
 	mypy .
 
 tests:
 	pytest --cov --cov-report term-missing
+
+docs-serve:
+	mkdocs serve

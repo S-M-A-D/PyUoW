@@ -1,7 +1,7 @@
 import typing as t
 from abc import ABC, abstractmethod
 
-from ...base import ModelEvent
+from ...event import ModelEvent
 
 
 class EventHandler(ABC):

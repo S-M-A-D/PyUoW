@@ -2,7 +2,8 @@ import typing as t
 
 from ...context import BaseContext
 from ...result import Result
-from ..base import BaseUnit, BaseUnitProxy, BaseWorkManager
+from ...unit import BaseUnit
+from ..base import BaseUnitProxy, BaseWorkManager
 
 CONTEXT = t.TypeVar("CONTEXT", bound=BaseContext[t.Any])
 OUT = t.TypeVar("OUT")

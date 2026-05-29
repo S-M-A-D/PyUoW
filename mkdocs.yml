@@ -1,0 +1,106 @@
+site_name: PyUoW
+site_description: >-
+  Unit of Work pattern for Python - composable units, transactional
+  work managers, and a domain model toolkit.
+site_url: https://s-m-a-d.github.io/PyUoW/
+site_author: SMAD
+repo_url: https://github.com/S-M-A-D/PyUoW
+repo_name: S-M-A-D/PyUoW
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; SMAD
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quickstart: quickstart.md
+  - Concepts:
+      - Units & Flow: concepts/units.md
+      - Result: concepts/result.md
+      - Context: concepts/context.md
+      - Work Manager: concepts/work.md
+      - Domain Model: concepts/domain.md
+      - DataPoints: concepts/datapoints.md
+  - Integrations:
+      - SQLAlchemy: integrations/sqlalchemy.md
+  - Async support: async.md
+  - API Reference:
+      - pyuow: api/pyuow.md
+      - pyuow.aio: api/aio.md
+      - pyuow.result: api/result.md
+      - pyuow.context: api/context.md
+      - pyuow.unit: api/unit.md
+      - pyuow.work: api/work.md
+      - pyuow.repository: api/repository.md
+      - pyuow.entity: api/entity.md
+      - pyuow.domain: api/domain.md
+      - pyuow.datapoint: api/datapoint.md
+      - pyuow.contrib.sqlalchemy: api/contrib-sqlalchemy.md
+  - Contributing: contributing.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_signature_annotations: true
+            separate_signature: true
+            merge_init_into_class: true
+            docstring_style: google
+            members_order: source
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/S-M-A-D/PyUoW
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/pyuow/

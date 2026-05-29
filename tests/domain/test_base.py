@@ -7,7 +7,16 @@ from uuid import UUID, uuid4
 
 import pytest
 
-from pyuow.domain import Batch, Change, ChangeType
+from pyuow.domain import (
+    Batch,
+    BatchShutError,
+    CannotAddExistingEntityError,
+    CannotDeleteNewEntityError,
+    CannotUpdateNewEntityError,
+    Change,
+    ChangeType,
+    DuplicateEntityInBatchError,
+)
 from pyuow.entity import Entity, Version
 from tests.fake_entities import (
     FakeEntity,
@@ -34,14 +43,14 @@ class TestModel:
         assert model.deleted_date is None
         assert model.is_new
         assert not model.is_deleted
-        assert model.events() == [
+        assert model.events() == (
             FakeModelCreatedEvent(
                 id=ANY,
                 model_id=model.id,
                 field="test",
                 created_date=model.created_date,
-            )
-        ]
+            ),
+        )
 
     def test_post_init_should_properly_set_defaults_when_id_is_provided(
         self,
@@ -57,7 +66,7 @@ class TestModel:
         assert model.deleted_date is None
         assert not model.is_new
         assert not model.is_deleted
-        assert model.events() == []
+        assert model.events() == ()
 
     def test_events_contain_all_events_history(self) -> None:
         # given
@@ -138,7 +147,10 @@ class TestBatch:
         old_model = FakeModel(id=FakeModelId(uuid4()))
         batch = Batch()
         # when / then
-        with pytest.raises(RuntimeError, match="Can't add an existing entity"):
+        with pytest.raises(
+            CannotAddExistingEntityError,
+            match="Can't add an existing entity",
+        ):
             batch.add(old_model)
 
     @pytest.mark.parametrize(
@@ -165,7 +177,9 @@ class TestBatch:
         new_model = FakeModel()
         batch = Batch()
         # when / then
-        with pytest.raises(RuntimeError, match="Can't update a new entity"):
+        with pytest.raises(
+            CannotUpdateNewEntityError, match="Can't update a new entity"
+        ):
             batch.update(new_model)
 
     @pytest.mark.parametrize(
@@ -192,7 +206,9 @@ class TestBatch:
         new_model = FakeModel()
         batch = Batch()
         # when / then
-        with pytest.raises(RuntimeError, match="Can't delete a new entity"):
+        with pytest.raises(
+            CannotDeleteNewEntityError, match="Can't delete a new entity"
+        ):
             batch.delete(new_model)
 
     def test_change_should_raise_if_batch_is_shut(self) -> None:
@@ -202,7 +218,7 @@ class TestBatch:
         batch.shut()
         # when / then
         with pytest.raises(
-            RuntimeError, match="Batch can't be changed, it's already shut"
+            BatchShutError, match="Batch can't be changed, it's already shut"
         ):
             batch.add(model)
 
@@ -214,7 +230,7 @@ class TestBatch:
         batch.update(model)
         # when / then
         with pytest.raises(
-            RuntimeError,
+            DuplicateEntityInBatchError,
             match=rf"{model.__class__.__name__}\[{model.id}\] has already been added to batch with UPDATE operation",
         ):
             batch.delete(model)
@@ -234,7 +250,7 @@ class TestBatch:
         batch.update(updated_model)
         batch.delete(deleted_model)
         # then
-        assert batch.events() == [
+        assert batch.events() == (
             FakeModelCreatedEvent(
                 id=ANY,
                 model_id=created_model.id,
@@ -253,4 +269,4 @@ class TestBatch:
                     datetime.datetime, deleted_model.deleted_date
                 ),
             ),
-        ]
+        )

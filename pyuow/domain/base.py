@@ -14,8 +14,15 @@ from ..entity import (
 )
 from ..types import MISSING
 from .event import ModelCreatedEvent, ModelDeletedEvent, ModelEvent
+from .exceptions import (
+    BatchShutError,
+    CannotAddExistingEntityError,
+    CannotDeleteNewEntityError,
+    CannotUpdateNewEntityError,
+    DuplicateEntityInBatchError,
+)
 
-ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Any)
+ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Hashable)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
 SELF = t.TypeVar("SELF", bound="Model[t.Any]")
 
@@ -84,7 +91,7 @@ class Model(
         return self.deleted_date is not None
 
     def events(self) -> t.Sequence[ModelEvent[ENTITY_ID]]:
-        return deepcopy(self._events)
+        return tuple(self._events)
 
 
 @unique
@@ -109,36 +116,36 @@ class Batch:
     )
 
     def events(self) -> t.Sequence[ModelEvent[t.Any]]:
-        return [
+        return tuple(
             event
             for change in self._changes.values()
             for event in (
                 change.entity.events()
                 if isinstance(change.entity, Model)
-                else []
+                else ()
             )
-        ]
+        )
 
     def changes(self) -> t.Dict[ENTITY_ID, Change]:
         return deepcopy(self._changes)
 
     def add(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         if isinstance(entity, Model) and not entity.is_new:
-            raise RuntimeError("Can't add an existing entity")
+            raise CannotAddExistingEntityError("Can't add an existing entity")
 
         self._add_change(ChangeType.ADD, entity)
         return entity
 
     def update(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         if isinstance(entity, Model) and entity.is_new:
-            raise RuntimeError("Can't update a new entity")
+            raise CannotUpdateNewEntityError("Can't update a new entity")
 
         self._add_change(ChangeType.UPDATE, entity)
         return entity
 
     def delete(self, entity: ENTITY_TYPE) -> ENTITY_TYPE:
         if isinstance(entity, Model) and entity.is_new:
-            raise RuntimeError("Can't delete a new entity")
+            raise CannotDeleteNewEntityError("Can't delete a new entity")
 
         self._add_change(ChangeType.DELETE, entity)
         return entity
@@ -150,11 +157,13 @@ class Batch:
         self, change_type: ChangeType, entity: ENTITY_TYPE
     ) -> None:
         if self.is_shut:
-            raise RuntimeError("Batch can't be changed, it's already shut")
+            raise BatchShutError("Batch can't be changed, it's already shut")
 
         if existing := self._changes.get(entity.id):
-            raise RuntimeError(
-                f"{entity.__class__.__name__}[{entity.id}] has already been added to batch with {existing.type.name} operation"
+            raise DuplicateEntityInBatchError(
+                entity_class=entity.__class__.__name__,
+                entity_id=entity.id,
+                prior_op=existing.type.name,
             )
 
         self._changes[entity.id] = Change(type=change_type, entity=entity)
