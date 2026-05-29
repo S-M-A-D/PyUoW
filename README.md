@@ -40,7 +40,7 @@ $ python -m pip install pyuow
 ```
 PyUow officially supports Python >= 3.9.
 
-PyPi link -
+PyPi link - https://pypi.org/project/pyuow/
 
 ---
 
