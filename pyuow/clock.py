@@ -1,4 +1,5 @@
 import datetime
+import time
 
 
 def offset_naive_utcnow() -> datetime.datetime:
@@ -6,4 +7,4 @@ def offset_naive_utcnow() -> datetime.datetime:
 
 
 def nano_timestamp_utc() -> int:
-    return int(offset_naive_utcnow().timestamp() * 1e9)
+    return time.time_ns()
