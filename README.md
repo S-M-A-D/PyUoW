@@ -27,6 +27,22 @@
 
 ---
 
+## What is PyUoW?
+
+PyUoW is a Python implementation of the [Unit of Work](https://martinfowler.com/eaaCatalog/unitOfWork.html) behavioural pattern. It gives you small, typed building blocks for business logic that compose into a **flow** and run inside a **Work Manager** that handles transactions, batching, and domain events.
+
+The result: business logic that reads top-to-bottom, separates orchestration from execution, and stays testable as it grows.
+
+### Highlights
+
+- **Composable units** — write each step as a `ConditionalUnit` / `RunUnit` / `FinalUnit`, chain them with `>>`, validate the chain at build time.
+- **Transactional out of the box** — a SQLAlchemy adapter ships in `pyuow.contrib.sqlalchemy` (sync + async), with nested-transaction support.
+- **Domain-first** — `Entity`, `AuditedEntity`, `SoftDeletableEntity`, `VersionedEntity`, and an event-emitting `Model` base, all immutable dataclasses.
+- **Sync and async parity** — every primitive has an `aio/` twin; pick one per flow.
+- **Strict types** — passes `mypy --strict`; runs on Python 3.9 through 3.14.
+
+---
+
 ## Install
 
 ```bash
