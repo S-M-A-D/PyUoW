@@ -9,4 +9,4 @@ tests:
 	pytest --cov --cov-report term-missing
 
 docs-serve:
-	uv run mkdocs serve
+	mkdocs serve
