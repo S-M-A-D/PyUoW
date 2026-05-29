@@ -1,5 +1,5 @@
 import typing as t
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from ..clock import offset_naive_utcnow
@@ -28,16 +28,12 @@ class Entity(t.Generic[ENTITY_ID]):
 
 @dataclass(frozen=True)
 class AuditedEntity(Entity[ENTITY_ID]):
-    created_date: datetime = t.cast(datetime, MISSING)
+    created_date: datetime = field(default_factory=offset_naive_utcnow)
     updated_date: datetime = t.cast(datetime, MISSING)
 
     def __post_init__(self) -> None:
-        now = offset_naive_utcnow()
-
-        if self.created_date is MISSING:  # type: ignore[comparison-overlap]
-            object.__setattr__(self, "created_date", now)
         if self.updated_date is MISSING:  # type: ignore[comparison-overlap]
-            object.__setattr__(self, "updated_date", now)
+            object.__setattr__(self, "updated_date", self.created_date)
 
 
 @dataclass(frozen=True)
