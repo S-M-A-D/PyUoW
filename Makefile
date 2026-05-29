@@ -1,9 +1,8 @@
 .PHONY: fmt tests
 
 fmt:
-	isort .
-	black .
-	autoflake --recursive .
+	ruff check --fix .
+	ruff format .
 	mypy .
 
 tests:

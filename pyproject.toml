@@ -48,10 +48,6 @@ pytest = [
     {version = "^9.0.3", python = ">=3.10"}
 ]
 pytest-cov = "^7.1.0"
-isort = [
-    {version = "^6.1.0", python = "<3.10"},
-    {version = "^8.0.1", python = ">=3.10"}
-]
 pre-commit = [
     {version = "^4.3.0", python = "<3.10"},
     {version = "^4.6.0", python = ">=3.10"}
@@ -59,10 +55,6 @@ pre-commit = [
 pytest-asyncio = [
     {version = "^1.2.0", python = "<3.10"},
     {version = "^1.4.0", python = ">=3.10"}
-]
-autoflake = [
-    {version = "^2.3.1", python = "<3.10"},
-    {version = "^2.3.3", python = ">=3.10"}
 ]
 mypy = [
     {version = "^1.19.1", python = "<3.10"},
@@ -72,10 +64,7 @@ coverage = [
     { version = "^7.10.0", extras = ["toml"], python = "<3.10" },
     { version = "^7.14.1", extras = ["toml"], python = ">=3.10" }
 ]
-black = [
-    {version = "^25.9.0", python = "<3.10"},
-    {version = "^26.5.1", python = ">=3.10"}
-]
+ruff = "^0.15.0"
 greenlet = [
     {version = "^3.1.1", python = "<3.10"},
     {version = "^3.5.1", python = ">=3.10"}
@@ -122,38 +111,16 @@ show_missing = true
 skip_covered = true
 fail_under = 99
 
-[tool.black]
+[tool.ruff]
 line-length = 79
-target-version = [
-    "py39",
-    "py310",
-    "py311",
-    "py312",
-    "py313",
-    "py314",
+target-version = "py39"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = [
+    "F",
+    "I",
 ]
-include = "\\.pyi?$"
-exclude = """
-    (
-      /(
-          \\.git
-        | \\.venv
-      )/
-    )"""
-
-[tool.isort]
-profile = "black"
-line_length = 79
-
-[tool.autoflake]
-check = false
-in-place = true
-recursive = true
-expand-star-imports = true
-remove-all-unused-imports = true
-ignore-init-module-imports = true
-remove-duplicate-keys = true
-remove-unused-variables = true
 
 [tool.mypy]
 strict = true

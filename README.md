@@ -13,7 +13,7 @@
     <a href="https://codecov.io/gh/S-M-A-D/PyUoW" target="_blank">
         <img src="https://codecov.io/gh/S-M-A-D/PyUoW/graph/badge.svg?token=L1Y13VT30W" alt="Codecov">
     </a>
-    <img src="https://img.shields.io/badge/code%20style-black-black" alt="Formatter">
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
     <img src="https://img.shields.io/pypi/pyversions/pyuow" alt="Python versions">
     <img src="https://img.shields.io/pypi/l/pyuow" alt="License">
 </p>
