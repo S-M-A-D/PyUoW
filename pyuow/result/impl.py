@@ -21,9 +21,6 @@ class Result(t.Generic[OUT]):
 
         return self._out
 
-    def or_raise(self) -> OUT:
-        return self.get()
-
     def is_ok(self) -> bool:
         return not (self.is_error() or self.is_empty())
 
