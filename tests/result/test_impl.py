@@ -41,14 +41,23 @@ class TestResult:
         assert result.is_error() is True
         assert result.is_empty() is False
 
-    async def test_repr_should_return_out_repr(self) -> None:
+    async def test_repr_should_wrap_ok_value(self) -> None:
         # given
-        mock_out = Mock()
-        result: Result[Mock] = Result(mock_out)
-        # when
-        _repr = result.__repr__()
-        # then
-        assert _repr == repr(mock_out)
+        result = Result.ok(42)
+        # when / then
+        assert repr(result) == "Result.ok(42)"
+
+    async def test_repr_should_wrap_error(self) -> None:
+        # given
+        result: Result[int] = Result.error(ValueError("boom"))
+        # when / then
+        assert repr(result) == "Result.error(ValueError('boom'))"
+
+    async def test_repr_should_render_empty(self) -> None:
+        # given
+        result: Result[int] = Result.empty()
+        # when / then
+        assert repr(result) == "Result.empty()"
 
     async def test_map_should_transform_ok_value(self) -> None:
         # given

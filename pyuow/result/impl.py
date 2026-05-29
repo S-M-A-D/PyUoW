@@ -58,4 +58,8 @@ class Result(t.Generic[OUT]):
         return Result(MISSING)
 
     def __repr__(self) -> str:
-        return self._out.__repr__()
+        if isinstance(self._out, MissingType):
+            return "Result.empty()"
+        if isinstance(self._out, Exception):
+            return f"Result.error({self._out!r})"
+        return f"Result.ok({self._out!r})"
