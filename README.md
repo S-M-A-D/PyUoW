@@ -180,7 +180,7 @@ from pyuow.contrib.sqlalchemy.aio.work import (
    SqlAlchemyReadOnlyTransactionManager,
    SqlAlchemyTransactionManager,
 )
-from pyuow.persistence.entities import Entity, AuditedEntity
+from pyuow.entity import Entity, AuditedEntity
 from pyuow.repository.aio import BaseEntityRepository
 from pyuow.work.aio.transactional import TransactionalWorkManager
 
