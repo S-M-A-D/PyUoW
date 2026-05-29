@@ -4,3 +4,7 @@ class CannotReassignUnitError(Exception):
 
 class FinalUnitError(Exception):
     pass
+
+
+class FlowNotTerminatedError(Exception):
+    pass

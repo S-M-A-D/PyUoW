@@ -1,14 +1,19 @@
 from .base import BaseUnit
-from .exceptions import CannotReassignUnitError, FinalUnitError
+from .exceptions import (
+    CannotReassignUnitError,
+    FinalUnitError,
+    FlowNotTerminatedError,
+)
 from .impl import ConditionalUnit, ErrorUnit, FinalUnit, FlowUnit, RunUnit
 
 __all__ = (
     "BaseUnit",
     "CannotReassignUnitError",
-    "FinalUnitError",
     "ConditionalUnit",
     "ErrorUnit",
     "FinalUnit",
+    "FinalUnitError",
+    "FlowNotTerminatedError",
     "FlowUnit",
     "RunUnit",
 )

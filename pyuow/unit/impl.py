@@ -7,7 +7,11 @@ from ..context import BaseContext
 from ..result import Result
 from ..types import MISSING, MissingType
 from .base import BaseUnit
-from .exceptions import CannotReassignUnitError, FinalUnitError
+from .exceptions import (
+    CannotReassignUnitError,
+    FinalUnitError,
+    FlowNotTerminatedError,
+)
 
 logger = getLogger(__name__)
 
@@ -31,6 +35,11 @@ class FlowUnit(BaseUnit[CONTEXT, OUT], ABC):
         return other
 
     def build(self) -> "FlowUnit[CONTEXT, OUT]":
+        cursor: "FlowUnit[CONTEXT, OUT]" = self._root
+        while not isinstance(cursor, FinalUnit):
+            if isinstance(cursor._next, MissingType):
+                raise FlowNotTerminatedError(cursor.__class__.__name__)
+            cursor = cursor._next
         return self._root
 
 

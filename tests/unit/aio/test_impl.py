@@ -10,7 +10,11 @@ from pyuow.datapoint import BaseDataPointSpec
 from pyuow.datapoint.aio import ConsumesDataPoints, ProducesDataPoints
 from pyuow.result import Result
 from pyuow.types import MISSING
-from pyuow.unit import CannotReassignUnitError, FinalUnitError
+from pyuow.unit import (
+    CannotReassignUnitError,
+    FinalUnitError,
+    FlowNotTerminatedError,
+)
 from pyuow.unit.aio import (
     ConditionalUnit,
     ErrorUnit,
@@ -59,10 +63,14 @@ class TestUnits:
             async def __call__(self, context: Mock) -> Result[None]:
                 return Result.empty()
 
+        class TerminalUnit(FinalUnit[Mock, None]):
+            async def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
         unit1 = FakeUnit()
         unit2 = FakeUnit()
         # when
-        flow = unit1 >> unit2
+        flow = unit1 >> unit2 >> TerminalUnit()
         # then
         assert flow.build() == unit1
 
@@ -146,7 +154,7 @@ class TestUnits:
         assert passed_condition is True
         assert failed_condition is False
 
-    async def test_async_conditional_unit_in_flow_should_raise_if_next_unit_is_not_set(
+    async def test_async_conditional_unit_build_should_raise_if_chain_not_terminated(
         self,
     ) -> None:
         # given
@@ -154,10 +162,9 @@ class TestUnits:
             async def condition(self, context: Mock) -> bool:
                 return False
 
-        flow = FakeUnit(on_failure=Mock()).build()
         # when / then
-        with pytest.raises(NotImplementedError):
-            await flow(Mock())
+        with pytest.raises(FlowNotTerminatedError):
+            FakeUnit(on_failure=Mock()).build()
 
     async def test_async_conditional_unit_in_flow_should_return_result_when_error_occurs(
         self,
@@ -167,8 +174,14 @@ class TestUnits:
             async def condition(self, context: Mock) -> bool:
                 raise Exception
 
+        class TerminalUnit(FinalUnit[Mock, None]):
+            async def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
         flow = (
-            FakeUnit(on_failure=Mock()) >> FakeUnit(on_failure=Mock())
+            FakeUnit(on_failure=Mock())
+            >> FakeUnit(on_failure=Mock())
+            >> TerminalUnit()
         ).build()
         # when
         result = await flow(Mock())
@@ -186,8 +199,14 @@ class TestUnits:
             async def condition(self, context: Mock) -> bool:
                 return False
 
+        class TerminalUnit(FinalUnit[Mock, None]):
+            async def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
         flow = (
-            FakeUnit(on_failure=mock_on_failure) >> FakeUnit(on_failure=Mock())
+            FakeUnit(on_failure=mock_on_failure)
+            >> FakeUnit(on_failure=Mock())
+            >> TerminalUnit()
         ).build()
         # when
         await flow(mock_context)
@@ -209,17 +228,16 @@ class TestUnits:
         # then
         mock_logic.assert_called_once_with(mock_context)
 
-    async def test_async_run_unit_in_flow_should_raise_if_next_unit_is_not_set(
+    async def test_async_run_unit_build_should_raise_if_chain_not_terminated(
         self,
     ) -> None:
         # given
         class FakeUnit(RunUnit[Mock, None]):
             async def run(self, context: Mock) -> None: ...
 
-        flow = FakeUnit().build()
         # when / then
-        with pytest.raises(NotImplementedError):
-            await flow(Mock())
+        with pytest.raises(FlowNotTerminatedError):
+            FakeUnit().build()
 
     async def test_async_run_unit_in_flow_should_return_result_when_error_occurs(
         self,
@@ -229,7 +247,11 @@ class TestUnits:
             async def run(self, context: Mock) -> None:
                 raise Exception
 
-        flow = (FakeUnit() >> FakeUnit()).build()
+        class TerminalUnit(FinalUnit[Mock, None]):
+            async def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
+        flow = (FakeUnit() >> FakeUnit() >> TerminalUnit()).build()
         # when
         result = await flow(Mock())
         # then

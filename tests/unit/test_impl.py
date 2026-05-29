@@ -19,6 +19,7 @@ from pyuow.unit import (
     ErrorUnit,
     FinalUnit,
     FinalUnitError,
+    FlowNotTerminatedError,
     FlowUnit,
     RunUnit,
 )
@@ -59,10 +60,14 @@ class TestUnits:
             def __call__(self, context: Mock) -> Result[None]:
                 return Result.empty()
 
+        class TerminalUnit(FinalUnit[Mock, None]):
+            def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
         unit1 = FakeUnit()
         unit2 = FakeUnit()
         # when
-        flow = unit1 >> unit2
+        flow = unit1 >> unit2 >> TerminalUnit()
         # then
         assert flow.build() == unit1
 
@@ -142,7 +147,7 @@ class TestUnits:
         assert passed_condition is True
         assert failed_condition is False
 
-    def test_conditional_unit_in_flow_should_raise_if_next_unit_is_not_set(
+    def test_conditional_unit_build_should_raise_if_chain_not_terminated(
         self,
     ) -> None:
         # given
@@ -150,10 +155,9 @@ class TestUnits:
             def condition(self, context: Mock) -> bool:
                 return False
 
-        flow = FakeUnit(on_failure=Mock()).build()
         # when / then
-        with pytest.raises(NotImplementedError):
-            flow(Mock())
+        with pytest.raises(FlowNotTerminatedError):
+            FakeUnit(on_failure=Mock()).build()
 
     def test_conditional_unit_in_flow_should_return_result_when_error_occurs(
         self,
@@ -163,8 +167,14 @@ class TestUnits:
             def condition(self, context: Mock) -> bool:
                 raise Exception
 
+        class TerminalUnit(FinalUnit[Mock, None]):
+            def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
         flow = (
-            FakeUnit(on_failure=Mock()) >> FakeUnit(on_failure=Mock())
+            FakeUnit(on_failure=Mock())
+            >> FakeUnit(on_failure=Mock())
+            >> TerminalUnit()
         ).build()
         # when
         result = flow(Mock())
@@ -182,8 +192,14 @@ class TestUnits:
             def condition(self, context: Mock) -> bool:
                 return False
 
+        class TerminalUnit(FinalUnit[Mock, None]):
+            def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
         flow = (
-            FakeUnit(on_failure=mock_on_failure) >> FakeUnit(on_failure=Mock())
+            FakeUnit(on_failure=mock_on_failure)
+            >> FakeUnit(on_failure=Mock())
+            >> TerminalUnit()
         ).build()
         # when
         flow(mock_context)
@@ -205,17 +221,16 @@ class TestUnits:
         # then
         mock_logic.assert_called_once_with(mock_context)
 
-    def test_run_unit_in_flow_should_raise_if_next_unit_is_not_set(
+    def test_run_unit_build_should_raise_if_chain_not_terminated(
         self,
     ) -> None:
         # given
         class FakeUnit(RunUnit[Mock, None]):
             def run(self, context: Mock) -> None: ...
 
-        flow = FakeUnit().build()
         # when / then
-        with pytest.raises(NotImplementedError):
-            flow(Mock())
+        with pytest.raises(FlowNotTerminatedError):
+            FakeUnit().build()
 
     def test_run_unit_in_flow_should_return_result_when_error_occurs(
         self,
@@ -225,7 +240,11 @@ class TestUnits:
             def run(self, context: Mock) -> None:
                 raise Exception
 
-        flow = (FakeUnit() >> FakeUnit()).build()
+        class TerminalUnit(FinalUnit[Mock, None]):
+            def finish(self, context: Mock) -> Result[None]:
+                return Result.empty()
+
+        flow = (FakeUnit() >> FakeUnit() >> TerminalUnit()).build()
         # when
         result = flow(Mock())
         # then
