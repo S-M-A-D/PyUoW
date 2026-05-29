@@ -32,6 +32,10 @@ jobs:
           ruff check .
           ruff format --check .
           mypy .
+      - name: Audit dependencies
+        run: |
+          pip install pip-audit
+          pip-audit
       - name: Run tests with Pytest
         run: |
           pytest --cov --cov-report=xml
