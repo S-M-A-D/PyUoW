@@ -62,6 +62,7 @@ empty = Result.empty()
 ```
 
 - `.get()` returns the value for ok, raises the wrapped exception for error, and raises `MissingOutError` for empty.
+- `.raise_for_error()` validates without returning — use it in side-effect flows where you only care that the flow succeeded.
 - `.unwrap_or(default)` returns the value for ok, otherwise the default. Never raises.
 - `.map(fn)` applies a function to the ok value; error and empty pass through unchanged.
 - `.and_then(fn)` binds a `Result`-returning operation; error and empty short-circuit.

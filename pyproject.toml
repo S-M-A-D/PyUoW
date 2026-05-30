@@ -1,6 +1,6 @@
 [project]
 name = "pyuow"
-version = "0.9.1"
+version = "0.9.2"
 description = "Python custom implementation of unit of work pattern"
 readme = "README.md"
 license = "MIT"
