@@ -52,6 +52,12 @@ pip install "pyuow[sqlalchemy]"  # with SQLAlchemy integration
 
 Python ≥ 3.10.
 
+### AI-agent skill
+
+After installing, run `pyuow install-skill` to drop an AI-agent skill file into your project so Claude Code / OpenCode learn PyUoW's idioms. Add `--global` to install for your user account, or `--check` to dry-run.
+
+See the [step-by-step guide](https://s-m-a-d.github.io/PyUoW/install-skill/) (or `docs/install-skill.md`).
+
 ## At a glance
 
 ```python
