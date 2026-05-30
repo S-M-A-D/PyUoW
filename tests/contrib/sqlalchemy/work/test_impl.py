@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy.engine import Engine
 
 from pyuow.contrib.sqlalchemy.work import (
+    SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransaction,
     SqlAlchemyTransactionManager,
 )
@@ -42,6 +43,18 @@ class TestSqlAlchemyTransaction:
         # then
         root_trx.rollback.assert_called_once()
 
+    def test_sync_rollback_should_do_nothing_when_no_active_transaction(
+        self,
+    ) -> None:
+        # given
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=False),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when / then
+        trx.rollback()
+
     def test_sync_commit_should_call_nested_transaction_commit(
         self,
     ) -> None:
@@ -56,6 +69,18 @@ class TestSqlAlchemyTransaction:
         trx.commit()
         # then
         nested_trx.commit.assert_called_once()
+
+    def test_sync_commit_should_do_nothing_when_no_active_transaction(
+        self,
+    ) -> None:
+        # given
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=False),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when / then
+        trx.commit()
 
     def test_sync_commit_should_call_root_transaction_commit(
         self,
@@ -109,5 +134,19 @@ class TestSqlAlchemyTransactionManager:
             # then
             assert session.in_transaction()
             assert not session.in_nested_transaction()
+
+        assert not session.in_transaction()
+
+    def test_sync_readonly_transaction_should_yield_session(
+        self, engine: Engine
+    ) -> None:
+        # given
+        manager = SqlAlchemyReadOnlyTransactionManager(engine)
+        # when
+        with manager.transaction() as trx:
+            session = trx.it()
+
+            # then
+            assert session is not None
 
         assert not session.in_transaction()

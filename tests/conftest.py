@@ -1,8 +1,14 @@
 import os
 import sys
+from pathlib import Path
 
 import pytest
 from _pytest.nodes import Item
+
+
+@pytest.fixture
+def project_root() -> Path:
+    return Path(__file__).resolve().parents[1]
 
 
 def pytest_runtest_setup(item: Item) -> None:

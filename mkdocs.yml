@@ -43,6 +43,7 @@ theme:
 nav:
   - Home: index.md
   - Installation: installation.md
+  - AI-agent skill: install-skill.md
   - Quickstart: quickstart.md
   - Concepts:
       - Units & Flow: concepts/units.md
@@ -54,6 +55,7 @@ nav:
   - Integrations:
       - SQLAlchemy: integrations/sqlalchemy.md
   - Async support: async.md
+  - CLI reference: cli.md
   - API Reference:
       - pyuow: api/pyuow.md
       - pyuow.aio: api/aio.md

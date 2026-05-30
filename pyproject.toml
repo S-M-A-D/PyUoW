@@ -1,6 +1,6 @@
 [project]
 name = "pyuow"
-version = "0.9.0"
+version = "0.9.1"
 description = "Python custom implementation of unit of work pattern"
 readme = "README.md"
 license = "MIT"
@@ -39,6 +39,9 @@ Repository = "https://github.com/S-M-A-D/PyUoW"
 Tracker = "https://github.com/S-M-A-D/PyUoW/issues"
 Changelog = "https://github.com/S-M-A-D/PyUoW/releases"
 
+[project.scripts]
+pyuow = "pyuow_cli.main:main"
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.3,<10.0.0",
@@ -60,7 +63,9 @@ docs = [
 ]
 
 [tool.poetry]
-include = ["pyuow/py.typed"]
+packages = [{include = "pyuow"}, {include = "pyuow_cli"}]
+exclude = ["pyuow/cli/**"]
+include = ["pyuow/py.typed", "pyuow_cli/assets/skills/*.md"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

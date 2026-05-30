@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from pyuow.contrib.sqlalchemy.aio.work import (
+    SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransaction,
     SqlAlchemyTransactionManager,
 )
@@ -42,6 +43,18 @@ class TestSqlAlchemyTransaction:
         # then
         root_trx.rollback.assert_awaited_once()
 
+    async def test_async_rollback_should_do_nothing_when_no_active_transaction(
+        self,
+    ) -> None:
+        # given
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=False),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when / then
+        await trx.rollback()
+
     async def test_async_commit_should_call_nested_transaction_commit(
         self,
     ) -> None:
@@ -72,6 +85,18 @@ class TestSqlAlchemyTransaction:
         await trx.commit()
         # then
         root_trx.commit.assert_awaited_once()
+
+    async def test_async_commit_should_do_nothing_when_no_active_transaction(
+        self,
+    ) -> None:
+        # given
+        trx_provider = Mock(
+            in_nested_transaction=Mock(return_value=False),
+            in_transaction=Mock(return_value=False),
+        )
+        trx = SqlAlchemyTransaction(trx_provider)
+        # when / then
+        await trx.commit()
 
 
 @pytest.mark.skip_on_ci
@@ -109,5 +134,19 @@ class TestSqlAlchemyTransactionManager:
             # then
             assert session.in_transaction()
             assert not session.in_nested_transaction()
+
+        assert not session.in_transaction()
+
+    async def test_async_readonly_transaction_should_yield_session(
+        self, async_engine: AsyncEngine
+    ) -> None:
+        # given
+        manager = SqlAlchemyReadOnlyTransactionManager(async_engine)
+        # when
+        async with manager.transaction() as trx:
+            session = trx.it()
+
+            # then
+            assert session is not None
 
         assert not session.in_transaction()
