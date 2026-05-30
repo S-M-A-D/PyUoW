@@ -33,6 +33,14 @@ err.get()        # raises ValueError("nope")
 empty.get()      # raises MissingOutError
 ```
 
+`.raise_for_error()` validates without returning. Use it in side-effect flows where the success value is irrelevant but you still want failures to surface.
+
+```python
+ok.raise_for_error()     # no-op
+err.raise_for_error()    # raises ValueError("nope")
+empty.raise_for_error()  # raises MissingOutError
+```
+
 `.unwrap_or(default)` returns the value for `ok`, otherwise returns the supplied default. It never raises.
 
 ```python
@@ -89,6 +97,7 @@ repr(Result.empty())                      # 'Result.empty()'
 | You want                              | Use                          |
 | ------------------------------------- | ---------------------------- |
 | Raise on failure, return on success   | `.get()`                     |
+| Raise on failure, ignore the value    | `.raise_for_error()`         |
 | Fall back to a default                | `.unwrap_or(default)`        |
 | Transform success only                | `.map(fn)`                   |
 | Chain a fallible operation            | `.and_then(fn)`              |

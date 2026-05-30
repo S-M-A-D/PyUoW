@@ -14,12 +14,14 @@ class Result(t.Generic[OUT]):
     _out: t.Union[OUT, MissingType, Exception]
 
     def get(self) -> OUT:
+        self.raise_for_error()
+        return t.cast(OUT, self._out)
+
+    def raise_for_error(self) -> None:
         if isinstance(self._out, MissingType):
             raise MissingOutError()
         elif isinstance(self._out, Exception):
             raise self._out
-
-        return self._out
 
     def is_ok(self) -> bool:
         return not (self.is_error() or self.is_empty())

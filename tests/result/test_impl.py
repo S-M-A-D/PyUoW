@@ -41,6 +41,33 @@ class TestResult:
         assert result.is_error() is True
         assert result.is_empty() is False
 
+    async def test_raise_for_error_should_do_nothing_if_ok(self) -> None:
+        # given
+        result = Result.ok(42)
+        # when / then
+        result.raise_for_error()
+        assert result.is_ok() is True
+
+    async def test_raise_for_error_should_raise_if_out_is_missing(
+        self,
+    ) -> None:
+        # given
+        result: Result[t.Any] = Result.empty()
+        # when
+        with pytest.raises(MissingOutError):
+            result.raise_for_error()
+        # then
+        assert result.is_empty() is True
+
+    async def test_raise_for_error_should_raise_if_out_is_error(self) -> None:
+        # given
+        result: Result[t.Any] = Result.error(ValueError("test"))
+        # when
+        with pytest.raises(ValueError, match="test"):
+            result.raise_for_error()
+        # then
+        assert result.is_error() is True
+
     async def test_repr_should_wrap_ok_value(self) -> None:
         # given
         result = Result.ok(42)
