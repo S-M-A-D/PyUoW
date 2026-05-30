@@ -22,7 +22,7 @@ jobs:
       - name: Run pre-commit autoupdate
         run: pre-commit autoupdate
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "build(pre-commit): bump hook versions"
           branch: chore/pre-commit-autoupdate
