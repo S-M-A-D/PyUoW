@@ -80,7 +80,7 @@ description: Use this skill whenever working with the PyUoW library ...
 ---
 ```
 
-Below the frontmatter, look for a version stamp such as `<!-- Generated for pyuow 0.9.1 -->`. That stamp confirms the skill matches your installed PyUoW version.
+Below the frontmatter, look for a version stamp such as `<!-- Generated for pyuow 0.9.2 -->`. That stamp confirms the skill matches your installed PyUoW version.
 
 ## Updating after a PyUoW upgrade
 
