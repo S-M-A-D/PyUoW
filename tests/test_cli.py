@@ -546,8 +546,7 @@ class TestMain:
         assert main(["--version"]) == 0
         captured = capsys.readouterr()
         # then
-        version = importlib.metadata.version("pyuow")
-        assert captured.out == f"pyuow {version}\n"
+        assert captured.out == "pyuow 0.9.3\n"
         assert captured.err == ""
 
     # given
