@@ -42,9 +42,21 @@ class Result(t.Generic[OUT]):
             return t.cast("Result[NEW]", self)
         return fn(self._out)
 
+    def or_else(
+        self, fn: t.Callable[[Exception], "Result[OUT]"]
+    ) -> "Result[OUT]":
+        if isinstance(self._out, Exception):
+            return fn(self._out)
+        return self
+
     def unwrap_or(self, default: OUT) -> OUT:
         if isinstance(self._out, (MissingType, Exception)):
             return default
+        return self._out
+
+    def unwrap_or_else(self, fn: t.Callable[[], OUT]) -> OUT:
+        if isinstance(self._out, (MissingType, Exception)):
+            return fn()
         return self._out
 
     @staticmethod

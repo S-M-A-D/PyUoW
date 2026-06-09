@@ -173,3 +173,50 @@ class TestResult:
         result: Result[int] = Result.empty()
         # when / then
         assert result.unwrap_or(0) == 0
+
+    async def test_or_else_should_pass_through_ok(self) -> None:
+        # given
+        result = Result.ok(42)
+        fn = Mock()
+        # when
+        out = result.or_else(fn)
+        # then
+        assert out.get() == 42
+        fn.assert_not_called()
+
+    async def test_or_else_should_call_fn_for_error(self) -> None:
+        # given
+        error = ValueError("test")
+        result: Result[int] = Result.error(error)
+        # when
+        out = result.or_else(lambda _: Result.ok(0))
+        # then
+        assert out.get() == 0
+
+    async def test_or_else_should_pass_through_empty(self) -> None:
+        # given
+        result: Result[int] = Result.empty()
+        fn = Mock()
+        # when
+        out = result.or_else(fn)
+        # then
+        assert out.is_empty() is True
+        fn.assert_not_called()
+
+    async def test_unwrap_or_else_should_return_value_for_ok(self) -> None:
+        # given
+        result = Result.ok(42)
+        # when / then
+        assert result.unwrap_or_else(lambda: 0) == 42
+
+    async def test_unwrap_or_else_should_call_fn_for_error(self) -> None:
+        # given
+        result: Result[int] = Result.error(ValueError("test"))
+        # when / then
+        assert result.unwrap_or_else(lambda: 0) == 0
+
+    async def test_unwrap_or_else_should_call_fn_for_empty(self) -> None:
+        # given
+        result: Result[int] = Result.empty()
+        # when / then
+        assert result.unwrap_or_else(lambda: 0) == 0

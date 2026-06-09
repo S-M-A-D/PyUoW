@@ -546,7 +546,7 @@ class TestMain:
         assert main(["--version"]) == 0
         captured = capsys.readouterr()
         # then
-        assert captured.out == "pyuow 0.9.2\n"
+        assert captured.out == "pyuow 0.9.3\n"
         assert captured.err == ""
 
     # given

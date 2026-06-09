@@ -3,7 +3,7 @@ name: pyuow
 description: Use this skill whenever working with the PyUoW library (Unit of Work pattern for Python) — composable units, flows, Result, transactional work managers, and the SQLAlchemy adapter.
 ---
 
-<!-- Generated for pyuow 0.9.1 -->
+<!-- Generated for pyuow 0.9.3 -->
 
 ## When to use PyUoW
 
@@ -76,7 +76,93 @@ A `Context` carries params (immutable inputs) plus any mutable or computed state
 - `BaseMutableContext` — mutable dataclass that blocks re-assigning an existing attribute (`AttributeCannotBeOverriddenError`).
 - `BaseImmutableContext` — frozen dataclass for pure pipelines.
 
-Specialised flavours include `BaseDomainContext` (adds a `Batch` field) and `InMemoryDataPointContext` (producer/consumer registry).
+Specialised flavours include `BaseDomainContext` (adds a `Batch` field) and `InMemoryDataPointContext` (producer/consumer registry). You can compose them — inherit from both to get domain batch handling + datapoint storage.
+
+## DataPoints
+
+DataPoints are typed contracts for what one unit produces and another consumes. They add explicit producer/consumer declarations to flows, catching missing data at runtime before it becomes a `KeyError` deep in business logic.
+
+Core pieces:
+
+- `BaseDataPointSpec[VALUE]` — a typed key with `name` and `ref_type`. Calling it creates a container: `spec(value)` returns `BaseDataPointContainer(spec, value)`.
+- `InMemoryDataPointContext[PARAMS]` — a frozen `BaseContext` that doubles as a `BaseDataPointProducer` and `BaseDataPointConsumer`. Stores datapoints in a dict keyed by their spec.
+- `ProducesDataPoints` — mixin for units that *write* datapoints. Declares `_produces: set[Spec]`. Use `self.to(producer).add(spec(value), ...)`.
+- `ConsumesDataPoints` — mixin for units that *read* datapoints. Declares `_consumes: set[Spec]`. Use `self.out_of(consumer)[spec]`.
+
+```python
+from dataclasses import dataclass
+from pyuow import BaseParams, RunUnit, FinalUnit, Result
+from pyuow.context.datapoint.in_memory import InMemoryDataPointContext
+from pyuow.datapoint import BaseDataPointSpec, ProducesDataPoints, ConsumesDataPoints
+
+
+@dataclass(frozen=True)
+class OrderParams(BaseParams):
+    user_id: str
+
+
+@dataclass(frozen=True)
+class OrderCtx(InMemoryDataPointContext[OrderParams]):
+    params: OrderParams
+
+
+# Declare typed specs at module level
+CartTotal = BaseDataPointSpec("cart_total", int)
+TaxAmount = BaseDataPointSpec("tax_amount", int)
+
+
+class ComputeCartTotal(RunUnit[OrderCtx, str], ProducesDataPoints):
+    _produces = {CartTotal}
+
+    def run(self, ctx: OrderCtx) -> None:
+        total = 100  # lookup from service
+        self.to(ctx).add(CartTotal(total))
+
+
+class ApplyTax(RunUnit[OrderCtx, str], ConsumesDataPoints, ProducesDataPoints):
+    _consumes = {CartTotal}
+    _produces = {TaxAmount}
+
+    def run(self, ctx: OrderCtx) -> None:
+        total = self.out_of(ctx)[CartTotal]
+        self.to(ctx).add(TaxAmount(total // 10))
+
+
+class Summarise(FinalUnit[OrderCtx, str], ConsumesDataPoints):
+    _consumes = {CartTotal, TaxAmount}
+
+    def finish(self, ctx: OrderCtx) -> Result[str]:
+        dp = self.out_of(ctx)
+        return Result.ok(f"total={dp[CartTotal]} tax={dp[TaxAmount]}")
+```
+
+Enforcement at runtime:
+
+| Mistake | Exception |
+|---|---|
+| Consumer requests a spec no producer wrote | `DataPointIsNotProducedError` |
+| Producer writes a spec not declared in `_produces` | `DataPointIsNotDeclaredError` |
+| Two producers write the same spec | `DataPointCannotBeOverriddenError` |
+| Wrong value type passed to `spec(value)` | `TypeError` at call time |
+
+### Combined context pattern
+
+In real flows you often need **both** domain batch handling (for `DomainTransactionalWorkManager`) and datapoint storage. Compose the two context bases:
+
+```python
+from dataclasses import dataclass
+from pyuow.context.domain import BaseDomainContext
+from pyuow.context.datapoint.in_memory import InMemoryDataPointContext
+
+
+@dataclass(frozen=True)
+class OrderCtx(BaseDomainContext[OrderParams], InMemoryDataPointContext[OrderParams]):
+    params: OrderParams
+```
+
+This gives you `ctx.batch` (for domain entity flushing) and `ctx.add()` / `ctx.get()` (for datapoints) in one context object. The unit mixins (`ProducesDataPoints`, `ConsumesDataPoints`) work unchanged — they only need a `BaseDataPointProducer` / `BaseDataPointConsumer`, which `InMemoryDataPointContext` provides.
+
+Async twins: `pyuow.context.datapoint.aio.in_memory.InMemoryDataPointContext` and `pyuow.datapoint.aio.{ProducesDataPoints,ConsumesDataPoints}`. Method names are identical; only difference is `await` on `to(ctx).add(...)` and `out_of(ctx)`.
 
 ## Work Manager
 
