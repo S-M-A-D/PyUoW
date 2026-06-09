@@ -49,6 +49,14 @@ err.unwrap_or(0)    # 0
 empty.unwrap_or(0)  # 0
 ```
 
+`.unwrap_or_else(fn)` returns the value for `ok`. For `error` or `empty`, it calls `fn()` and returns that result instead.
+
+```python
+ok.unwrap_or_else(lambda: 0)     # 42
+err.unwrap_or_else(lambda: 0)    # 0
+empty.unwrap_or_else(lambda: 0)  # 0
+```
+
 ## Transforming
 
 ### `.map(fn)`
@@ -82,6 +90,16 @@ Result.empty().and_then(parse)     # Result.empty()
 
 `.and_then` is the classic monadic bind — it lets you chain operations that themselves can fail without un-nesting Results.
 
+### `.or_else(fn)`
+
+Recover from an error by calling `fn(exc)` and returning its `Result`. `ok` and `empty` pass through unchanged.
+
+```python
+Result.ok(42).or_else(lambda _: Result.ok(0))              # Result.ok(42)
+Result.error(ValueError()).or_else(lambda _: Result.ok(0)) # Result.ok(0)
+Result.empty().or_else(lambda _: Result.ok(0))             # Result.empty()
+```
+
 ## Repr
 
 `repr()` wraps the value in its constructor form so logs are unambiguous:
@@ -99,8 +117,10 @@ repr(Result.empty())                      # 'Result.empty()'
 | Raise on failure, return on success   | `.get()`                     |
 | Raise on failure, ignore the value    | `.raise_for_error()`         |
 | Fall back to a default                | `.unwrap_or(default)`        |
+| Fall back to a computed value         | `.unwrap_or_else(fn)`        |
 | Transform success only                | `.map(fn)`                   |
 | Chain a fallible operation            | `.and_then(fn)`              |
+| Recover from an error                 | `.or_else(fn)`               |
 | Inspect without unwrapping            | `.is_ok()` / `.is_error()` / `.is_empty()` |
 
 ## Reference
