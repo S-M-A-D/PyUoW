@@ -122,6 +122,111 @@ class TestModel:
         )
 
 
+class TestModelNew:
+    def test_new_without_id_should_auto_generate_id_and_seed_created_event(
+        self,
+    ) -> None:
+        # given / when
+        model = FakeModel.new(field="test")
+        # then
+        assert model.field == "test"
+        assert isinstance(model.id, UUID)
+        assert model.is_new
+        assert model.events() == (
+            FakeModelCreatedEvent(
+                id=ANY,
+                model_id=model.id,
+                field="test",
+                created_date=model.created_date,
+            ),
+        )
+
+    def test_new_with_supplied_id_should_keep_supplied_id_and_seed_created_event(
+        self,
+    ) -> None:
+        # given
+        model_id = FakeModelId(uuid4())
+        # when
+        model = FakeModel.new(id=model_id, field="test")
+        # then
+        assert model.id == model_id
+        assert model.is_new
+        assert model.events() == (
+            FakeModelCreatedEvent(
+                id=ANY,
+                model_id=model_id,
+                field="test",
+                created_date=model.created_date,
+            ),
+        )
+
+    def test_batch_add_should_accept_model_new_with_supplied_id(self) -> None:
+        # given
+        model_id = FakeModelId(uuid4())
+        model = FakeModel.new(id=model_id, field="test")
+        batch = Batch()
+        # when
+        batch.add(model)
+        # then
+        assert batch.changes() == {
+            model_id: Change(type=ChangeType.ADD, entity=model),
+        }
+
+    def test_constructor_with_id_still_marks_not_new_and_blocks_batch_add(
+        self,
+    ) -> None:
+        # given
+        model_id = FakeModelId(uuid4())
+        model = FakeModel(id=model_id, field="test")
+        batch = Batch()
+        # when / then
+        assert not model.is_new
+        assert model.events() == ()
+        with pytest.raises(
+            CannotAddExistingEntityError,
+            match="Can't add an existing entity",
+        ):
+            batch.add(model)
+
+    def test_new_with_supplied_id_twice_should_produce_independent_instances(
+        self,
+    ) -> None:
+        # given
+        model_id = FakeModelId(uuid4())
+        # when
+        first = FakeModel.new(id=model_id, field="test")
+        second = FakeModel.new(id=model_id, field="test")
+        # then
+        assert first is not second
+        assert first.id == second.id == model_id
+        assert first.is_new
+        assert second.is_new
+        assert len(first.events()) == len(second.events()) == 1
+
+    def test_new_with_supplied_id_then_update_stays_new_and_accepted_by_batch_add(
+        self,
+    ) -> None:
+        # given
+        model_id = FakeModelId(uuid4())
+        model = FakeModel.new(id=model_id, field="test")
+        batch = Batch()
+        # when
+        changed_model = model.change_field("change 1")
+        # then
+        assert changed_model.is_new
+        first, second = changed_model.events()
+        assert first == FakeModelCreatedEvent(
+            id=ANY,
+            model_id=model_id,
+            field="test",
+            created_date=changed_model.created_date,
+        )
+        assert second == FakeModelUpdatedEvent(
+            id=ANY, model_id=model_id, new_field="change 1"
+        )
+        batch.add(changed_model)
+
+
 class TestBatch:
     @pytest.mark.parametrize(
         "entity",
