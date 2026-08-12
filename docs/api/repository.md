@@ -9,6 +9,8 @@ Repository ABCs and the domain batch processor.
         - BaseWriteOnlyEntityRepository
         - BaseEntityRepository
         - BaseRepositoryFactory
+        - BaseViewRepository
+        - BaseViewRepositoryFactory
 
 ## `pyuow.repository.domain`
 
@@ -23,6 +25,8 @@ Repository ABCs and the domain batch processor.
         - BaseWriteOnlyEntityRepository
         - BaseEntityRepository
         - BaseRepositoryFactory
+        - BaseViewRepository
+        - BaseViewRepositoryFactory
 
 ## `pyuow.repository.aio.domain`
 

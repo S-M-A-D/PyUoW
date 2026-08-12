@@ -222,7 +222,9 @@ The integration lives under `pyuow.contrib.sqlalchemy` (sync) and `pyuow.contrib
 - `SqlAlchemyTransactionManager` / `SqlAlchemyReadOnlyTransactionManager` — for `TransactionalWorkManager`.
 - `BaseSqlAlchemyEntityRepository` — implements `BaseEntityRepository` against `EntityTable` mixins.
 - `BaseSqlAlchemyRepositoryFactory` — wires repositories for `DomainTransactionalWorkManager`.
+- `BaseSqlAlchemyViewRepository` / `BaseSqlAlchemyViewRepositoryFactory` — read-only repositories over database views: implement `to_view`, then query with `select()` + `find_by` / `find_all_by` / `get_by` / `exists_by`.
 - `EntityTable` / `AuditedEntityTable` / `SoftDeletableEntityTable` / `VersionedEntityTable` — `DeclarativeBase` mixins.
+- `ViewTable` — `DeclarativeBase` mixin for a mapped database view; pair it with a plain frozen dataclass read model.
 
 Install with `pip install "pyuow[sqlalchemy]"`.
 

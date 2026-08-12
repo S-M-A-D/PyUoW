@@ -4,6 +4,7 @@ from .base import (
     EntityTable,
     SoftDeletableEntityTable,
     VersionedEntityTable,
+    ViewTable,
 )
 
 __all__ = (
@@ -12,4 +13,5 @@ __all__ = (
     "EntityTable",
     "SoftDeletableEntityTable",
     "VersionedEntityTable",
+    "ViewTable",
 )

@@ -4,8 +4,14 @@ from unittest.mock import Mock
 import pytest
 
 from pyuow.entity import Entity
-from pyuow.repository.aio import BaseEntityRepository, BaseRepositoryFactory
+from pyuow.repository.aio import (
+    BaseEntityRepository,
+    BaseRepositoryFactory,
+    BaseViewRepository,
+    BaseViewRepositoryFactory,
+)
 from tests.fake_entities import FakeEntity, FakeEntityId
+from tests.fake_views import FakeView
 
 
 class FakeBaseEntityRepository(BaseEntityRepository[FakeEntityId, FakeEntity]):
@@ -73,3 +79,44 @@ class TestRepositoryFactory:
         # when
         with pytest.raises(KeyError):
             factory.repo_for(Mock)
+
+
+class FakeBaseViewRepository(BaseViewRepository[FakeView, str]):
+    async def find_by(self, criteria: str) -> t.Optional[FakeView]:
+        return None
+
+    async def find_all_by(self, criteria: str) -> t.Iterable[FakeView]:
+        return []
+
+    async def get_by(self, criteria: str) -> FakeView:
+        return FakeView(field=criteria)
+
+    async def exists_by(self, criteria: str) -> bool:
+        return True
+
+
+class FakeViewRepositoryFactory(BaseViewRepositoryFactory):
+    @property
+    def views(
+        self,
+    ) -> t.Mapping[t.Type[t.Any], BaseViewRepository[t.Any, t.Any]]:
+        return {FakeView: FakeBaseViewRepository()}
+
+
+class TestViewRepositoryFactory:
+    def test_async_view_for_should_return_proper_repository_for_view_type(
+        self,
+    ) -> None:
+        # given
+        factory = FakeViewRepositoryFactory()
+        # then
+        assert isinstance(factory.view_for(FakeView), FakeBaseViewRepository)
+
+    def test_async_view_for_should_raise_if_no_repository_for_view_type(
+        self,
+    ) -> None:
+        # given
+        factory = FakeViewRepositoryFactory()
+        # when
+        with pytest.raises(KeyError):
+            factory.view_for(Mock)

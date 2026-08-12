@@ -18,4 +18,10 @@ CREATE TABLE IF NOT EXISTS fake_entities
 (
     id           uuid NOT NULL PRIMARY KEY,
     field        varchar(255) NOT NULL
-)
+);
+
+CREATE OR REPLACE VIEW fake_entities_view AS
+SELECT id,
+       field,
+       upper(field) AS upper_field
+FROM fake_entities
