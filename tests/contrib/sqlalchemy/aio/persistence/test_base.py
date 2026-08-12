@@ -115,26 +115,18 @@ class FakeEntityViewRepository(
         )
 
     async def find_by_field(self, field: str) -> t.Optional[FakeEntityView]:
-        return await self.find_by(
-            self.select().where(self._table.field == field)
-        )
+        return await self.find_by(self._table.field == field)
 
     async def find_all_by_field(
         self, field: str
     ) -> t.Iterable[FakeEntityView]:
-        return await self.find_all_by(
-            self.select().where(self._table.field == field)
-        )
+        return await self.find_all_by(self._table.field == field)
 
     async def get_by_field(self, field: str) -> FakeEntityView:
-        return await self.get_by(
-            self.select().where(self._table.field == field)
-        )
+        return await self.get_by(self._table.field == field)
 
     async def exists_by_field(self, field: str) -> bool:
-        return await self.exists_by(
-            self.select().where(self._table.field == field)
-        )
+        return await self.exists_by(self._table.field == field)
 
 
 class FakeRepositoryFactory(

@@ -221,7 +221,7 @@ class BaseSqlAlchemyRepositoryFactory(BaseRepositoryFactory, ABC):
 
 class BaseSqlAlchemyViewRepository(
     t.Generic[VIEW_TYPE, VIEW_TABLE],
-    BaseViewRepository[VIEW_TYPE, Select[t.Any]],
+    BaseViewRepository[VIEW_TYPE, ColumnElement[bool]],
     ABC,
 ):
     def __init__(
@@ -237,28 +237,36 @@ class BaseSqlAlchemyViewRepository(
     def to_view(record: VIEW_TABLE) -> VIEW_TYPE:
         raise NotImplementedError
 
-    async def find_by(self, criteria: Select[t.Any]) -> t.Optional[VIEW_TYPE]:
+    async def find_by(
+        self, criteria: ColumnElement[bool]
+    ) -> t.Optional[VIEW_TYPE]:
+        statement = self.select().where(criteria)
+
         async with self._readonly_transaction_manager.transaction() as trx:
-            result = (await trx.it().execute(criteria)).scalar_one_or_none()
+            result = (await trx.it().execute(statement)).scalar_one_or_none()
 
         return self.to_view(result) if result else None
 
     async def find_all_by(
-        self, criteria: Select[t.Any]
+        self, criteria: ColumnElement[bool]
     ) -> t.Iterable[VIEW_TYPE]:
+        statement = self.select().where(criteria)
+
         async with self._readonly_transaction_manager.transaction() as trx:
-            result = (await trx.it().execute(criteria)).scalars().all()
+            result = (await trx.it().execute(statement)).scalars().all()
 
         return [self.to_view(record) for record in result]
 
-    async def get_by(self, criteria: Select[t.Any]) -> VIEW_TYPE:
+    async def get_by(self, criteria: ColumnElement[bool]) -> VIEW_TYPE:
+        statement = self.select().where(criteria)
+
         async with self._readonly_transaction_manager.transaction() as trx:
-            result = (await trx.it().execute(criteria)).scalar_one()
+            result = (await trx.it().execute(statement)).scalar_one()
 
         return self.to_view(result)
 
-    async def exists_by(self, criteria: Select[t.Any]) -> bool:
-        statement = select(criteria.exists())
+    async def exists_by(self, criteria: ColumnElement[bool]) -> bool:
+        statement = exists(self._table).where(criteria).select()
 
         async with self._readonly_transaction_manager.transaction() as trx:
             return (await trx.it().execute(statement)).scalar() or False

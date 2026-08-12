@@ -311,19 +311,29 @@ class UserStatsViewRepository(
         )
 
     def for_user(self, user_id: UserId) -> t.Optional[UserStats]:
-        return self.find_by(
-            self.select().where(self._table.user_id == user_id)
-        )
+        return self.find_by(self._table.user_id == user_id)
 
+    def big_spenders(self, threshold: int) -> t.Iterable[UserStats]:
+        return self.find_all_by(self._table.total_spent >= threshold)
+```
+
+`to_view` is the only abstract member. The four read methods take a **whereclause**, not a whole statement — the base wraps it as `SELECT ... FROM <view> WHERE <criteria>` for you. Combine several conditions with `and_()` / `or_()`. `find_*` return `None` or an empty sequence when nothing matches, `get_by` raises, `exists_by` returns a bool. Your own finders name the access paths that make sense for the view, and callers never build SQL.
+
+For anything a whereclause cannot express — ordering, limits, joins, aggregates — `select()` gives you the base `Select` over the view table and you run it yourself:
+
+```python
     def top_spenders(self, limit: int = 10) -> t.Iterable[UserStats]:
-        return self.find_all_by(
+        statement = (
             self.select()
             .order_by(self._table.total_spent.desc())
             .limit(limit)
         )
-```
 
-`to_view` is the only abstract member. The base gives you `select()` to start a statement plus `find_by` / `find_all_by` / `get_by` / `exists_by` to run one — `find_*` return `None` or an empty sequence when nothing matches, `get_by` raises. Your own finders name the access paths that make sense for the view, and callers never build SQL.
+        with self._readonly_transaction_manager.transaction() as trx:
+            records = (trx.it().execute(statement)).scalars().all()
+
+        return [self.to_view(record) for record in records]
+```
 
 ### Wire up the factory
 
