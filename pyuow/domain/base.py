@@ -67,6 +67,23 @@ class Model(
                 self, "_events", [self._created_event(self.created_date)]
             )
 
+    @classmethod
+    def new(
+        cls: t.Type[SELF],
+        *,
+        id: t.Optional[ENTITY_ID] = None,
+        **kwargs: t.Any,
+    ) -> SELF:
+        instance = cls(**kwargs)
+        if id is not None:
+            object.__setattr__(instance, "id", id)
+            object.__setattr__(
+                instance,
+                "_events",
+                [instance._created_event(instance.created_date)],
+            )
+        return instance
+
     def update(
         self: SELF,
         event: t.Optional[ModelEvent[ENTITY_ID]] = None,
