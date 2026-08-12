@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from sqlalchemy.orm import Mapped
+from uuid import UUID
+
+from sqlalchemy.orm import Mapped, mapped_column
 
 from pyuow.contrib.sqlalchemy.tables import (
     AuditedEntityTable,
     EntityTable,
     SoftDeletableEntityTable,
     VersionedEntityTable,
+    ViewTable,
 )
 
 
@@ -26,3 +29,11 @@ class FakeVersionedEntityTable(VersionedEntityTable):
     __tablename__ = "fake_versioned_entities"
 
     field: Mapped[str]
+
+
+class FakeEntityViewTable(ViewTable):
+    __tablename__ = "fake_entities_view"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    field: Mapped[str]
+    upper_field: Mapped[str]

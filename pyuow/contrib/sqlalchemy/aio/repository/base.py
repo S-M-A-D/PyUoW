@@ -29,6 +29,7 @@ from .....contrib.sqlalchemy.tables import (
     AuditedEntityTable,
     EntityTable,
     VersionedEntityTable,
+    ViewTable,
 )
 from .....entity import (
     AuditedEntity,
@@ -36,11 +37,18 @@ from .....entity import (
     SoftDeletableEntity,
     VersionedEntity,
 )
-from .....repository.aio import BaseEntityRepository, BaseRepositoryFactory
+from .....repository.aio import (
+    BaseEntityRepository,
+    BaseRepositoryFactory,
+    BaseViewRepository,
+    BaseViewRepositoryFactory,
+)
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Hashable)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
 ENTITY_TABLE = t.TypeVar("ENTITY_TABLE", bound=EntityTable)
+VIEW_TYPE = t.TypeVar("VIEW_TYPE")
+VIEW_TABLE = t.TypeVar("VIEW_TABLE", bound=ViewTable)
 
 
 class BaseSqlAlchemyEntityRepository(
@@ -208,4 +216,68 @@ class BaseSqlAlchemyRepositoryFactory(BaseRepositoryFactory, ABC):
         readonly_transaction_manager: SqlAlchemyReadOnlyTransactionManager,
     ) -> None:
         self._transaction_manager = transaction_manager
+        self._readonly_transaction_manager = readonly_transaction_manager
+
+
+class BaseSqlAlchemyViewRepository(
+    t.Generic[VIEW_TYPE, VIEW_TABLE],
+    BaseViewRepository[VIEW_TYPE, ColumnElement[bool]],
+    ABC,
+):
+    def __init__(
+        self,
+        table: t.Type[VIEW_TABLE],
+        readonly_transaction_manager: SqlAlchemyReadOnlyTransactionManager,
+    ) -> None:
+        self._table = table
+        self._readonly_transaction_manager = readonly_transaction_manager
+
+    @staticmethod
+    @abstractmethod
+    def to_view(record: VIEW_TABLE) -> VIEW_TYPE:
+        raise NotImplementedError
+
+    async def find_by(
+        self, criteria: ColumnElement[bool]
+    ) -> t.Optional[VIEW_TYPE]:
+        statement = self.select().where(criteria)
+
+        async with self._readonly_transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalar_one_or_none()
+
+        return self.to_view(result) if result else None
+
+    async def find_all_by(
+        self, criteria: ColumnElement[bool]
+    ) -> t.Iterable[VIEW_TYPE]:
+        statement = self.select().where(criteria)
+
+        async with self._readonly_transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalars().all()
+
+        return [self.to_view(record) for record in result]
+
+    async def get_by(self, criteria: ColumnElement[bool]) -> VIEW_TYPE:
+        statement = self.select().where(criteria)
+
+        async with self._readonly_transaction_manager.transaction() as trx:
+            result = (await trx.it().execute(statement)).scalar_one()
+
+        return self.to_view(result)
+
+    async def exists_by(self, criteria: ColumnElement[bool]) -> bool:
+        statement = exists(self._table).where(criteria).select()
+
+        async with self._readonly_transaction_manager.transaction() as trx:
+            return (await trx.it().execute(statement)).scalar() or False
+
+    def select(self) -> Select[t.Any]:
+        return select(self._table)
+
+
+class BaseSqlAlchemyViewRepositoryFactory(BaseViewRepositoryFactory, ABC):
+    def __init__(
+        self,
+        readonly_transaction_manager: SqlAlchemyReadOnlyTransactionManager,
+    ) -> None:
         self._readonly_transaction_manager = readonly_transaction_manager

@@ -3,7 +3,7 @@ name: pyuow
 description: Use this skill whenever working with the PyUoW library (Unit of Work pattern for Python) — composable units, flows, Result, transactional work managers, and the SQLAlchemy adapter.
 ---
 
-<!-- Generated for pyuow 0.10.0 -->
+<!-- Generated for pyuow 0.11.0 -->
 
 ## When to use PyUoW
 
@@ -222,7 +222,9 @@ The integration lives under `pyuow.contrib.sqlalchemy` (sync) and `pyuow.contrib
 - `SqlAlchemyTransactionManager` / `SqlAlchemyReadOnlyTransactionManager` — for `TransactionalWorkManager`.
 - `BaseSqlAlchemyEntityRepository` — implements `BaseEntityRepository` against `EntityTable` mixins.
 - `BaseSqlAlchemyRepositoryFactory` — wires repositories for `DomainTransactionalWorkManager`.
+- `BaseSqlAlchemyViewRepository` / `BaseSqlAlchemyViewRepositoryFactory` — read-only repositories over database views: implement `to_view`, then query by whereclause with `find_by` / `find_all_by` / `get_by` / `exists_by`; `select()` is the escape hatch for ordering, limits, or joins.
 - `EntityTable` / `AuditedEntityTable` / `SoftDeletableEntityTable` / `VersionedEntityTable` — `DeclarativeBase` mixins.
+- `ViewTable` — `DeclarativeBase` mixin for a mapped database view; pair it with a plain frozen dataclass read model.
 
 Install with `pip install "pyuow[sqlalchemy]"`.
 

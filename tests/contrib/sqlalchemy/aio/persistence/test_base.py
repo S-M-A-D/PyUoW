@@ -12,23 +12,27 @@ from pyuow.clock import offset_naive_utcnow
 from pyuow.contrib.sqlalchemy.aio.repository import (
     BaseSqlAlchemyEntityRepository,
     BaseSqlAlchemyRepositoryFactory,
+    BaseSqlAlchemyViewRepository,
+    BaseSqlAlchemyViewRepositoryFactory,
 )
 from pyuow.contrib.sqlalchemy.aio.work import (
     SqlAlchemyReadOnlyTransactionManager,
     SqlAlchemyTransactionManager,
 )
 from pyuow.entity import Entity, Version
-from pyuow.repository.aio import BaseEntityRepository
+from pyuow.repository.aio import BaseEntityRepository, BaseViewRepository
 from tests.fake_entities import (
     FakeAuditedEntity,
     FakeEntity,
     FakeEntityId,
     FakeVersionedEntity,
 )
+from tests.fake_views import FakeEntityView
 
 from ...fake_tables import (
     FakeAuditedEntityTable,
     FakeEntityTable,
+    FakeEntityViewTable,
     FakeVersionedEntityTable,
 )
 
@@ -99,7 +103,35 @@ class FakeVersionedEntityRepository(
         )
 
 
-class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
+class FakeEntityViewRepository(
+    BaseSqlAlchemyViewRepository[FakeEntityView, FakeEntityViewTable]
+):
+    @staticmethod
+    def to_view(record: FakeEntityViewTable) -> FakeEntityView:
+        return FakeEntityView(
+            id=FakeEntityId(record.id),
+            field=record.field,
+            upper_field=record.upper_field,
+        )
+
+    async def find_by_field(self, field: str) -> t.Optional[FakeEntityView]:
+        return await self.find_by(self._table.field == field)
+
+    async def find_all_by_field(
+        self, field: str
+    ) -> t.Iterable[FakeEntityView]:
+        return await self.find_all_by(self._table.field == field)
+
+    async def get_by_field(self, field: str) -> FakeEntityView:
+        return await self.get_by(self._table.field == field)
+
+    async def exists_by_field(self, field: str) -> bool:
+        return await self.exists_by(self._table.field == field)
+
+
+class FakeRepositoryFactory(
+    BaseSqlAlchemyRepositoryFactory, BaseSqlAlchemyViewRepositoryFactory
+):
     @property
     def repositories(
         self,
@@ -121,6 +153,20 @@ class FakeRepositoryFactory(BaseSqlAlchemyRepositoryFactory):
             FakeEntity: FakeEntityRepository(
                 FakeEntityTable,
                 self._transaction_manager,
+                self._readonly_transaction_manager,
+            ),
+        }
+
+    @property
+    def views(
+        self,
+    ) -> t.Mapping[
+        t.Type[t.Any],
+        BaseViewRepository[t.Any, t.Any],
+    ]:
+        return {
+            FakeEntityView: FakeEntityViewRepository(
+                FakeEntityViewTable,
                 self._readonly_transaction_manager,
             ),
         }
@@ -395,3 +441,107 @@ class TestSqlAlchemyEntityRepository:
         result = await audited_entity_repository.delete_all([entity1, entity2])
         # then
         assert result is True
+
+
+@pytest.mark.skip_on_ci
+class TestSqlAlchemyViewRepository:
+    @pytest.fixture
+    def entity_repository(
+        self, repository_factory: FakeRepositoryFactory
+    ) -> BaseEntityRepository[FakeEntityId, FakeEntity]:
+        return repository_factory.repo_for(FakeEntity)
+
+    @pytest.fixture
+    def entity_view_repository(
+        self, repository_factory: FakeRepositoryFactory
+    ) -> BaseViewRepository[FakeEntityView, t.Any]:
+        return repository_factory.view_for(FakeEntityView)
+
+    async def test_async_find_by_should_find_view(
+        self,
+        entity_repository: FakeEntityRepository,
+        entity_view_repository: FakeEntityViewRepository,
+    ) -> None:
+        # given
+        entity = FakeEntity(id=FakeEntityId(uuid4()), field=str(uuid4()))
+        await entity_repository.add(entity)
+        # when
+        result = await entity_view_repository.find_by_field(entity.field)
+        # then
+        assert result == FakeEntityView(
+            id=entity.id,
+            field=entity.field,
+            upper_field=entity.field.upper(),
+        )
+
+    async def test_async_find_by_should_return_none_when_no_view_matches(
+        self, entity_view_repository: FakeEntityViewRepository
+    ) -> None:
+        # when
+        result = await entity_view_repository.find_by_field(str(uuid4()))
+        # then
+        assert result is None
+
+    async def test_async_find_all_by_should_find_all_views(
+        self,
+        entity_repository: FakeEntityRepository,
+        entity_view_repository: FakeEntityViewRepository,
+    ) -> None:
+        # given
+        field = str(uuid4())
+        entity1 = FakeEntity(id=FakeEntityId(uuid4()), field=field)
+        entity2 = FakeEntity(id=FakeEntityId(uuid4()), field=field)
+        await entity_repository.add_all([entity1, entity2])
+        # when
+        result = await entity_view_repository.find_all_by_field(field)
+        # then
+        assert {view.id for view in result} == {entity1.id, entity2.id}
+
+    async def test_find_all_by_should_return_empty_sequence_when_no_view_matches(
+        self, entity_view_repository: FakeEntityViewRepository
+    ) -> None:
+        # when
+        result = await entity_view_repository.find_all_by_field(str(uuid4()))
+        # then
+        assert result == []
+
+    async def test_async_get_by_should_get_existing_view(
+        self,
+        entity_repository: FakeEntityRepository,
+        entity_view_repository: FakeEntityViewRepository,
+    ) -> None:
+        # given
+        entity = FakeEntity(id=FakeEntityId(uuid4()), field=str(uuid4()))
+        await entity_repository.add(entity)
+        # when
+        result = await entity_view_repository.get_by_field(entity.field)
+        # then
+        assert result.upper_field == entity.field.upper()
+
+    async def test_async_get_by_should_raise_if_no_view_exists(
+        self, entity_view_repository: FakeEntityViewRepository
+    ) -> None:
+        # when / then
+        with pytest.raises(NoResultFound):
+            await entity_view_repository.get_by_field(str(uuid4()))
+
+    async def test_async_exists_by_should_return_true_if_view_exists(
+        self,
+        entity_repository: FakeEntityRepository,
+        entity_view_repository: FakeEntityViewRepository,
+    ) -> None:
+        # given
+        entity = FakeEntity(id=FakeEntityId(uuid4()), field=str(uuid4()))
+        await entity_repository.add(entity)
+        # when
+        result = await entity_view_repository.exists_by_field(entity.field)
+        # then
+        assert result is True
+
+    async def test_async_exists_by_should_return_false_if_no_view_found(
+        self, entity_view_repository: FakeEntityViewRepository
+    ) -> None:
+        # when
+        result = await entity_view_repository.exists_by_field(str(uuid4()))
+        # then
+        assert result is False

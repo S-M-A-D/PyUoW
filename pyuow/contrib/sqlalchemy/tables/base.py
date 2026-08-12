@@ -52,3 +52,7 @@ class SoftDeletableEntityTable(EntityTable):
 class VersionedEntityTable(EntityTable):
     __abstract__ = True
     version: Mapped[int] = mapped_column(Integer(), nullable=False)
+
+
+class ViewTable(BaseTable):
+    __abstract__ = True

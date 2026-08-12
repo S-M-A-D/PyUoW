@@ -6,6 +6,8 @@ from ...entity import Entity
 
 ENTITY_ID = t.TypeVar("ENTITY_ID", bound=t.Hashable)
 ENTITY_TYPE = t.TypeVar("ENTITY_TYPE", bound=Entity[t.Any])
+VIEW_TYPE = t.TypeVar("VIEW_TYPE")
+CRITERIA = t.TypeVar("CRITERIA")
 
 
 class BaseReadOnlyEntityRepository(t.Generic[ENTITY_ID, ENTITY_TYPE], ABC):
@@ -66,6 +68,16 @@ class BaseEntityRepository(
     pass
 
 
+class BaseViewRepository(t.Generic[VIEW_TYPE, CRITERIA], ABC):
+    @abc.abstractmethod
+    async def find_by(self, criteria: CRITERIA) -> t.Optional[VIEW_TYPE]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def find_all_by(self, criteria: CRITERIA) -> t.Iterable[VIEW_TYPE]:
+        raise NotImplementedError
+
+
 class BaseRepositoryFactory(ABC):
     @property
     @abc.abstractmethod
@@ -85,4 +97,26 @@ class BaseRepositoryFactory(ABC):
         except KeyError as e:
             raise KeyError(
                 f"Repository for {entity_type.__name__} is not registered"
+            ) from e
+
+
+class BaseViewRepositoryFactory(ABC):
+    @property
+    @abc.abstractmethod
+    def views(
+        self,
+    ) -> t.Mapping[
+        t.Type[t.Any],
+        BaseViewRepository[t.Any, t.Any],
+    ]:
+        raise NotImplementedError
+
+    def view_for(
+        self, view_type: t.Type[VIEW_TYPE]
+    ) -> BaseViewRepository[VIEW_TYPE, t.Any]:
+        try:
+            return self.views[view_type]
+        except KeyError as e:
+            raise KeyError(
+                f"View repository for {view_type.__name__} is not registered"
             ) from e

@@ -5,7 +5,9 @@ PyUoW ships a SQLAlchemy 2.x integration under `pyuow.contrib.sqlalchemy` (sync)
 - `SqlAlchemyTransactionManager` / `SqlAlchemyReadOnlyTransactionManager` — concrete transaction managers compatible with `TransactionalWorkManager`.
 - `BaseSqlAlchemyEntityRepository` — implements `BaseEntityRepository` against any `EntityTable`.
 - `BaseSqlAlchemyRepositoryFactory` — wires repositories together for use with `DomainTransactionalWorkManager`.
+- `BaseSqlAlchemyViewRepository` / `BaseSqlAlchemyViewRepositoryFactory` — read-only repositories over database views, and their factory.
 - `EntityTable` / `AuditedEntityTable` / `SoftDeletableEntityTable` / `VersionedEntityTable` — `DeclarativeBase` mixins that mirror the entity hierarchy.
+- `ViewTable` — `DeclarativeBase` mixin for mapping a database view.
 
 Install the extra:
 
@@ -256,6 +258,138 @@ The manager:
 
 ---
 
+## Read-only views
+
+A database view is a read model, not an entity: there is nothing to `add`, `update` or `delete`, and the access path is normally a predicate rather than an id. PyUoW models views with a parallel hierarchy — `View`, `BaseViewRepository`, `BaseViewRepositoryFactory` — so a view can never end up in a `Batch` or in the entity `repositories` mapping by accident.
+
+### Map the view
+
+```python
+from uuid import UUID
+from sqlalchemy.orm import Mapped, mapped_column
+from pyuow.contrib.sqlalchemy.tables import ViewTable
+
+
+class UserStatsViewTable(ViewTable):
+    __tablename__ = "user_stats"
+
+    user_id: Mapped[UUID] = mapped_column(primary_key=True)
+    orders_count: Mapped[int]
+    total_spent: Mapped[int]
+```
+
+SQLAlchemy needs a primary key to identity-map rows. A view has none, so mark the column (or columns) that are unique in practice — it is a mapping-level declaration and the database is not asked to enforce it.
+
+### Define the read model
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class UserStats:
+    user_id: UserId
+    orders_count: int
+    total_spent: int
+```
+
+### Write the repository
+
+```python
+from pyuow.contrib.sqlalchemy.repository import BaseSqlAlchemyViewRepository
+
+
+class UserStatsViewRepository(
+    BaseSqlAlchemyViewRepository[UserStats, UserStatsViewTable]
+):
+    @staticmethod
+    def to_view(record: UserStatsViewTable) -> UserStats:
+        return UserStats(
+            user_id=UserId(record.user_id),
+            orders_count=record.orders_count,
+            total_spent=record.total_spent,
+        )
+
+    def for_user(self, user_id: UserId) -> t.Optional[UserStats]:
+        return self.find_by(self._table.user_id == user_id)
+
+    def big_spenders(self, threshold: int) -> t.Iterable[UserStats]:
+        return self.find_all_by(self._table.total_spent >= threshold)
+```
+
+`to_view` is the only abstract member. The four read methods take a **whereclause**, not a whole statement — the base wraps it as `SELECT ... FROM <view> WHERE <criteria>` for you. Combine several conditions with `and_()` / `or_()`. `find_*` return `None` or an empty sequence when nothing matches, `get_by` raises, `exists_by` returns a bool. Your own finders name the access paths that make sense for the view, and callers never build SQL.
+
+For anything a whereclause cannot express — ordering, limits, joins, aggregates — `select()` gives you the base `Select` over the view table and you run it yourself:
+
+```python
+    def top_spenders(self, limit: int = 10) -> t.Iterable[UserStats]:
+        statement = (
+            self.select()
+            .order_by(self._table.total_spent.desc())
+            .limit(limit)
+        )
+
+        with self._readonly_transaction_manager.transaction() as trx:
+            records = (trx.it().execute(statement)).scalars().all()
+
+        return [self.to_view(record) for record in records]
+```
+
+### Wire up the factory
+
+`BaseSqlAlchemyViewRepositoryFactory` mirrors `BaseSqlAlchemyRepositoryFactory` but only needs the read-only transaction manager. One class can serve both sides:
+
+```python
+from pyuow.contrib.sqlalchemy.repository import (
+    BaseSqlAlchemyRepositoryFactory,
+    BaseSqlAlchemyViewRepositoryFactory,
+)
+from pyuow.repository import BaseEntityRepository, BaseViewRepository
+
+
+class Repositories(
+    BaseSqlAlchemyRepositoryFactory, BaseSqlAlchemyViewRepositoryFactory
+):
+    @property
+    def repositories(self) -> t.Mapping[
+        t.Type[Entity[t.Any]],
+        BaseEntityRepository[t.Any, t.Any],
+    ]:
+        return {
+            User: UserRepository(
+                UserTable,
+                self._transaction_manager,
+                self._readonly_transaction_manager,
+            ),
+        }
+
+    @property
+    def views(self) -> t.Mapping[
+        t.Type[t.Any],
+        BaseViewRepository[t.Any, t.Any],
+    ]:
+        return {
+            UserStats: UserStatsViewRepository(
+                UserStatsViewTable,
+                self._readonly_transaction_manager,
+            ),
+        }
+
+    def users(self) -> UserRepository:
+        return t.cast(UserRepository, self.repo_for(User))
+
+    def user_stats(self) -> UserStatsViewRepository:
+        return t.cast(UserStatsViewRepository, self.view_for(UserStats))
+```
+
+`view_for(UserStats)` returns the registered repository as a `BaseViewRepository[UserStats, ...]`, so — exactly as with `repo_for` — the explicit accessor is what exposes the view's own finders.
+
+### Materialized views
+
+A materialized view maps the same way. `REFRESH MATERIALIZED VIEW` is a write and is deliberately outside the read-only repository: refresh it from a scheduler, a migration, or a dedicated unit that owns a write transaction.
+
+---
+
 ## Async
 
 The async surface mirrors the sync one. Imports change to `.aio`:
@@ -270,6 +404,8 @@ from pyuow.contrib.sqlalchemy.aio.work import (
 from pyuow.contrib.sqlalchemy.aio.repository import (
     BaseSqlAlchemyEntityRepository,
     BaseSqlAlchemyRepositoryFactory,
+    BaseSqlAlchemyViewRepository,
+    BaseSqlAlchemyViewRepositoryFactory,
 )
 from pyuow.work.aio.transactional import TransactionalWorkManager
 

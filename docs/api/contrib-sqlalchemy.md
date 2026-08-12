@@ -16,6 +16,7 @@ pip install "pyuow[sqlalchemy]"
         - AuditedEntityTable
         - SoftDeletableEntityTable
         - VersionedEntityTable
+        - ViewTable
 
 ## Sync work
 
@@ -33,6 +34,8 @@ pip install "pyuow[sqlalchemy]"
       members:
         - BaseSqlAlchemyEntityRepository
         - BaseSqlAlchemyRepositoryFactory
+        - BaseSqlAlchemyViewRepository
+        - BaseSqlAlchemyViewRepositoryFactory
 
 ## Async work
 
@@ -50,3 +53,5 @@ pip install "pyuow[sqlalchemy]"
       members:
         - BaseSqlAlchemyEntityRepository
         - BaseSqlAlchemyRepositoryFactory
+        - BaseSqlAlchemyViewRepository
+        - BaseSqlAlchemyViewRepositoryFactory

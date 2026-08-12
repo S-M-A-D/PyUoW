@@ -115,7 +115,7 @@ assert result.get() == "greeted"
 | [Work Manager](https://s-m-a-d.github.io/PyUoW/concepts/work/)                | NoOp, transactional, and domain-transactional managers                       |
 | [Domain Model](https://s-m-a-d.github.io/PyUoW/concepts/domain/)              | `Entity`, `AuditedEntity`, `Model`, `Batch`, events, typed exceptions        |
 | [DataPoints](https://s-m-a-d.github.io/PyUoW/concepts/datapoints/)            | Typed producer / consumer contracts between units                            |
-| [SQLAlchemy](https://s-m-a-d.github.io/PyUoW/integrations/sqlalchemy/)        | Ready-made repositories, table mixins, and transaction manager               |
+| [SQLAlchemy](https://s-m-a-d.github.io/PyUoW/integrations/sqlalchemy/)        | Ready-made entity and view repositories, table mixins, transaction manager   |
 | [Async](https://s-m-a-d.github.io/PyUoW/async/)                               | A sync and an `aio/` twin for every primitive                                |
 
 ## Contributing
