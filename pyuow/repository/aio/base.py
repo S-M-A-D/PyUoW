@@ -77,14 +77,6 @@ class BaseViewRepository(t.Generic[VIEW_TYPE, CRITERIA], ABC):
     async def find_all_by(self, criteria: CRITERIA) -> t.Iterable[VIEW_TYPE]:
         raise NotImplementedError
 
-    @abc.abstractmethod
-    async def get_by(self, criteria: CRITERIA) -> VIEW_TYPE:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def exists_by(self, criteria: CRITERIA) -> bool:
-        raise NotImplementedError
-
 
 class BaseRepositoryFactory(ABC):
     @property

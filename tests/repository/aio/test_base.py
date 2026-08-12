@@ -88,12 +88,6 @@ class FakeBaseViewRepository(BaseViewRepository[FakeView, str]):
     async def find_all_by(self, criteria: str) -> t.Iterable[FakeView]:
         return []
 
-    async def get_by(self, criteria: str) -> FakeView:
-        return FakeView(field=criteria)
-
-    async def exists_by(self, criteria: str) -> bool:
-        return True
-
 
 class FakeViewRepositoryFactory(BaseViewRepositoryFactory):
     @property
