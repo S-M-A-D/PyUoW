@@ -3,7 +3,7 @@ name: pyuow
 description: Use this skill whenever working with the PyUoW library (Unit of Work pattern for Python) — composable units, flows, Result, transactional work managers, and the SQLAlchemy adapter.
 ---
 
-<!-- Generated for pyuow 0.10.0 -->
+<!-- Generated for pyuow 0.11.0 -->
 
 ## When to use PyUoW
 
