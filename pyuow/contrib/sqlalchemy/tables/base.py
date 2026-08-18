@@ -56,3 +56,4 @@ class VersionedEntityTable(EntityTable):
 
 class ViewTable(BaseTable):
     __abstract__ = True
+    __table_args__ = {"info": {"is_view": True}}
