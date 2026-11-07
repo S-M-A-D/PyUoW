@@ -4,7 +4,7 @@ from typing import Iterator
 import pytest
 from sqlalchemy import text
 from sqlalchemy.engine import Engine, create_engine
-from testcontainers.postgres import (  # type: ignore[import-untyped]
+from testcontainers.postgres import (
     PostgresContainer,
 )
 
@@ -12,13 +12,13 @@ TEST_DB_SCHEMA = Path(__file__).parent / "test_db_schema.sql"
 
 
 @pytest.fixture(scope="session")
-def postgres() -> Iterator[PostgresContainer]:  # type: ignore[no-any-unimported]
+def postgres() -> Iterator[PostgresContainer]:
     with PostgresContainer("postgres:15") as postgres:
         yield postgres
 
 
 @pytest.fixture(scope="session")
-def engine(postgres: PostgresContainer) -> Iterator[Engine]:  # type: ignore[no-any-unimported]
+def engine(postgres: PostgresContainer) -> Iterator[Engine]:
     engine = create_engine(
         postgres.get_connection_url(),
         echo=True,

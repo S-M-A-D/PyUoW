@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
+        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14", "3.15" ]
     steps:
       - uses: actions/checkout@v7
       - name: Set up Python ${{ matrix.python-version }}
@@ -47,11 +47,13 @@ jobs:
   windows-macos-checks:
     strategy:
       matrix:
-        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
+        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14", "3.15" ]
         os: [ macos-latest, windows-latest ]
         exclude:
           - os: windows-latest
             python-version: "3.14"
+          - os: windows-latest
+            python-version: "3.15"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
