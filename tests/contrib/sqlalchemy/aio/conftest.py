@@ -4,7 +4,7 @@ from typing import Iterator
 import pytest
 from sqlalchemy import NullPool, text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from testcontainers.postgres import (  # type: ignore[import-untyped]
+from testcontainers.postgres import (
     PostgresContainer,
 )
 
@@ -12,13 +12,13 @@ TEST_DB_SCHEMA = Path(__file__).parent.parent / "test_db_schema.sql"
 
 
 @pytest.fixture(scope="session")
-def async_postgres() -> Iterator[PostgresContainer]:  # type: ignore[no-any-unimported]
+def async_postgres() -> Iterator[PostgresContainer]:
     with PostgresContainer("postgres:15", driver="asyncpg") as postgres:
         yield postgres
 
 
 @pytest.fixture(scope="session")
-def async_engine(async_postgres: PostgresContainer) -> Iterator[AsyncEngine]:  # type: ignore[no-any-unimported]
+def async_engine(async_postgres: PostgresContainer) -> Iterator[AsyncEngine]:
     engine = create_async_engine(
         async_postgres.get_connection_url(),
         # NullPool is required for sqlalchemy in tests

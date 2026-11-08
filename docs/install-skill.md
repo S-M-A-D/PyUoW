@@ -8,7 +8,7 @@ AI agents work best when they know the library you are using. The PyUoW skill fi
 
 ## Prerequisites
 
-- Python ≥ 3.10
+- Python ≥ 3.11
 - PyUoW installed: `pip install pyuow`
 - Claude Code or OpenCode available in your environment
 
